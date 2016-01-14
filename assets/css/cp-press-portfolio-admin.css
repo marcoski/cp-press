@@ -1,0 +1,43 @@
+table.cp-portfolio tr.cp-item td .thumb {
+    position: relative;
+    height: 150px;
+    width: 150px;
+    background-size: auto 150px;
+    background-position: center;
+	margin-left: 15px;
+}
+
+table.cp-portfolio tr.cp-item td .thumb .cp-item-details {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 0 5px;
+    text-transform: uppercase;
+    font-size: 9px;
+    opacity: 0.6;
+}
+
+table.cp-portfolio tr.cp-item td .cp-col{
+	border: 0;
+}
+
+table.cp-portfolio tr.cp-item-placeholder td{
+	border: 1px dashed #aeaeae;
+	background-color: #c4ffb8 !important;
+	margin: 0 1em 1em 0;
+	height: 300px;
+	background: white;
+}
+
+ table.cp-portfolio tr.cp-item input {
+	 width: 100%;
+    margin: 1px 0 10px 3px;
+}
+table.cp-portfolio tr.cp-item textarea {
+    width: 100%;
+    height: 75px;
+    margin: 0 0 5px 0;
+}
+

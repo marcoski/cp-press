@@ -1,0 +1,80 @@
+.cp-events h3{
+	margin-bottom: 5px;
+}
+
+.cp-events-row{
+	background-color: white;
+}
+
+.cp-events-row h3.title a, .cp-events-row h4{
+	color: #58595b !important;
+}
+
+.cp-events-row p, .cp-events-row a{
+	color: #535252 !important;
+}
+
+.cp-events{
+	width: 70%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+h4.cpevents-info{
+	text-align: left;
+	margin-bottom: 5px;
+	font-size: 16px;
+}
+
+.cp-events-post-thumbnail, .cp-events-content{
+	padding: 10px;
+}
+
+.cp-events-row{
+	margin: 0;
+        -webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+        padding: 5px;
+}
+.cp-events-readmore{
+	padding: 0;
+}
+
+.cp-events-carousel{
+	position: relative;
+	text-align: center;
+	margin: 10px 0 30px 0;
+}
+
+.cp-events-carousel .cp-arrow{
+	top: 0;
+}
+
+.cp-events-carousel .cp-arrow a:hover{
+	background: #00b5a5;
+}
+
+.cp-events-carousel .cp-arrow-next{
+	right: 9px; 
+}
+
+.cp-events-carousel .cp-arrow-prev{
+	left: 1px;
+}
+
+.cp-events-carousel .cp-arrow-next a i{
+	margin-left:-12px;
+}
+
+.cp-events-carousel .cp-arrow-prev a i{
+	margin-left:-14px;
+}
+
+.cp-events-carousel span{
+	font-size: 40px;
+}
+
+.cp-events-carousel a:hover, .cp-events-carousel span.current-slide{
+	color: #00b5a5;
+}
