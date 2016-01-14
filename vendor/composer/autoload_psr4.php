@@ -9,6 +9,6 @@ return array(
     'Test\\Pdo\\' => array($vendorDir . '/commonhelp/libs/src/Commonhelp/Orm/tests/Entity/Pdo'),
     'Test\\Ldap\\' => array($vendorDir . '/commonhelp/libs/src/Commonhelp/Orm/tests/Entity/Ldap'),
     'CpPress\\' => array($baseDir . '/src/CpPress'),
-    //'Commonhelp\\' => array($vendorDir . '/commonhelp/libs/src/Commonhelp'),
-	'Commonhelp\\' => array('/var/www/commonhelp-lib/src/Commonhelp'),
+    'Commonhelp\\' => array($vendorDir . '/commonhelp/libs/src/Commonhelp'),
+//	'Commonhelp\\' => array('/var/www/commonhelp-lib/src/Commonhelp'),
 );
