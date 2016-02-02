@@ -124,7 +124,7 @@ class PageController extends WPController{
 	private function saveWidgets($widgets){
 		for($i=0; $i<count($widgets); $i++){
 			$info = $widgets[$i]['widget_info'];
-			$info['class'] = 'CpPress\\Application\\Widgets\\'.Inflector::classify($info['id_base']);
+			$info['class'] = 'CpPress\\Application\\Widgets\\'.Inflector::camelize($info['id_base']);
 			if($info['raw']){
 				$theWidget = new $info['class'];
 				$widgets[$i] = $theWidget->update($widgets[$i], $widgets[$i]);

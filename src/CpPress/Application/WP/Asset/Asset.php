@@ -3,12 +3,12 @@ namespace CpPress\Application\WP\Asset;
 
 interface Asset{
 	
-	function register($asset, $deps = array(), $ver = false, $extra = false);
+	function register($asset, $deps = array(), $ver = false, $extra = '');
 	function deregister($asset);
-	function enqueue($asset, $deps = array(), $ver = false, $extra = 'false');
+	function enqueue($asset, $deps = array(), $ver = false, $extra = '');
 	function dequeue($asset);
 	function localize($asset, $objectName, $data);
 	function inline($asset, $data);
-	function is($asset, $list = 'enqueued');
+	function isRegistered($asset);
 	
 }

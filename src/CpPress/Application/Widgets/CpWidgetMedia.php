@@ -2,8 +2,40 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
+use CpPress\Application\WP\Theme\Media\Image;
+
 class CpWidgetMedia extends CpWidgetBase{
 
+	private $wpQuery;
+	
+	/**
+	 * @TODO auto embed video
+	 * @see https://gist.github.com/joshhartman/5380593
+	 */
+	private $providers = array(
+			'#https?://(www\.)?youtube.com/watch.*#i'            => array( 'http://www.youtube.com/oembed',                     true  ),
+			'http://youtu.be/*'                                  => array( 'http://www.youtube.com/oembed',                     false ),
+			'http://blip.tv/*'                                   => array( 'http://blip.tv/oembed/',                            false ),
+			'#https?://(www\.)?vimeo\.com/.*#i'                  => array( 'http://vimeo.com/api/oembed.{format}',              true  ),
+			'#https?://(www\.)?dailymotion\.com/.*#i'            => array( 'http://www.dailymotion.com/services/oembed',        true  ),
+			'#https?://(www\.)?flickr\.com/.*#i'                 => array( 'http://www.flickr.com/services/oembed/',            true  ),
+			'#https?://(.+\.)?smugmug\.com/.*#i'                 => array( 'http://api.smugmug.com/services/oembed/',           true  ),
+			'#https?://(www\.)?hulu\.com/watch/.*#i'             => array( 'http://www.hulu.com/api/oembed.{format}',           true  ),
+			'#https?://(www\.)?viddler\.com/.*#i'                => array( 'http://lab.viddler.com/services/oembed/',           true  ),
+			'http://qik.com/*'                                   => array( 'http://qik.com/api/oembed.{format}',                false ),
+			'http://revision3.com/*'                             => array( 'http://revision3.com/api/oembed/',                  false ),
+			'http://i*.photobucket.com/albums/*'                 => array( 'http://photobucket.com/oembed',                     false ),
+			'http://gi*.photobucket.com/groups/*'                => array( 'http://photobucket.com/oembed',                     false ),
+			'#https?://(www\.)?scribd\.com/.*#i'                 => array( 'http://www.scribd.com/services/oembed',             true  ),
+			'http://wordpress.tv/*'                              => array( 'http://wordpress.tv/oembed/',                       false ),
+			'#https?://(.+\.)?polldaddy\.com/.*#i'               => array( 'http://polldaddy.com/oembed/',                      true  ),
+			'#https?://(www\.)?funnyordie\.com/videos/.*#i'      => array( 'http://www.funnyordie.com/oembed',                  true  ),
+			'#https?://(www\.)?twitter.com/.+?/status(es)?/.*#i' => array( 'http://api.twitter.com/1/statuses/oembed.{format}', true  ),
+			'#https?://(www\.)?soundcloud\.com/.*#i'             => array( 'http://soundcloud.com/oembed',                      true  ),
+			'#https?://(www\.)?slideshare.net/*#'                => array( 'http://www.slideshare.net/api/oembed/2',            true  ),
+			'#http://instagr(\.am|am\.com)/p/.*#i'               => array( 'http://api.instagram.com/oembed',                   true  ),
+	);
+	
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
 				__('Media Widget', 'cppress'),
@@ -24,7 +56,18 @@ class CpWidgetMedia extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		if($instance['extarnal'] != '' && filter_var($instance['external'], FILTER_VALIDATE_URL)){
+			$instance['link'] = $instance['extrenal'];
+		}else if($instance['media'] != ''){
+			$image = new Image();
+			$image->set($instance['media']);
+			$imageSrc = $image->getImage($instance['media']);
+			$instance['link'] = $imageSrc[0];
+		}
+		
+		unset($instance['external']);
+		unset($instance['media']);
+		return parent::widget($args, $instance);
 	}
 
 	/**

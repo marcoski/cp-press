@@ -6,7 +6,9 @@ use Commonhelp\WP\WPIController;
 use Commonhelp\Util\Inflector;
 use Commonhelp\WP\WPTemplate;
 use Commonhelp\WP\WPContainer;
+use CpPress\Application\WP\Asset\Scripts;
 use CpPress\CpPress;
+use CpPress\Application\WP\Hook\Filter;
 
 abstract class CpWidgetBase extends WP_Widget implements WPIController{
 
@@ -14,6 +16,13 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	protected $templateDirs;
 	protected $icon;
 	protected $container;
+	protected $adminScripts=array();
+	private $template;
+	protected $uri;
+	protected $scriptsPath;
+	protected $action;
+	private $scripts;
+	protected $filter;
 
 	public function __construct($name, $widget_options = array(), $control_options = array(), array $templateDirs=array()){
 		if(!empty($templateDirs)){
@@ -21,6 +30,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 		}else{
 			$this->templateDirs = array(dirname(dirname(dirname(CpPress::$FILE))));
 		}
+		$this->action = '';
 		$this->vars = array();
 		$id_base = Inflector::underscore(
 			(new \ReflectionClass($this))->getShortName()
@@ -33,6 +43,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 			$control_options
 		);
 		$this->_register();
+		$this->template = new WPTemplate($this);
 	}
 
 	public static function getWidgets(){
@@ -51,6 +62,31 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	public function setContainer(WPContainer $c){
 		$this->container = $c;
 	}
+	
+	public function setFilter(Filter $filter){
+		$this->filter = $filter;
+	}
+	
+	public function setUri($uri){
+		$this->uri = $uri.'/templates/widget/'.$this->id_base;
+		$this->scriptsPath = $this->templateDirs[0].'/templates/widget/'.$this->id_base;
+	}
+	
+	public function setScriptsObj(Scripts $scripts){
+		$this->scripts = $scripts;
+	}
+	
+	public function enqueueAdminScripts(){
+		$oldUris = $this->scripts->getUris();
+		$this->scripts->setUri(
+			array($this->scriptsPath, $this->uri),
+			array($this->scriptsPath, $this->uri)
+		);
+		foreach($this->adminScripts as $s){
+			$this->scripts->enqueue($s['source'], $s['deps']);
+		}
+		$this->setUri($oldUris['base'], $oldUris['child']);
+	}
 
 	public function assign($name, $value){
 		$this->vars[$name] = $value;
@@ -68,7 +104,10 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		$this->assign('args', $args);
+		$this->assign('instance', $instance);
+		$this->assign('filter', $this->filter);
+		return $this->render();
 	}
 
 	 /**
@@ -107,13 +146,22 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	}
 
 	protected function render(){
-		$template = new WPTemplate($this);
-		$template->setVars($this->vars);
-		return $template->render();
+		$this->template->setVars($this->vars);
+		return $this->template->render();
 	}
 
 	public function getAppName(){
 		return 'WidgetApp';
+	}
+	
+	protected function formatStyles($styles){
+		$style = '';
+		foreach($styles as $key => $value){
+			if(!is_null($value)){
+				$style .= $key . ':' . $value . '; ';
+			}
+		}
+		return rtrim($style);
 	}
 
 }

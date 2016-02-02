@@ -23,7 +23,7 @@ class CpWidgetFacebook extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		return parent::widget($args, $instance);
 	}
 
 	/**

@@ -34,7 +34,7 @@ abstract class Hook{
 	
 	public function execAll($flush=true){
 		foreach($this->registered as $hookName => $hooks){
-			$this->exec($hookName);
+			$this->exec($hookName, $flush);
 		}
 		if($flush){
 			$this->flush();

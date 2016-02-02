@@ -6,17 +6,17 @@
 	<div class="cp-col col-md-9">
 		<div class="cp-widget-field cp-widget-input" style="margin-top: 0px;">
 			<label for="cp-press-portfolio">Title </label>
-			<input type='text' disabled="disabled" class="widefat" value='<?= $item_title ?>'/>
+			<input type='text' disabled="disabled" class="widefat cp-widget-portfolio-title" value='<?= $item_title ?>'/>
 		</div>
 		<? if($item_content): ?>
 		<div class="cp-widget-field cp-widget-input">
 			<label for="cp-press-portfolio">Content </label>
-			<textarea disabled="disabled" style="width: 100%; height: 80px;"><?= $item_content ?></textarea>
+			<textarea disabled="disabled" style="width: 100%; height: 80px;" class="cp-widget-portfolio-content"><?= $item_content ?></textarea>
 		</div>
 		<? endif; ?>
 		<div class="cp-widget-field cp-widget-input">
 			<label>Link:</label>
-			<input disabled="disable" type="text" value="<?= $item_link ?>"/>
+			<input disabled="disable" type="text" value="<?= $item_link ?>" class="cp-widget-portfolio-link" />
 		</div>
 	</div>
 </div>

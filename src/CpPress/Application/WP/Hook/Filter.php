@@ -24,7 +24,7 @@ class Filter extends Hook{
 	
 	public function apply(){
 		$args = func_get_args();
-		call_user_func_array('apply_filters', $args);
+		return call_user_func_array('apply_filters', $args);
 	}
 	
 }

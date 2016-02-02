@@ -20,11 +20,22 @@ trait AssetTrait{
 		return $this->childUri;
 	}
 	
+	public function setUri($base, $child){
+		list($this->baseRoot, $this->baseUri) = $base;
+		list($this->childRoot, $this->childUri) = $child;
+	}
+	
+	public function getUris(){
+		return array(
+			'base' => array($this->baseRoot, $this->baseUri),
+			'child' => array($this->childRoot, $this->childUri)
+		);
+	}
+	
 	public function getAssetSrc($asset, $type){
 		if(!$this->isDefault($asset)){
 			$src = $this->baseUri.'/'.$type.'/'.$asset.'.'.$type;
 			$path = $this->baseRoot.'/'.$type.'/'.$asset.'.'.$type;
-			
 			if(is_file($path)){
 				return $src;
 			}
@@ -40,16 +51,9 @@ trait AssetTrait{
 			if(is_file($path)){
 				return $src;
 			}
-			$message = sprintf( __( 'Asset %1$s not found in: %2$s or %3$s or %4$s' ),
-					"<code>$asset</code>", "<code>$this->baseRoot</code>", "<code>$this->childRoot</code>", "<code>".dirname(dirname(dirname(CpPress::$FILE)))."/assets/</code>");
-			throw new AssetNotFoundException($message);
+			
 		}
-		
 		return null;
-	}
-	
-	public function isRegistered($asset){
-		return $this->is($asset, 'registered');
 	}
 	
 	public function isQueued($asset){

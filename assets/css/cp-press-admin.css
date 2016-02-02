@@ -1230,7 +1230,10 @@ table.cp-link tr.cp-link textarea {
 }
 
 .cp-widget-button h3{
-  padding-top: 0px !important;
+	font-size: 14px;
+  padding: 0px 12px;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .cp-widget-wrapper{
@@ -1291,6 +1294,7 @@ table.cp-link tr.cp-link textarea {
   cursor: pointer;
   padding: 2px 2px 2px 15px;
   z-index: 10;
+  background: #F8F8F8;
 }
 
 .cp-widget .title .actions a{
@@ -1827,4 +1831,27 @@ table.cp-link tr.cp-link textarea {
 
 .cp-fake-editor-container{
 	display: none;
+}
+
+.cp-press-attachment-files li{
+	background: #eee;
+	padding: 5px;
+}
+
+.cp-press-attachment-files li span{
+	line-height: 28px;
+}
+
+.cp-press-attachment-files li span i{
+	cursor: pointer;
+}
+
+.cp-press-attachment-files li span i.cp-widget-icon-delete:hover:before{
+	color: red;
+	content: "\f335";
+}
+
+.cp-press-attachment-files li span i.cp-widget-icon-featured:hover:before,
+.cp-press-attachment-files li span i.cp-widget-icon-featured.featured{
+	color: green;
 }

@@ -23,7 +23,7 @@ class CpWidgetMenu extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		return parent::widget($args, $instance);
 	}
 
 	/**
@@ -32,7 +32,13 @@ class CpWidgetMenu extends CpWidgetBase{
 	 * @param array $instance The widget options
 	 */
 	public function form($instance) {
-		// outputs the options form on admin
+		$menues = array();
+		$tMenus = get_terms( 'nav_menu', array( 'hide_empty' => true ) );
+		foreach($tMenus as $m){
+			$menues[$m->term_id] = $m->name; 
+		}
+		$this->assign('menues', $menues);
+		return parent::form($instance);
 	}
 
 	/**

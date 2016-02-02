@@ -2,6 +2,7 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
+use CpPress\Application\FrontEndApplication;
 class CpWidgetLoop extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -24,7 +25,9 @@ class CpWidgetLoop extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		$loop = FrontEndApplication::part('Post', 'loop', $this->container, array($instance));
+		$this->assign('loop', $loop);
+		return parent::widget($args, $instance);
 	}
 
 	/**
@@ -35,26 +38,40 @@ class CpWidgetLoop extends CpWidgetBase{
 	public function form($instance) {
 		$advInstance = array(
 			'id' => array(
-					'enableadvanced' => $this->get_field_id( 'enableadvanced' ),
+					'posttype' => $this->get_field_id('posttype'),
 					'limit' => $this->get_field_id( 'limit' ),
 					'offset' => $this->get_field_id( 'offset' ),
 					'order' => $this->get_field_id( 'order' ),
 					'orderby' => $this->get_field_id( 'orderby' ),
 					'categories' => $this->get_field_id( 'categories' ),
-					'tags' => $this->get_field_id( 'tags' )
+					'tags' => $this->get_field_id( 'tags' ),
+					'linktitle' => $this->get_field_id('linktitle'),
+					'showinfo' => $this->get_field_id('showinfo'),
+					'showexcerpt' => $this->get_field_id('showexcerpt'),
+					'showthumbnail' => $this->get_field_id('showthumbnail'),
+					'hidecontent' => $this->get_field_id('hidecontent'),
+					'linkthumbnail' => $this->get_field_id('linkthumbnail'),
+					'postspercolumn' => $this->get_field_id('postspercolumn')
 			),
 			'name' => array(
-					'enableadvanced' => $this->get_field_name( 'enableadvanced' ),
+					'posttype' => $this->get_field_name('posttype'),
 					'limit' => $this->get_field_name( 'limit' ),
 					'offset' => $this->get_field_name( 'offset' ),
 					'order' => $this->get_field_name( 'order' ),
 					'orderby' => $this->get_field_name( 'orderby' ),
 					'categories' => $this->get_field_name( 'categories' ),
-					'tags' => $this->get_field_name( 'tags' )
+					'tags' => $this->get_field_name( 'tags' ),
+					'linktitle' => $this->get_field_name('linktitle'),
+					'showinfo' => $this->get_field_name('showinfo'),
+					'showexcerpt' => $this->get_field_name('showexcerpt'),
+					'showthumbnail' => $this->get_field_name('showthumbnail'),
+					'hidecontent' => $this->get_field_name('hidecontent'),
+					'linkthumbnail' => $this->get_field_name('linkthumbnail'),
+					'postspercolumn' => $this->get_field_name('postspercolumn')
 			),
 			'value' => $instance
 		);
-		$advanced = BackEndApplication::part('PostController', 'advanced', $this->container, array($advInstance, false));
+		$advanced = BackEndApplication::part('PostController', 'advanced', $this->container, array($advInstance, false, true));
 		$this->assign('advanced', $advanced);
 		return parent::form($instance);
 	}

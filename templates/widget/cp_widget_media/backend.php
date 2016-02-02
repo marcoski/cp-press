@@ -4,7 +4,7 @@
   <input class="widefat" type="text"
     id="<?= $widget->get_field_id( 'wtitle' ); ?>"
     name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['title']; ?>"
+    value="<?= $instance['wtitle']; ?>"
   />
 </div>
 <div class="cp-widget-field cp-widget-input">
@@ -30,28 +30,15 @@
 			</label>
 		</div>
 		<div class="cp-widget-field">
-			<label for="<?= $widget->get_field_id('bound' ); ?>">
+			<label for="<?= $widget->get_field_id('showcaption' ); ?>">
 				<input 
-					id="<?= $widget->get_field_id( 'bound' ); ?>"
-					name="<?= $widget->get_field_name( 'bound' ); ?>" 
+					id="<?= $widget->get_field_id( 'showcaption' ); ?>"
+					name="<?= $widget->get_field_name( 'showcaption' ); ?>" 
 					type="checkbox" 
-					value="1" <?php checked( '1', $instance['bound'] ); ?> />&nbsp;
-				<?php _e('Bound', 'cppress'); ?>
+					value="1" <?php checked( '1', $instance['showcaption'] ); ?> />&nbsp;
+				<?php _e('Show caption', 'cppress'); ?>
 				<div class="cp-widget-field-description">
-					<?php _e('Make sure the image doesn\'t extend beyond its container.', 'cppress')?>
-				</div>
-			</label>
-		</div>
-		<div class="cp-widget-field">
-			<label for="<?= $widget->get_field_id( 'fullscreen' ); ?>">
-				<input 
-					id="<?= $widget->get_field_id( 'fullscreen' ); ?>"
-					name="<?= $widget->get_field_name( 'fullscreen' ); ?>" 
-					type="checkbox" 
-					value="1" <?php checked( '1', $instance['fullscreen'] ); ?> />&nbsp;
-				<?php _e('Full screen', 'cppress'); ?>
-				<div class="cp-widget-field-description">
-					<?php _e('Resize image to fit its container.', 'cppress')?>
+					<?php _e('Show title in figcaption.', 'cppress')?>
 				</div>
 			</label>
 		</div>

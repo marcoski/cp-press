@@ -3,6 +3,7 @@ namespace CpPress\Application\WP\MetaType;
 
 use CpPress\Exception\PostTypeException;
 use CpPress\Exception\CpPress\Exception;
+use CpPress\Application\WP\Admin\MetaBox;
 
 class PostType extends MetaType{
 	
@@ -52,11 +53,18 @@ class PostType extends MetaType{
 	}
 	
 	public function addSupport($feature){
-		if(in_array($feature, $this->validSupports)){
-			return add_post_type_support($this->name, $feature);
+		if(is_array($feature)){
+			if(in_array($feature, $this->validSupports)){
+				return add_post_type_support($this->name, $feature);
+			}
+			
+			throw new PostTypeException('Invalid feature for post type support '.$feature);
+		}else if($feature instanceof MetaBox){
+			$feature->setPostType($this);
+			$feature->add();
+		}else{
+			throw new PostTypeException('Invalid feature for post type support '.$feature);
 		}
-		
-		throw new PostTypeException('Invalid feature for post type support '.$feature);
 	}
 	
 	public function removeSupport($feature){

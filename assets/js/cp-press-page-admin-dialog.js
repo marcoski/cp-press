@@ -119,6 +119,7 @@
 			this.on('content-loaded', function(){
 				// Handle any attempt to move focus out of the modal.
 				this.$el.find('.cp-row-field').on('change', this.changeRow);
+				this.$el.find('.cp-grid-select-field').on('change', this.changeRowSize);
 				$( document ).on( "focusin", this.preserveFocus );
 				// set overflow to "hidden" on the body so that it ignores any scroll events while the modal is active
 				// and append the modal to the body.
@@ -156,9 +157,35 @@
 					classes: cellData.classes
 				});
 			}
+		
 			this.$el.find('.cp-row-preview').html(content);
 			this.$el.find('.sidebar-cell-container').html(sidebar);
-
+			this.$el.find('.cp-grid-select-field').on('change', this.changeRowSize);
+				this.$el.find('.cp-grid').each(function(i, el){
+				$(el).data('weight', weight);
+			});
+		},
+		
+		changeRowSize: function(e){
+			var $$ = $(e.target);
+			var removed;
+			$grid = $$.parents('.cp-grid');
+			$grid.removeClass(function(index, css){
+				removed = (css.match (/col-md-[0-9]*/g) || []).join(' ');
+				return removed;
+			});
+			
+			$grid.addClass(removed.replace(/(col-md-)[0-9]*/g, "$1"+$$.val()));
+			$grid.data('weight', $$.val());
+		},
+		
+		getWeight: function(){
+			var w = [];
+			this.$el.find('.cp-grid').each(function(i, el){
+				w[i] = $(el).data('weight');
+			});
+			
+			return w;
 		},
 
 		renderSidebar: function(args){
@@ -229,11 +256,11 @@
 		save: function(e){
 			var sidebarFormData = this.getFormValues('.cppress_dialog-sidebar');
 			var cell = this.$el.find('.cp-grid').length;
-			var weight = Math.floor(12/cell);
+			var weight = this.getWeight();
 			var map = [];
 			map[0] = [];
 			for(var i=0; i<cell; i++){
-				map[0][i] = weight;
+				map[0][i] = weight[i];
 			}
 			this.model.setGrids(1, map);
 			var grid = this.model.grids.last();
@@ -259,7 +286,10 @@
 		title: 'Edit row',
 		render: function(){
 			var cellCount = this.model.cells.length;
-			var cellWeight = Math.floor(12/cellCount);
+			var cellWeight = [];
+			this.model.cells.forEach(function(el, i){
+				cellWeight[i] = el.get('weight');
+			});
 			this.renderWindow({count: cellCount, weight: cellWeight});
 			this.renderSidebar({
 				cell: cellCount,
@@ -275,13 +305,17 @@
 		save: function(e){
 			var sidebarFormData = this.getFormValues('.cppress_dialog-sidebar');
 			var cell = this.$el.find('.cp-grid').length;
-			var weight = Math.floor(12/cell);
-			cells = [];
+			var weight = this.getWeight();
+			var cells = [];
 			for(var i=0; i<cell; i++){
-				cells[i] = weight;
+				cells[i] = weight[i];
 			}
+			var widgets = [];
+			this.model.cells.forEach(function(cell, i){
+				widgets[i] = cell.widgets;
+			});
 			this.model.cells.reset();
-			this.model.setCells(cells, this.model.section);
+			this.model.setCells(cells, this.model.section, {widgets: widgets});
 			for(var j=0; j<cell; j++){
 				var index = j+1;
 				var cellIndex = "cell"+index;
@@ -317,6 +351,7 @@
 			this.widget.on('widget-loaded', function(){
 				this.$el.find('article').removeClass("cp-loading cp-panel-loading");
 				$.CpField.fn.enable(this.$el.find('#widget_form'));
+				this.$el.find('#widget_form').trigger('widget.loaded');
 			}, this);
 			this.$el.find('article').addClass("cp-loading cp-panel-loading");
 			this.trigger('widget-loaded');
@@ -330,7 +365,6 @@
 	      }else{
 	        widgetFormData = widgetFormData[Object.keys(widgetFormData)[0]];
 	      }
-	      console.log(widgetFormData);
 	      this.model.setData(widgetFormData);
 	      this.model.set('raw', true);
 	      this.trigger('widget:edit');

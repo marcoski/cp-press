@@ -322,6 +322,7 @@
       validTypes: null,
       $search: null,
       $input: null,
+      $wtitle: null,
       $ul: null,
       $s: null,
       
@@ -331,6 +332,7 @@
         this.validTypes = this.$el.data('valid-types');
         this.$search = this.$el.find('.content-text-search');
         this.$input = this.$el.find('.url-input-wrapper input');
+        this.$wtitle = $("[name*='[wtitle]']").not('.cp-widget-title-noedit');
         this.$ul = this.$el.find('ul.posts');
         this.$s = this.$el.find('.existing-content-selector');
       },
@@ -354,8 +356,12 @@
       select: function(e){
         e.preventDefault();
         var $$ = $(e.target);
+        if(this.$wtitle.length > 0){
+        	this.$wtitle.val($$.data('post_title'));
+        }
         this.$input.val($$.data('post_type') + ': ' + $$.data('ID'));
         this.$input.trigger('change');
+        this.$input.trigger('linker.change');
         this.$s.toggle();
       },
       
@@ -375,27 +381,36 @@
         var query = this.$search.val();
         this.$ul.empty().addClass('loading');
         this.cpAjax.call('widget_search_post', function(data){
-          for(var i=0; i<data.length; i++){
-            if(data[i].post_title === ''){
-              data[i].post_title = '&nbsp;';
-            }
-            
-            var title;
-            if(data[i].post_title.length > 30){
-              title = data[i].post_title.substring(0, 30) + '...';
-            }else{
-              title = data[i].post_title;
-            }
-            
-            _that.$ul.append(
-              $('<li>')
-                .addClass('post')
-                .html(title + ' <span>('+data[i].post_type+')</span>')
-                .data(data[i])
-            );
-            
-            _that.$ul.removeClass('loading');
-          } 
+        	if(data.length > 0){
+	          for(var i=0; i<data.length; i++){
+	            if(data[i].post_title === ''){
+	              data[i].post_title = '&nbsp;';
+	            }
+	            
+	            var title;
+	            if(data[i].post_title.length > 30){
+	              title = data[i].post_title.substring(0, 30) + '...';
+	            }else{
+	              title = data[i].post_title;
+	            }
+	            
+	            _that.$ul.append(
+	              $('<li>')
+	                .addClass('post')
+	                .html(title + ' <span>('+data[i].post_type+')</span>')
+	                .data(data[i])
+	            );
+	            
+	            
+	          } 
+	         }else{
+	         		_that.$ul.append(
+		         		$('<li>')
+	                .addClass('post')
+	                .html('No element found')
+	           	);
+	         }
+	         _that.$ul.removeClass('loading');
         }, {query: query, valid: this.validTypes});
         
       }
@@ -468,6 +483,7 @@
         $.CpField.fn.enable($item, {exclude: ['repeater']});
         $item.removeClass('loading');
         _that.sortObj.refresh();
+        $item.trigger('repeater.add');
       }, {id: this.data.itemId, name: this.data.elementName, values: values, count: this.countItem});
     },
     

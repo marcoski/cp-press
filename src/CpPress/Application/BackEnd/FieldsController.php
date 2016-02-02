@@ -111,11 +111,12 @@ class FieldsController extends WPController{
 		$this->assign('valid_types', esc_attr(json_encode($validTypes)));
 	}
 	
-	public function repeater($id, $name, $values, $actions, $title, $itemTitle){
+	public function repeater($id, $name, $values, $actions, $title, $itemTitle, $events=null){
 		$this->assign('id', $id);
 		$this->assign('name', $name);
 		$this->assign('values', esc_attr(json_encode($values)));
 		$this->assign('actions', esc_attr(json_encode($actions)));
+		$this->assign('events', esc_attr(json_encode($events)));
 		$this->assign('title', $title);
 		$this->assign('item_title', $itemTitle);
 	}
@@ -145,6 +146,23 @@ class FieldsController extends WPController{
 	}
 	
 	public function template(){
+	}
+	
+	/** STATIC */
+	public static function getLinkArgs($val){
+		if(preg_match("/([a-zA-Z]*):\s([0-9]+)/", $val, $match)){
+			return array(
+				'p' => $match[2],
+				'post_type' => $match[1] 
+			);
+		}else{
+			return array();
+		}
+	}
+	
+	public static function getLinkPermalink($val){
+		$args = self::getLinkArgs($val);
+		return get_permalink($args['p']);
 	}
 
 }

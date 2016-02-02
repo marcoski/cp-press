@@ -2,8 +2,12 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
-class CpWidgetGallery extends CpWidgetBase{
+use CpPress\Application\WP\Theme\Media\Image;
+use CpPress\Application\FrontEndApplication;
 
+class CpWidgetGallery extends CpWidgetBase{
+	//dump(apply_filters('the_content', '[embed]http://www.youtube.com/watch?v=dQw4w9WgXcQ[/embed]'));
+	//$post_embed = $wp_embed->run_shortcode('[embed]your-video-url[/embed]');
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
 				__('Gallery Widget', 'cppress'),
@@ -24,7 +28,39 @@ class CpWidgetGallery extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		$gallery = array();
+		$options = array(
+    	'enablelightbox' => isset($instance['enablelightbox']) ? true : false,
+    	'tperrow' => $instance['tperrow'] > 0 ? $instance['tperrow'] : 1
+		);
+		if($instance['items']['countitem'] > 0){
+			for($i=0; $i<$instance['items']['countitem']; $i++){
+				if($instance['items']['caption'][$i] !== ''){
+					$gallery['items'][$i]['caption'] = $instance['items']['caption'][$i];
+				}
+				if($instance['items']['img'][$i] !== ''){
+					$image = new Image();
+					$image->set($instance['items']['img'][$i]);
+					$imageSrc = $image->getImage($instance['items']['img'][$i]);
+					$gallery['items'][$i]['link'] = $imageSrc[0];
+					$gallery['items'][$i]['isvideo'] = false;
+				}else if($instance['items']['img_ext'][$i]){
+					$gallery['items'][$i]['link'] = $instance['items']['img_ext'][$i];
+					$gallery['items'][$i]['isvideo'] = false;
+				}else if($items[$i]['video']){
+				}else if($instance['items']['video_ext'][$i]){
+					$gallery['items'][$i]['link'] = $instance['items']['video_ext'][$i];
+					$gallery['items'][$i]['isvideo'] = true;
+				}
+			}
+		}
+		if($instance['template']){
+			$galleryHtml = FrontEndApplication::part('Gallery', $instance['template'], $this->container, array($gallery, $options));
+			$this->assign('galleryHtml', $galleryHtml);
+		}else{
+			$this->assign('galleryHtml', '');
+		}
+		return parent::widget($args, $instance);
 	}
 
 	/**

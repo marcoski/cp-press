@@ -1,7 +1,7 @@
 <?php
 namespace CpPress\Application\WP\Asset;
 
-class Styles extends \WP_Styles implements Asset{
+class Styles implements Asset{
 	use AssetTrait;
 	
 	
@@ -14,36 +14,43 @@ class Styles extends \WP_Styles implements Asset{
 	);
 	
 	public function __construct($base, $child){
-		parent::__construct();
 		list($this->baseRoot, $this->baseUri) = $base;
 		list($this->childRoot, $this->childUri) = $child;
 	}
 	
-	public function register($asset, $deps = array(), $ver = false, $extra = false){
+	public function register($asset, $deps = array(), $ver = false, $extra = ''){
 		if($this->isDefault($asset)){
 			throw new CpPressException('Cannot register a default asset');
 		}
-		if(!$extra){
-			$extra = 'all';
-		}
 		$src = $this->getAssetSrc($asset, 'css');
-		return $this->add($asset, $src, $deps, $ver, $extra);
+		
+		$media = $extra == '' ? 'all' : $extra;
+		return wp_register_style($asset, $src, $deps, $ver, $media);
 	}
 	
-	public function enqueue($asset, $deps = array(), $ver = false, $extra = false){
-		if(!$extra){
-			$extra = 'all';
+	public function enqueue($asset, $deps = array(), $ver = false, $extra = ''){
+		$media = $extra == '' ? 'all' : $extra;
+		if($this->isRegistered($asset)){
+			return wp_enqueue_style($asset, false, $deps, $ver, $media);
 		}
-		if(!$this->isRegistered($asset)){
-			$src = $this->getAssetSrc($asset, 'css');
-			$_asset = explode('?', $asset);
-			$this->add( $_asset[0], $src, $deps, $ver, $extra );
+		if($this->isDefault($asset)){
+			return wp_enqueue_style($asset, false, $deps, $ver, $media);
 		}
-		parent::enqueue($asset);
+		$src = $this->getAssetSrc($asset, 'css');
+		
+		if(is_null($src)){
+			return null;
+		}
+		
+		return wp_enqueue_style($asset, $src, $deps, $ver, $media);
 	}
 	
 	public function deregister($asset){
-		$this->remove($asset);
+		wp_deregister_style($asset);
+	}
+	
+	public function isRegistered($asset){
+		return wp_style_is($asset, 'registered');
 	}
 	
 	public function localize($asset, $objectName, $data){
@@ -51,11 +58,7 @@ class Styles extends \WP_Styles implements Asset{
 	}
 	
 	public function inline($asset, $data){
-		if(false !== stripos( $data, '</style>' )){
-			$data = trim(preg_replace('#<style[^>]*>(.*)</style>#is', '$1', $data));
-		}
-		
-		return $this->add_inline_style( $handle, $data );
+		return wp_add_inline_style( $handle, $data );
 	}
 	
 }

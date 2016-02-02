@@ -21,9 +21,13 @@ class PostController extends WPController{
 	public function singlebox(){
 	}
 	
-	public function advanced($instance, $single){
+	public function advanced($instance, $single, $showViewOptions=false){
+		if(isset($instance['id']['posttype'])){
+			$this->assign('posttypes', PostType::getPostTypes(array('public' => true)));
+		}
 		$this->assign('values', $instance);
 		$this->assign('single', $single);
+		$this->assign('show_view_options', $showViewOptions);
 	}
 	
 	public function select($name, $id, $value){

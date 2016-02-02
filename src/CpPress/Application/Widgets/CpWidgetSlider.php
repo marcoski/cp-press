@@ -15,6 +15,12 @@ class CpWidgetSlider extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-media-interactive';
+		$this->adminScripts = array(
+				array(
+						'source' => 'cp-sliders',
+						'deps' => array('jquery')
+				)
+		);
 	}
 
 	/**
@@ -24,7 +30,73 @@ class CpWidgetSlider extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		$type =  'image';
+		if(!empty($instance['type']) && is_array($instance['type'])){
+			$type = (array_pop(array_keys($instance['type'])));
+		}
+		$action = 'widget'.ucfirst($type);
+		$options = array(
+				'theme' => $instance['stheme'],
+				'speed' => $instance['speed'],
+				'timeout' => $instance['timeout'],
+				'navcolor' => $instance['navcolor'],
+				'hideindicators' => isset($instance['hideindicators']) ? true : false,
+				'hidecontrol' => isset($instance['hidecontrol']) ? true : false
+		);
+		$this->assign('options', $options);
+		$slides = $this->$action($instance, $options);
+		$slider = BackEndApplication::part('Slider', 'frontend_'.$type, $this->container, array($slides, $options));
+		$this->assign('slider', $slider);
+		return parent::widget($args, $instance);
+	}
+	
+	private function widgetImage($instance){
+		$slides = $instance['slides']; $count = $instance['slides']['countitem'];
+		$slider = array();
+		for($i=0; $i<$count; $i++){
+			if($slides['img'][$i] === "" && $slides['img_ext'][$i] !== ""){
+				$slider[$i]['img'] = $slides['img_ext'][$i];
+			}else{
+				$slider[$i]['img'] = $slides['img'][$i];
+			}
+			$slider[$i]['title'] = $slides['title'][$i];
+			$slider[$i]['content'] = $slides['content'][$i];
+			$slider[$i]['link'] = array();
+			if($slides['link'][$i] != ""){
+				$slider[$i]['link']['url'] = $slides['link'][$i];
+				if(filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
+					$slider[$i]['link']['isext'] = true;
+				}
+				if(is_numeric($slider[$i]['link']['url'])){
+					$slider[$i]['link']['isext'] = false;
+					$slider[$i]['link']['url'] = get_permalink($slider[$i]['link']['url']);
+					if(!$slider[$i]['link']['url']){
+						$slider[$i]['link'] = array();
+					}
+				}
+			}
+			$slider[$i]['displaytitle'] = $slides['displaytitle'] == 1 ? true : false;
+			$slider[$i]['displaycontent'] = $slides['displaycontent'] == 1 ? true : false;
+		}
+		return $slider;
+	}
+	
+	private function widgetParallax($instance){
+		$slides = $instance['parallax']; $count = $instance['parallax']['countitem'];
+		$slider = array();
+		for($i=0; $i<$count; $i++){
+			$slider['slide'][$i] = $slide['slides'][$i];
+		}
+		$slider['subtitle'] = $slides['subtitle'];
+		$slider['displaytitle'] = $slides['displaytitle'] == 1 ? true : false;
+		$slider['displayoverlay'] = $slides['displayoverlay'] == 1 ? true : false;
+		$slider['nextlink'] = $slides['nextlink'];
+		$slider['bg'] = $slides['img'];
+		return $slider;
+	}
+	
+	private function widgetPost($instance){
+		return $instance;
 	}
 
 	/**
@@ -34,7 +106,7 @@ class CpWidgetSlider extends CpWidgetBase{
 	 */
 	public function form($instance) {
 		$imageParams = array(
-			array('id' => $this->get_field_id('images'), 'name' => $this->get_field_name('images')),
+			array('id' => $this->get_field_id('slides'), 'name' => $this->get_field_name('slides')),
 			$instance,
 			$this->getRepeater(
 				'slides',
@@ -50,8 +122,8 @@ class CpWidgetSlider extends CpWidgetBase{
 			array('id' => $this->get_field_id('parallax'), 'name' => $this->get_field_name('parallax')),
 			$instance['parallax'],
 			$this->getRepeater(
-				'sentences',
-				$instance['sentences'],
+				'parallax',
+				$instance['parallax'],
 				array('add' => 'widget_slider_add_sentences'),
 				array(
 					'title' => __('Slides', 'cppress'),
@@ -111,26 +183,41 @@ class CpWidgetSlider extends CpWidgetBase{
 	private function getAdvPost($instance){
 		$adv = array(
 			'id' => array(
-					'enableadvanced' => $this->get_field_id( 'enableadvanced' ),
+					'posttype' => $this->get_field_id('posttype'),
 					'limit' => $this->get_field_id( 'limit' ),
 					'offset' => $this->get_field_id( 'offset' ),
 					'order' => $this->get_field_id( 'order' ),
 					'orderby' => $this->get_field_id( 'orderby' ),
 					'categories' => $this->get_field_id( 'categories' ),
-					'tags' => $this->get_field_id( 'tags' )
+					'tags' => $this->get_field_id( 'tags' ),
+					'linktitle' => $this->get_field_id('linktitle'),
+					'showinfo' => $this->get_field_id('showinfo'),
+					'showexcerpt' => $this->get_field_id('showexcerpt'),
+					'showthumbnail' => $this->get_field_id('showthumbnail'),
+					'hidecontent' => $this->get_field_id('hidecontent'),
+					'linkthumbnail' => $this->get_field_id('linkthumbnail'),
+					'postspercolumn' => $this->get_field_id('postspercolumn')
 			),
 			'name' => array(
-					'enableadvanced' => $this->get_field_name( 'post' ).'[enableadvanced]',
+					'posttype' => $this->get_field_name('post').'[posttype]',
 					'limit' => $this->get_field_name( 'post' ).'[limit]',
 					'offset' => $this->get_field_name( 'post' ).'[offset]',
 					'order' => $this->get_field_name( 'post' ).'[order]',
 					'orderby' => $this->get_field_name( 'post' ).'[orderby]',
 					'categories' => $this->get_field_name( 'post' ).'[categories]',
-					'tags' => $this->get_field_name( 'post' ).'[tags]'
+					'tags' => $this->get_field_name( 'post' ).'[tags]',
+					'linktitle' => $this->get_field_name('post').'[linktitle]',
+					'showinfo' => $this->get_field_name('post').'[showinfo]',
+					'showexcerpt' => $this->get_field_name('post').'[showexcerpt]',
+					'showthumbnail' => $this->get_field_name('post').'[showthumbnail]',
+					'hidecontent' => $this->get_field_name('post').'[hidecontent]',
+					'linkthumbnail' => $this->get_field_name('post').'[linkthumbnail]',
+					'postspercolumn' => $this->get_field_id('post').'[postspercolumn]'
+					
 			),
-			'value' => $instance['post']
+			'value' => $instance['post'],
 		);
-		return BackEndApplication::part('PostController', 'advanced', $this->container, array($adv, false));
+		return BackEndApplication::part('PostController', 'advanced', $this->container, array($adv, false, true));
 	}
 	
 	private function getRepeater($type, $instance, $actions, $labels){

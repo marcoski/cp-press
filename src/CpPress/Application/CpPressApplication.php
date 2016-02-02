@@ -10,6 +10,13 @@ use CpPress\Application\WP\Theme\ThemeSupport;
 use CpPress\Application\WP\Asset\Scripts;
 use CpPress\Application\WP\Asset\Styles;
 use CpPress\Application\WP\Hook\AjaxHook;
+use CpPress\Application\WP\MetaType\EventPostType;
+use CpPress\Application\WP\MetaType\CalendarTaxonomy;
+use CpPress\Application\WP\MetaType\NewsTaxonomy;
+use CpPress\Application\WP\MetaType\EventtagsTaxonomy;
+use CpPress\Application\WP\MetaType\NewstagsTaxonomy;
+use CpPress\Application\WP\MetaType\PagePostType;
+use CpPress\Application\WP\MetaType\NewsPostType;
 
 abstract class CpPressApplication extends WPApplication{
 	
@@ -37,6 +44,7 @@ abstract class CpPressApplication extends WPApplication{
 		$container->registerService('AjaxHook', function($c){
 			return new AjaxHook($this);
 		});
+		$this->registerPostTypes();
 	}
 	
 
@@ -87,12 +95,50 @@ abstract class CpPressApplication extends WPApplication{
 		$hookObj->register($hook, $closure, $priority, $acceptedArgs);
 	}
 	
+	protected function setup(){
+	/*	global $wp_scripts, $wp_styles;
+		//init styles and scripts global
+		$wp_styles = $this->getStyles();
+		$wp_scripts = $this->getScripts();*/
+		$container = $this->getContainer();
+		$container->query('EventPostType')->register();
+		$container->query('CalendarTaxonomy')->register();
+		$container->query('EventtagsTaxonomy')->register();
+		$container->query('NewsPostType')->register();
+		$container->query('NewsTaxonomy')->register();
+		$container->query('NewstagsTaxonomy')->register();
+	}
+	
+	protected function registerPostTypes(){
+		$container = $this->getContainer();
+		$container->registerService('PagePostType', function($c){
+			return new PagePostType();
+		});
+		$container->registerService('EventPostType', function($c){
+			return new EventPostType();
+		});
+		$container->registerService('NewsPostType', function($c){
+			return new NewsPostType();
+		});
+		$container->registerService('CalendarTaxonomy', function($c){
+			return new CalendarTaxonomy();
+		});
+		$container->registerService('EventtagsTaxonomy', function($c){
+			return new EventtagsTaxonomy();
+		});
+		$container->registerService('NewsTaxonomy', function($c){
+			return new NewsTaxonomy();
+		});
+		$container->registerService('NewstagsTaxonomy', function($c){
+			return new NewstagsTaxonomy();
+		});
+	}
+	
 	abstract public function registerHooks();
 	abstract public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1);
 	abstract public function registerFilters();
 	abstract public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1);
 	abstract public function execHooks();
 	abstract public function execFilters();
-	abstract public function setup();
 	
 }

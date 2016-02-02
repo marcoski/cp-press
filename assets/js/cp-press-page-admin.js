@@ -1,12 +1,14 @@
 jQuery(document).ready(function(){
 
 	var $ = jQuery;
-  var cpPageModel = new $.CpPage.Model.Page();
-	var cpPageBuilder = new $.CpPage.View.PageBuilder({
-    el: $('#cp_press_select_content_type'),
-    model: cpPageModel
-  });
-  cpPageBuilder.render().load();
+	if($('#cp_press_select_content_type').length > 0){
+		var cpPageModel = new $.CpPage.Model.Page();
+		var cpPageBuilder = new $.CpPage.View.PageBuilder({
+    	el: $('#cp_press_select_content_type'),
+    	model: cpPageModel
+  	});
+  	cpPageBuilder.render().load();
+	}
 });
 
 (function($, _){
@@ -34,15 +36,15 @@ jQuery(document).ready(function(){
       this.sections = new $.CpPage.Collection.Sections();
     },
 
-		addSection: function(gridCount, weights, options){
-      options = _.extend({
-        title: null,
-        slug: null
-      }, options);
-      
-			var section = new $.CpPage.Model.Section({
-				collection: this.sections
-			});
+	addSection: function(gridCount, weights, options){
+		  options = _.extend({
+		    title: null,
+		    slug: null
+		  }, options);
+		  
+		var section = new $.CpPage.Model.Section({
+			collection: this.sections
+		});
 
       if(options.title !== null){
         section.set('title', options.title);
@@ -52,161 +54,168 @@ jQuery(document).ready(function(){
         section.set('slug', options.slug);
       }
 
-			section.setGrids(gridCount, weights);
-			this.sections.add(section);
+		section.setGrids(gridCount, weights);
+		this.sections.add(section);
 
-			return section;
-		},
+		return section;
+	},
 
-		loadLayoutData: function(data){
-			this.emptySections();
-			this.set("data", data, {silent: true});
-			if(typeof data.sections == "undefined"){
-				this.trigger('layout-loaded');
-				return;
-			}
-			var sections = [];
-			for(var skey=0; skey<data.sections.length; skey++){
-			  sections[skey] = {
-			   cells: [[]]
-			  };
-				sections[skey].gridCount = data.sections[skey].grids;
-				for(var gkey=0; gkey<data.grids.length; gkey++){
-					for(var ckey=0; ckey<data.cells.length; ckey++){
-						if(data.cells[ckey].section == skey &&
-							 	data.cells[ckey].grid == gkey){
-							sections[skey].cells[gkey][ckey] = data.cells[ckey].weight;
-						}
-					}
-				}
-			}
-			var _that = this;
-			_.each(sections, function(section, skey){
-				var newSection = _that.addSection(
-				  section.gridCount, 
-				  section.cells,
-				  {
-				    title: data.sections[skey].title,
-				    slug: data.sections[skey].slug
-				  }
-				);
-				_.each(data.grids, function(g, gkey){
-					var grid = newSection.grids.at(gkey);
-					grid.set('style', g.style);
-					grid.set('classes', g.classes);
-					_.each(data.cells, function(c, ckey){
-						var cell = grid.cells.at(ckey);
-						cell.set('style', c.style);
-						cell.set('classes', c.classes);
-					});
-				});
-			});
-
-			if(typeof data.widgets === "undefined") { return; }
-
-			_.each(data.widgets, function(widgetData){
-				try{
-					var widget_info = widgetData.widget_info;
-					delete widgetData.widget_info;
-					var section = _that.sections.at(parseInt(widget_info.section));
-					var grid = section.grids.at(parseInt(widget_info.grid));
-					var cell = grid.cells.at(parseInt(widget_info.cell));
-					var widget = new $.CpPage.Model.Widget({
-						class: widget_info.class,
-						id_base: widget_info.id_base,
-						data: widgetData,
-						title: widget_info.title,
-						description: widget_info.description,
-						icon: widget_info.icon
-					});
-					if(typeof widget_info.style !== "undefined"){
-						widget.set('style', widget_info.style);
-					}
-					widget.cell = cell;
-					cell.widgets.add(widget);
-				}catch(err){
-				}
-			});
-
-		},
-
-		getLayoutData: function(){
-			var layout = {
-				widgets: [],
-				sections: [],
-				grids: [],
+	loadLayoutData: function(data){
+		this.emptySections();
+		this.set("data", data, {silent: true});
+		if(typeof data.sections == "undefined"){
+			this.trigger('layout-loaded');
+			return;
+		}
+		var sections = [];
+		for(var skey=0; skey<data.sections.length; skey++){
+			sections[skey] = {
 				cells: []
 			};
-
-			var widgetId = 0;
-
-			this.sections.each(function(section, skey){
-				section.grids.each(function(grid, gkey){
-						grid.cells.each(function(cell, ckey){
-							cell.widgets.each(function(widget, wkey){
-								var values = _.extend(_.clone(widget.get('data')),{
-									widget_info: {
-										class: widget.get('class'),
-										id_base: widget.get('id_base'),
-										title: widget.get('title'),
-										description: widget.get('description'),
-										icon: widget.get('icon'),
-										section: skey,
-										grid: gkey,
-										cell: ckey,
-										id: widgetId++,
-										style: widget.get('style'),
-										raw: widget.get('raw')
-									}
-								});
-								layout.widgets.push(values);
-							});
-
-							layout.cells.push({
-								grid: gkey,
-								section: skey,
-								weight: cell.get('weight'),
-								style: cell.get('style'),
-								classes: cell.get('classes')
-							});
-
-						});
-
-						layout.grids.push({
-							section: skey,
-							cells: grid.cells.length,
-							style: grid.get('style'),
-							classes: grid.get('classes')
-						});
-
-				});
-
-				layout.sections.push({
-					grids: section.grids.length,
-					title: section.get('title'),
-					slug: section.get('slug'),
+			sections[skey].gridCount = data.sections[skey].grids;
+			for(var gkey=0; gkey<data.grids.length; gkey++){
+				for(var ckey=0; ckey<data.cells.length; ckey++){
+					if(data.cells[ckey].section == skey &&
+						 	data.cells[ckey].grid == gkey){
+						if(typeof sections[skey].cells[gkey] === "undefined"){
+							sections[skey].cells[gkey] = [];
+						}
+						sections[skey].cells[gkey].push(data.cells[ckey].weight);
+					}
+				}
+			}
+		}
+		var _that = this;
+		_.each(sections, function(section, skey){
+			var ns = _that.addSection(
+				section.gridCount,
+				section.cells,
+				{
+					title: data.sections[skey].title,
+					slug: data.sections[skey].slug
+				}
+			);
+			var sg = _.where(data.grids, {section: skey});
+			_.each(sg, function(g, gkey){
+				var grid = ns.grids.at(g.gkey);
+				grid.set('style', g.style);
+				grid.set('classes', g.classes);
+				var gc = _.where(data.cells, {section: skey, grid: gkey});
+				_.each(gc, function(c, ckey){
+					var cell = grid.cells.at(c.ckey);
+					cell.set('style', c.style);
+					cell.set('classes', c.classes);
 				});
 			});
-			return layout;
+		});
 
-		},
+		if(typeof data.widgets === "undefined") { return; }
 
-		refreshLayoutData: function(){
-			var oldLayout = JSON.stringify(this.get('data'));
-			var newLayout = this.getLayoutData();
-			this.set('data', newLayout, {silent: true});
-			if(JSON.stringify(newLayout) !== oldLayout){
-				this.trigger('change');
-				this.trigger('change:data');
+		_.each(data.widgets, function(widgetData){
+			try{
+				var widget_info = widgetData.widget_info;
+				delete widgetData.widget_info;
+				var section = _that.sections.at(parseInt(widget_info.section));
+				var grid = section.grids.at(parseInt(widget_info.grid));
+				var cell = grid.cells.at(parseInt(widget_info.cell));
+				var widget = new $.CpPage.Model.Widget({
+					class: widget_info.class,
+					id_base: widget_info.id_base,
+					data: widgetData,
+					title: widget_info.title,
+					description: widget_info.description,
+					icon: widget_info.icon
+				});
+				if(typeof widget_info.style !== "undefined"){
+					widget.set('style', widget_info.style);
+				}
+				widget.cell = cell;
+				cell.widgets.add(widget);
+			}catch(err){
 			}
-		},
+		});
 
-		emptySections: function(){
-			_.invoke(this.sections.toArray(), "destroy");
-			this.sections.reset();
+	},
 
-			return this;
+	getLayoutData: function(){
+		var layout = {
+			widgets: [],
+			sections: [],
+			grids: [],
+			cells: []
+		};
+
+		var widgetId = 0;
+
+		this.sections.each(function(section, skey){
+			section.grids.each(function(grid, gkey){
+					grid.cells.each(function(cell, ckey){
+						cell.widgets.each(function(widget, wkey){
+							var values = _.extend(_.clone(widget.get('data')),{
+								widget_info: {
+									class: widget.get('class'),
+									id_base: widget.get('id_base'),
+									title: widget.get('title'),
+									description: widget.get('description'),
+									icon: widget.get('icon'),
+									section: skey,
+									grid: gkey,
+									cell: ckey,
+									id: widgetId++,
+									style: widget.get('style'),
+									raw: widget.get('raw')
+								}
+							});
+							layout.widgets.push(values);
+						});
+
+						layout.cells.push({
+							grid: gkey,
+							ckey: ckey,
+							section: skey,
+							weight: cell.get('weight'),
+							style: cell.get('style'),
+							classes: cell.get('classes')
+						});
+
+					});
+
+					layout.grids.push({
+						section: skey,
+						gkey: gkey,
+						cells: grid.cells.length,
+						style: grid.get('style'),
+						classes: grid.get('classes')
+					});
+
+			});
+
+			layout.sections.push({
+				grids: section.grids.length,
+				title: section.get('title'),
+				slug: section.get('slug'),
+			});
+		});
+		return layout;
+
+	},
+
+	refreshLayoutData: function(){
+		var oldLayout = JSON.stringify(this.get('data'));
+		var newLayout = this.getLayoutData();
+		this.set('data', newLayout, {silent: true});
+		if(JSON.stringify(newLayout) !== oldLayout){
+			this.trigger('change');
+			this.trigger('change:data');
 		}
+	},
+
+	emptySections: function(){
+		_.invoke(this.sections.toArray(), "destroy");
+		this.sections.reset();
+
+		return this;
+	}
   });
 
   $.CpPage.Model.Section = Backbone.Model.extend({
@@ -236,17 +245,17 @@ jQuery(document).ready(function(){
       }
     },
 
-		clone: function(cloneOptions){
-				cloneOptions = _.extend({cloneGrids: true}, cloneOptions);
-				var clone = new this.constructor(this.attributes);
-				if(cloneOptions.cloneGrids){
-					this.grids.each(function(grid){
-						clone.grids.add(grid.clone(clone, cloneOptions), {silent: true});
-					});
-				}
+	clone: function(cloneOptions){
+			cloneOptions = _.extend({cloneGrids: true}, cloneOptions);
+			var clone = new this.constructor(this.attributes);
+			if(cloneOptions.cloneGrids){
+				this.grids.each(function(grid){
+					clone.grids.add(grid.clone(clone, cloneOptions), {silent: true});
+				});
+			}
 
-				return clone;
-		}
+			return clone;
+	}
   });
 
   $.CpPage.Collection.Sections = Backbone.Collection.extend({
@@ -273,12 +282,22 @@ jQuery(document).ready(function(){
 			this.cells.reset();
 		},
 
-    setCells: function(cells, section){
+    setCells: function(cells, section, options){
+    	options || (options={});
+			options = _.extend({widgets: []}, options);
       var _that = this;
-      _.each(cells, function(cellWeight){
+      _.each(cells, function(cellWeight, i){
         var cell = new $.CpPage.Model.Cell({weight: cellWeight});
 				cell.section = section;
         cell.grid = _that;
+        
+        if(options.widgets.length > 0){
+        	if(typeof options.widgets[i] !== "undefined"){
+	        	_.each(options.widgets[i].models, function(widget, k){
+	        		cell.widgets.add(widget);
+	        	});
+	        }
+        }
         _that.cells.add(cell);
       });
     },
@@ -585,6 +604,7 @@ jQuery(document).ready(function(){
 			this.dialog.render();
 			this.dialog.on('grid:edit', function(){
 				this.section.pageBuilder.model.refreshLayoutData();
+				this.section.pageBuilder.initDropable();
 			}, this);
 			return false;
 		},
@@ -825,6 +845,8 @@ jQuery(document).ready(function(){
 
 		dragOptions: {
 			snap: '.cp-row-droppable',
+			scrollSpeed: 13,
+			scrollSensitivity: 100
 		},
 
 		dropOptions: {},
@@ -840,6 +862,7 @@ jQuery(document).ready(function(){
       this.layout = JSON.parse(this.$input.val());
       this.listenTo(this.model.sections, "add", this.onSectionAdd);
 			this.listenTo(this.model, "change:data", this.storeLayout);
+			this.initDragable();
     },
     
     render: function(){
@@ -864,6 +887,14 @@ jQuery(document).ready(function(){
         section.setGrids(1, [[12]]);
         this.model.sections.add(section);
     },
+    
+    initDragable: function(){
+    	this.$widgetsList = $('#cp-press-page-widgets').find('li.cp-draggable')
+													.cpdragdrop($('div.cp-row-droppable'));
+			_.each(this.$widgetsList, function(el){
+				el.drag(this.dragOptions);
+			}, this);
+    },
 
 		initDropable: function(){
 			this.dropOptions.drop = this.dropWidget;
@@ -871,7 +902,6 @@ jQuery(document).ready(function(){
 													.cpdragdrop($('div.cp-row-droppable'));
 			_.each(this.$widgetsList, function(el){
 				el.setDropable($('div.cp-row-droppable'));
-				el.drag(this.dragOptions);
 				el.drop(this.dropOptions);
 			}, this);
 		},

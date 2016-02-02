@@ -31,7 +31,7 @@ class CpWidgetText extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		return parent::widget($args, $instance);
 	}
 
 	public function form($instance){
@@ -78,7 +78,6 @@ class CpWidgetText extends CpWidgetBase{
 	 * @param array $old The previous options
 	 */
 	public function update($new, $old) {
-		$new['text'] = $this->unwpautop($new['text']);
 		return parent::update($new, $old);
 	}
 

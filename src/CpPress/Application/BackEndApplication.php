@@ -9,15 +9,6 @@ use CpPress\Application\WP\Admin\Menu\OptionsMenu;
 use CpPress\Application\BackEnd\SettingsController;
 use CpPress\Application\WP\Admin\Settings;
 use CpPress\Application\WP\Admin\Menu\Menu;
-use CpPress\Application\WP\Admin\Options;
-use CpPress\Application\WP\MetaType\SectionPostType;
-use CpPress\Application\WP\MetaType\GalleryPostType;
-use CpPress\Application\WP\MetaType\EventPostType;
-use CpPress\Application\WP\MetaType\CalendarTaxonomy;
-use CpPress\Application\WP\MetaType\EventtagsTaxonomy;
-use CpPress\Application\WP\MetaType\PortfolioPostType;
-use CpPress\Application\WP\MetaType\SliderPostType;
-use CpPress\Application\WP\MetaType\PagePostType;
 use CpPress\Application\BackEnd\PageController;
 use CpPress\Application\BackEnd\LinkController;
 use CpPress\Application\BackEnd\PostController;
@@ -26,6 +17,8 @@ use CpPress\Application\BackEnd\GalleryController;
 use CpPress\Application\BackEnd\PortfolioController;
 use CpPress\Application\BackEnd\SliderController;
 use CpPress\Application\BackEnd\DialogController;
+use CpPress\Application\BackEnd\NewsController;
+use CpPress\Application\BackEnd\SocialmediaController;
 use CpPress\Application\WP\Theme\Editor;
 use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\Application\WP\Query\Query;
@@ -33,6 +26,7 @@ use CpPress\Application\WP\MetaType\PostType;
 use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\BackEnd\FieldsController;
 use Commonhelp\Util\Hash;
+use CpPress\Application\BackEnd\AttachmentController;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -70,8 +64,7 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('CpPressSettings', function($c) use($container){
 			$menu = $container->query('WpOptionMenu');
-			$options = Options::instance('cppress_settings_options');
-			return new Settings('cppress_settings', 'cppress', $menu, $options);
+			return new Settings('cppress_settings', 'cppress', $menu, $c);
 		});
 		$container->registerService('WpEditor', function($c){
 			return new Editor();
@@ -80,24 +73,16 @@ class BackEndApplication extends CpPressApplication{
 			return new Query();
 		});
 		$this->registerControllers();
-		$this->registerPostTypes();
 	}
 
 	public function setup(){
-		global $wp_scripts, $wp_styles;
-		//init styles and scripts global
-		$wp_styles = $this->getStyles();
-		$wp_scripts = $this->getScripts();
-		$container = $this->getContainer();
+		parent::setup();
+		$hookObj = $this->getContainer()->query('BackEndHook');
 		$this->registerHooks();
 		$this->execHooks();
 		$this->registerFilters();
 		$this->execFilters();
-
-		$container->query('EventPostType')->register();
-		$container->query('CalendarTaxonomy')->register();
-		$container->query('EventtagsTaxonomy')->register();
-
+		$hookObj->create('cppress_backend_setup');
 	}
 
 	public function settings(){
@@ -106,21 +91,9 @@ class BackEndApplication extends CpPressApplication{
 			self::main('SettingsController', 'main', $this->getContainer());
 		});
 		$settings = $this->getSettings();
-		$settings->addSection('general', __('General Settings', 'cppress'), function(){
-			self::main('SettingsController', 'general', $this->getContainer());
-		});
-		$settings->addSection('gallery', __('Gallery Settings', 'cppress'), function(){
-			self::main('SettingsController', 'gallery', $this->getContainer());
-		});
-		$settings->addSection('event', __('Event Settings', 'cppress'), function(){
-			self::main('SettingsController', 'event', $this->getContainer());
-		});
-		$settings->addSection('portfolio', __('Portfolio Settings', 'cppress'), function(){
-			self::main('SettingsController', 'portfolio', $this->getContainer());
-		});
-		$settings->addSection('slider', __('Gallery Settings', 'cppress'), function(){
-			self::main('SettingsController', 'slider', $this->getContainer());
-		});
+		$settings->addSections();
+		$settings->addFields();
+		$settings->registerAll();
 	}
 
 	public function registerBackEndAjax(){
@@ -157,6 +130,12 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$hookObj->register('select_event_calendar', function(){
 			//CpEvent::dispatch('AdminEvent', 'select_event_calendar', func_get_args());
+		});
+		$hookObj->register('widget_social_add', function(){
+			self::main('SocialmediaController', 'xhr_add', $this->getContainer());
+		});
+		$hookObj->register('widget_social_get_network', function(){
+			self::main('SocialmediaController', 'xhr_get_network', $this->getContainer());
 		});
 		$hookObj->register('widget_gallery_add', function(){
 			$container = $this->getContainer();
@@ -203,14 +182,9 @@ class BackEndApplication extends CpPressApplication{
 		$hookObj->register('widget_portfolio_add', function(){
 			$container = $this->getContainer();
 			$request = $container->query('Request');
-			$settings = Hash::extract(
-				Options::getOption('cppress_settings_options', array()), 
-				'cpress_settings_options.portfolio.exclude'
-			);
 			$validPostTypes = array_diff(
 					PostType::getPostTypes(),
-					PostType::getPostTypes(array('_builtin' => true)),
-					$settings
+					PostType::getPostTypes(array('_builtin' => true))
 			);
 			$id = $request->getParam('values', array());
 			if(!empty($id)){
@@ -342,6 +316,8 @@ class BackEndApplication extends CpPressApplication{
 		$page->save($id);
 		$event = $container->query('EventController');
 		$event->save($id);
+		$attachment = $container->query('AttachmentController');
+		$attachment->save($id);
 	}
 
 	private function registerControllers(){
@@ -349,6 +325,12 @@ class BackEndApplication extends CpPressApplication{
 		$container->registerService('FieldsController', function($c){
 			return new FieldsController('FieldApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
 		});
+		$container->registerService('SocialmediaController', function($c){
+			return new SocialmediaController('SocialmediaApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
+		});
+			$container->registerService('NewsController', function($c){
+				return new NewsController('NewsApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
+			});
 		$container->registerService('SettingsController', function($c){
 			$settings = $c->query('CpPressSettings');
 			return new SettingsController('SettingsApp', $c->query('Request'), array($this->themeRoot), $this->themeUri, $settings);
@@ -364,6 +346,9 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('LinkController', function($c){
 			return new LinkController('LinkApp', $c->query('Request'), array($this->themeRoot));
+		});
+		$container->registerService('AttachmentController', function($c){
+			return new AttachmentController('AttachmentApp', $c->query('Request'), array($this->themeRoot));
 		});
 		$container->registerService('PostController', function($c){
 			return new PostController('PostApp', $c->query('Request'), array($this->themeRoot), $c->query('Query'));
@@ -387,22 +372,6 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('DialogController', function($c){
 			return new DialogController('DialogApp', $c->query('Request'), array($this->themeRoot));
-		});
-	}
-
-	private function registerPostTypes(){
-		$container = $this->getContainer();
-		$container->registerService('PagePostType', function($c){
-			return new PagePostType();
-		});
-		$container->registerService('EventPostType', function($c){
-			return new EventPostType();
-		});
-		$container->registerService('CalendarTaxonomy', function($c){
-			return new CalendarTaxonomy();
-		});
-		$container->registerService('EventtagsTaxonomy', function($c){
-			return new EventtagsTaxonomy();
 		});
 	}
 

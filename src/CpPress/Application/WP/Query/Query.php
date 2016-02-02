@@ -28,4 +28,9 @@ class Query extends WP_Query{
 		$this->query = $query;
 	}
 	
+	public function setLoop($query){
+		$this->query = $query;
+		$this->query($query);
+	}
+	
 }

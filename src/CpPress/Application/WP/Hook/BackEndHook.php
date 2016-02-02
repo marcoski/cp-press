@@ -12,6 +12,7 @@ use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\Application\WP\Theme\Media\Video;
 use CpPress\Application\BackEnd\PortfolioController;
 use CpPress\Application\Widgets\CpWidgetBase;
+use CpPress\Application\WP\Admin\CpPress\Application\WP\Admin;
 
 class BackEndHook extends Hook{
 
@@ -22,9 +23,11 @@ class BackEndHook extends Hook{
 	public function massRegister(){
 		$this->register('admin_head', function(){
 			$this->app->favicon();
+			$this->create('cppress_admin_head');
 		});
 		$this->register('login_head', function(){
 			$this->app->favicon();
+			$this->create('cppress_login_head');
 		});
 		$this->register('admin_init', function(){
 			$this->app->registerBackEndAjax();
@@ -52,29 +55,48 @@ class BackEndHook extends Hook{
 				$container->registerService($widget, function($c) use ($widget){
 					$w = new $widget();
 					$w->setContainer($c);
+					$w->setUri($this->app->getThemeUri());
+					$w->setScriptsObj($this->app->getScripts());
 					return $w;
 				});
-				register_widget($widget);
 			}
+			$this->create('cppress_admin_init');
 		});
 		$this->register('admin_menu', function(){
 			$this->app->settings();
+			$this->create('cppress_admin_menu');
 		});
 		$this->register('add_meta_boxes', function(){
 			$container = $this->app->getContainer();
+			$container->registerService('CpAttachment', function($c){
+				$metaBox = new MetaBox('cp-press-attachment', __('Featured Attachment', 'cppress'));
+				$metaBox->setContext('side');
+				$metaBox->setCallback(function($post, $box) use($c){
+					BackEndApplication::main('AttachmentController', 'featured', $c, array($post));
+				});
+				
+				return $metaBox;
+			});
+			$container->registerService('CpLink', function($c){
+				$metaBox = new MetaBox('cp-press-link', __('Link', 'cppress'));
+				$metaBox->setCallback(function($post, $box) use ($c){
+					BackEndApplication::main('LinkerController', 'create', $c, array($post, $box));
+				});
+				return $metaBox;
+			});
 			$container->registerService('CpPageWidgets', function($c){
 				$metaBox = new MetaBox('cp-press-page-widgets', __('Widgets', 'cppress'));
-				$metaBox->setPostType($c->query('PagePostType'));
 				$metaBox->setCallback(function($post, $box) use ($c){
 					BackEndApplication::main('PageController', 'widgets', $c, array($post, $c));
 				});
 				$metaBox->add();
 				return $metaBox;
 			});
-			$container->query('CpPageWidgets');
+			
+			$pageWidgets = $container->query('CpPageWidgets');
+			$pageWidgets->setPostType($container->query('PagePostType'));
 			$container->registerService('CpPageContent', function($c){
 				$metaBox = new MetaBox('cp-press-page-content', __('Content', 'cppress'));
-				$metaBox->setPostType($c->query('PagePostType'));
 				$metaBox->setCallback(function($post, $box) use ($c){
 					$dialog = BackEndApplication::part('DialogController', 'content_dialog', $c);
 					$template = BackEndApplication::part('PageController', 'page_template', $c);
@@ -85,7 +107,9 @@ class BackEndHook extends Hook{
 				$metaBox->add();
 				return $metaBox;
 			});
-			$container->query('CpPageContent');
+			$pageContent = $container->query('CpPageContent');
+			$pageContent->setPostType($container->query('PagePostType'));
+			
 			$container->registerService('CpPageSubtitle', function($c){
 				$metaBox = new MetaBox('cp-press-page-subtitle', __('Sub Title', 'cppress'));
 				$metaBox->setPostType($c->query('PagePostType'));
@@ -97,13 +121,6 @@ class BackEndHook extends Hook{
 				return $metaBox;
 			});
 			$container->query('CpPageSubtitle');
-			$container->registerService('CpLink', function($c){
-				$metaBox = new MetaBox('cp-press-link', __('Link', 'cppress'));
-				$metaBox->setCallback(function($post, $box) use ($c){
-					BackEndApplication::main('LinkerController', 'create', $c, array($post, $box));
-				});
-				return $metaBox;
-			});
 			$container->registerService('CpPostSettings', function($c){
 				$metaBox = new MetaBox('cp-press-post-settings', __('View options', 'cppress'));
 				$metaBox->setContext('side');
@@ -139,6 +156,7 @@ class BackEndHook extends Hook{
 				return $metaBox;
 			});
 			$container->query('CpEventWhen');
+			$this->create('cppress_add_meta_boxes');
 		});
 		$this->register('save_post', function($post_id, $post, $update){
 			$this->app->save($post_id);
@@ -165,11 +183,18 @@ class BackEndHook extends Hook{
 			$scripts->enqueue('cp-press-page-admin-dialog', array('backbone', 'underscore', 'wp-util'));
 			$scripts->enqueue('cp-press-page-admin', array('backbone', 'underscore'));
 			$scripts->enqueue('cp-press-field-admin', array('backbone', 'underscore'));
+			$scripts->enqueue('cp-press-attachment-admin', array('backbone', 'underscore'));
 			$scripts->enqueue('cp-press-field-tinymce', array('editor', 'quicktags'));
 			$scripts->enqueue('media-upload');
 			$styles->enqueue('jquery-ui');
 			$styles->enqueue('cp-press-dialog');
 			$styles->enqueue('cp-press-admin');
+			foreach(CpWidgetBase::getWidgets() as $widget){
+				$container = $this->app->getContainer();
+				$wObj = $container->query($widget);
+				$wObj->enqueueAdminScripts();
+			}
+			$this->create('cppress_admin_enqueue_scripts');
 		});
 		$this->register('plugins_loaded', function(){
 			//CpOnePage::include_widgets();

@@ -24,7 +24,7 @@ class CpWidgetPost extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+		return parent::widget($args, $instance);
 	}
 
 	/**
@@ -55,14 +55,36 @@ class CpWidgetPost extends CpWidgetBase{
 			'value' => $instance
 		);
 		$advanced = BackEndApplication::part('PostController', 'advanced', $this->container, array($advInstance, true));
-		$posts = BackEndApplication::part('PostController', 'select', $this->container,
-			array(
-					$this->get_field_name( 'postid' ),
-					$this->get_field_id( 'postid' ),
-					$instance['postid']
-			)
+		$posts = BackEndApplication::part(
+				'FieldsController', 'link_button', $this->container,
+				array(
+						$this->get_field_id( 'postid' ),
+						$this->get_field_name( 'postid' ),
+						$instance['postid'],
+						array('post')
+				)
 		);
 		$this->assign('post_list', $posts);
+		$icon = BackEndApplication::part(
+			'FieldsController', 'icon_button', $this->container,
+			array(
+				array(
+					'icon' => $this->get_field_id( 'icon' ),
+					'color' => $this->get_field_id( 'iconcolor' ),
+					'class' => $this->get_field_id( 'iconclass' ),
+				),
+				array(
+					'icon' => $this->get_field_name( 'icon' ),
+					'color' => $this->get_field_name( 'iconcolor' ),
+					'class' => $this->get_field_name( 'iconclass' ),
+				),
+				$instance['icon'],
+				$instance['iconcolor'],
+				$instance['iconclass'],
+				true
+			)
+		);
+		$this->assign('icon', $icon);
 		$this->assign('advanced', $advanced);
 		return parent::form($instance);
 	}

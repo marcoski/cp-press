@@ -1,6 +1,7 @@
 <div class="cp-widget-field cp-widget-type-section ">
 	<label class="section"><?php _e('Advanced options', 'cppress')?></label>
 	<div class="cp-widget-section">
+		<?php if(isset($values['id']['enableadvanced'])): ?>
 		<div class="cp-widget-field">
 			<label for="<?= $values['id']['enableadvanced']; ?>">
 				<input 
@@ -11,6 +12,19 @@
 				<?php _e('Enable advanced options', 'cppress')?>
 			</label>
 		</div>
+		<?php endif; ?>
+		<?php if(isset($values['id']['posttype'])): ?>
+		<div class="cp-widget-field">
+			<label><?php _e('Select post type', 'cppress')?>:</label>
+			<select  id="<?= $values['id']['posttype'] ?>"
+				name="<?= $values['name']['posttype']; ?>">
+					<?php foreach( $posttypes as $posttype ) { ?>
+						<option value="<?php echo $posttype; ?>" 
+							<?php selected($posttype, $values['value']['posttype']); ?>><?php echo ucfirst($posttype); ?></option>
+					<?php } ?>
+			</select>
+		</div>
+		<?php endif; ?>
 		<? if(!$single): ?>
 		<div class="cp-widget-field">
 			<label for="<?= $values['id']['limit'] ?>"><?php _e('Limit', 'cppress')?>:</label>
@@ -84,3 +98,108 @@
 		</div>
 	</div>
 </div>
+<?php if($show_view_options): ?>
+<div class="cp-widget-field cp-widget-type-section ">
+	<label class="section"><?php _e('View options', 'cppress')?></label>
+	<div class="cp-widget-section cp-widget-section-hide">
+		<div class="cp-widget-field">
+	    <label for="<?= $values['id']['linktitle']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['linktitle']; ?>"
+		      name="<?= $values['name']['linktitle']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['linktitle'] ); ?> />&nbsp;
+	    	<?php _e('Link title', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Apply a link to the post title', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field cp-widget-input">
+			<label for="<?php echo $values['id']['postspercolumn']; ?>"><?php _e( 'Posts per column:', 'cppress' ); ?></label>
+				<input type="number" min="0" max="20"
+           id="<?php echo  $values['id']['postspercolumn']; ?>" 
+           name="<?php echo  $values['name']['postspercolumn']; ?>"
+           value="<?php echo  $values['value']['postspercolumn'] == '' ? 0 :  $values['value']['postspercolumn']; ?>"> 
+      <div class="cp-widget-field-description">
+				<?php  _e( 'Set to 0 to auto column', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field">
+			<label for="<?= $values['id']['showinfo']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['showinfo']; ?>"
+		      name="<?= $values['name']['showinfo']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['showinfo'] ); ?> />&nbsp;
+	    	<?php _e('Show post info', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Show post publish date and post author', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field">
+			<label for="<?= $values['id']['showmeta']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['showmeta']; ?>"
+		      name="<?= $values['name']['showmeta']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['showmeta'] ); ?> />&nbsp;
+	    	<?php _e('Show post meta info', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Show post categories and tags', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field">
+			<label for="<?= $values['id']['showexcerpt']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['showexcerpt']; ?>"
+		      name="<?= $values['name']['showexcerpt']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['showexcerpt'] ); ?> />&nbsp;
+	    	<?php _e('Show excerpt', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Show the post excerpt instead the post content', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field">
+			<label for="<?= $values['id']['hidecontent']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['hidecontent']; ?>"
+		      name="<?= $values['name']['hidecontent']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['hidecontent'] ); ?> />&nbsp;
+	    	<?php _e('Hide content', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Hide post content and post excerpt', 'cppress' ); ?>
+			</div>
+		</div>
+		<div class="cp-widget-field">
+			<label for="<?= $values['id']['showthumbnail']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['showthumbnail']; ?>"
+		      name="<?= $values['name']['showthumbnail']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['showthumbnail'] ); ?> />&nbsp;
+	    	<?php _e('Show post thumbnail', 'cppress')?>
+	    </label>
+	  </div>
+	  <div class="cp-widget-field">
+	    <label for="<?= $values['id']['linkthumbnail']; ?>">
+	    	<input class="widefat"
+		      id="<?= $values['id']['linkthumbnail']; ?>"
+		      name="<?= $values['name']['linkthumbnail']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $values['value']['linkthumbnail'] ); ?> />&nbsp;
+	    	<?php _e('Link thumbnail', 'cppress')?>
+	    </label>
+	    <div class="cp-widget-field-description">
+				<?php  _e( 'Apply a link to the thumbnail if is visible', 'cppress' ); ?>
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif; ?>

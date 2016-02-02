@@ -4,7 +4,8 @@ namespace CpPress\Application\WP\Admin;
 use Closure;
 use CpPress\Application\WP\Admin\Menu\OptionsMenu;
 use CpPress\Exception\SettingsException;
-use CpPress\Application\WP\Admin\Options;
+use Commonhelp\WP\WPContainer;
+use CpPress\Application\BackEndApplication;
 
 class Settings{
 	
@@ -20,67 +21,85 @@ class Settings{
 	
 	private $options;
 	
+	private $container;
 	
-	public function __construct($name, $group, OptionsMenu $menu, Options $options){
+	
+	public function __construct($name, $group, OptionsMenu $menu, WPContainer $container){
 		$this->name = $name;
 		$this->group = $group;
 		$this->errorSlug = $name.'-error';
 		$this->menu = $menu;
 		$this->sections = array();
-		$this->options = $options;
+		
+		$this->container = $container;
 	}
 	
-	public function addOption($value){
-		return $this->options->add($value);
-	}
 	
-	public function updateOption($newValue){
-		return $this->options->update($newValue);
-	}
-	
-	public function deleteOption(){
-		return $this->options->delete();
-	}
-	
-	public function getOption($default=false){
-		return $this->options->get($default);
-	}
-	
-	public function getOptions(){
-		return $this->options;
-	}
-	
-	public function register(Closure $validate){
-		register_setting($this->group, $this->name, $validate);
-	}
-	
-	public function unregister($sanitize=''){
-		unregister_setting($this->group, $this->name, $sanitize);
+	public function addFields(){
+		$this->addField(
+				'attachment-valid-mime',
+				__('Valid Attachment', 'cppress'),
+				'cppress-options-attachment',
+				function($args){
+					BackEndApplication::main('SettingsController', 'attachment_fields', $this->container, array($args));
+				},
+				array(
+					'id' => 'attachment-valid-mime', 
+					'name' => 'validmime', 
+					'tag' => 'selectmultiple', 
+					'options' => array(__('Mime Types', 'cppress') => array_flip(get_allowed_mime_types()))
+				)
+		);
 	}
 	
 	public function addField($id, $title, $section, Closure $renderize, $args=array()){
-		if(array_key_exists($section, $this->sections)){
+		if(isset($this->sections[$section]) && $this->sections[$section]){
 			$this->fields[$id] = true;
-			add_settings_field($id, $title, $renderize, $this->menu->getSlug(), $section, $args);
+			add_settings_field($id, $title, $renderize, $section, $section, $args);
+		}else{
+			throw new SettingsException('No section '.$section.' registered');
 		}
-		
-		throw new SettingsException('No section '.$section.' registered');
 	}
 	
-	public function addSection($id, $title, Closure $renderize, Closure $addFields = null){
+	public function registerAll(){
+		register_setting('cppress-options-general', 'cppress-options-general');
+		register_setting('cppress-options-attachment', 'cppress-options-attachment');
+		register_setting('cppress-options-widget', 'cppress-options-widget');
+		register_setting('cppress-options-event', 'cppress-options-event');
+	}
+	
+	public function addSections(){
+		$this->addSection('cppress-options-general', __('General Settings', 'cppress'), function(){
+			BackEndApplication::main('SettingsController', 'general', $this->container);
+		});
+		$this->addSection('cppress-options-widget', __('Widget Settings', 'cppress'), function(){
+			BackEndApplication::main('SettingsController', 'widget', $this->container);
+		});
+		$this->addSection('cppress-options-event', __('Event Settings', 'cppress'), function(){
+			BackEndApplication::main('SettingsController', 'event', $this->container);
+		});
+		$this->addSection('cppress-options-attachment', __('Attachment Settings', 'cppress'), function(){
+			BackEndApplication::main('SettingsController', 'attachment', $this->container);
+		});
+	}
+	
+	public function addSection($id, $title, Closure $renderize){
 		$this->sections[$id] = true;
-		if(!is_null($addFields)){
-			$addFields($this);
+		add_settings_section($id, $title, $renderize, $id);		
+	}
+	
+	public function fields($tab = ''){
+		if($tab == ''){
+			$tab = $this->group;
 		}
-		add_settings_section($id, $title, $renderize, $this->menu->getSlug());		
+		settings_fields($tab);
 	}
 	
-	public function fields(){
-		settings_fields($this->group);
-	}
-	
-	public function doSections(){
-		do_settings_sections($this->menu->getSlug());
+	public function doSections($tab = ''){
+		if($tab == ''){
+			$tab = $this->menu->getSlug();
+		}
+		do_settings_sections($tab);
 	}
 	
 	public function doFields($section){

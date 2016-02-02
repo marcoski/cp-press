@@ -7,7 +7,6 @@ use CpPress\Application\WP\Query\Query;
 use CpPress\Application\WP\Admin\PostMeta;
 use Commonhelp\Util\Hash;
 use CpPress\Application\WP\Admin\Settings;
-use CpPress\Application\WP\Admin\Options;
 use CpPress\Application\WP\MetaType\PostType;
 use CpPress\Application\BackEndApplication;
 

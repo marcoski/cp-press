@@ -4,10 +4,19 @@ namespace CpPress\Application;
 use Closure;
 use \Commonhelp\WP\WPApplication;
 use CpPress\Application\FrontEnd\FrontPageController;
+use CpPress\Application\FrontEnd\FrontSliderController;
+use CpPress\Application\FrontEnd\FrontPostController;
 use CpPress\Application\WP\Hook\FrontEndHook;
-use CpPress\Application\WP\Hook\Filter;
+use CpPress\Application\WP\Hook\FrontEndFilter;
+use CpPress\CpPress;
+use CpPress\Application\Widgets\CpWidgetBase;
+use CpPress\Application\WP\Query\Query;
+use CpPress\Application\FrontEnd\FrontBreadcrumbController;
+use CpPress\Application\FrontEnd\FrontGalleryController;
 
 class FrontEndApplication extends CpPressApplication{
+	
+	private $post;
 	
 	public function __construct($urlParams=array()){
 		parent::__construct(
@@ -15,40 +24,98 @@ class FrontEndApplication extends CpPressApplication{
 			$urlParams,
 			array(
 					'main' => array(
-							'root' 	=> get_template_directory(),
-							'uri'	=> get_template_directory_uri()
+							'root' 	=> dirname(dirname(dirname(CpPress::$FILE))),
+							'uri'	=> plugins_url('', dirname(dirname(CpPress::$FILE)))
 					),
-					'child' => array(
-							'root'	=> get_stylesheet_directory(),
-							'uri'	=> get_stylesheet_directory_uri()
-					)
 			)
 		);
-		
 		$container = $this->getContainer();
-		$container->registerService('FrontPageController', function($c){
+		$container->registerService('Page', function($c){
+			$filter = $c->query('FrontEndFilter');
+			$widgets = array();
+			foreach(CpWidgetBase::getWidgets() as $widget){
+				$wObj = $c->query($widget);
+				$widgets[$widget] = $wObj;
+			}
 			return new FrontPageController(
-				'', 
+				'PageApp', 
 				$c->query('Request'),
 				array(
-					$this->childRoot,
 					$this->themeRoot	
-				)
+				),
+				$filter,
+				$widgets
+			);
+		});
+		$container->registerService('Slider', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontSliderController(
+					'SliderApp',
+					$c->query('Request'),
+					array(
+							$this->themeRoot
+					),
+					$filter,
+					$c->query('Query')
+			);
+		});
+		$container->registerService('Post', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontPostController(
+					'PostApp',
+					$c->query('Request'),
+					array(
+							$this->themeRoot
+					),
+					$filter,
+					$c->query('Query')
+			);
+		});
+		$container->registerService('Breadcrumb', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontBreadcrumbController(
+					'BreadcrumbApp',
+					$c->query('Request'),
+					array(
+						$this->themeRoot
+					),
+					$filter
+			);
+		});
+		$container->registerService('Gallery', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontGalleryController(
+					'GalleryApp',
+					$c->query('Request'),
+					array(
+							$this->themeRoot
+					),
+					$filter
 			);
 		});
 		$container->registerService('FrontEndHook', function($c){
 			return new FrontEndHook($this);
 		});
 		$container->registerService('FrontEndFilter', function($c){
-			return new Filter($this);
+			return new FrontEndFilter($this);
+		});
+		$container->registerService('Query', function($c){
+			return new Query();
 		});
 	}
 	
+	public function setWPPost($post){
+		$this->post = $post;
+	}
+	
+	public function getWPPost(){
+		return $this->post;
+	}
+	
 	public function setup(){
-		global $wp_scripts, $wp_styles;
-		//init styles and scripts global
-		$wp_styles = $this->getStyles();
-		$wp_scripts = $this->getScripts();
+		parent::setup();
+		$hookObj = $this->getContainer()->query('FrontEndHook');
+		$hookObj->create('cppress_frontend_setup');
 	}
 	
 	public function registerHooks(){
@@ -69,7 +136,7 @@ class FrontEndApplication extends CpPressApplication{
 	
 	public function registerFilters(){
 		$filter = $this->getContainer()->query('FrontEndFilter');
-	
+		$filter->massRegister();
 	}
 	
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){

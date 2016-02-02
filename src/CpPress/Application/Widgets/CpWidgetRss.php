@@ -1,8 +1,12 @@
 <?php
 namespace CpPress\Application\Widgets;
 
+use Commonhelp\Rss\Reader\Reader;
+use Commonhelp\Rss\RssConfig;
 class CpWidgetRss extends CpWidgetBase{
 
+	private $reader;
+	
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
 				__('Rss Widget', 'cppress'),
@@ -14,6 +18,12 @@ class CpWidgetRss extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-rss';
+		$rssConfig = new RssConfig();
+		$rssConfig->setGrabberRulesFolder(array(
+				$this->templateDirs[0].'/templates/widget/' . $this->id_base . '/rules',
+				get_stylesheet_directory() . '/rules'
+		));
+		$this->reader = new Reader($rssConfig);
 	}
 
 	/**
@@ -23,7 +33,25 @@ class CpWidgetRss extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		// outputs the content of the widget
+	/*	if(filter_var($instance['rsslink'], FILTER_VALIDATE_URL)){
+			try{
+				$rssConfig = new RssConfig();
+				$resource = $this->reader->download($instance['rsslink']);
+				$parser = $this->reader->getParser(
+						$resource->getUrl(),
+						$resource->getContent(),
+						$resource->getEncoding()
+				);
+				$parser->enableContentGrabber(true);
+				$this->assign('feeds', $parser->execute());
+			}catch(\Exception $e){
+				$this->assign('feeds', array());
+			}
+		}else{
+			$this->assign('feeds', array());
+		}*/
+		$this->assign('feeds', array());
+		return parent::widget($args, $instance);
 	}
 
 	/**

@@ -7,6 +7,7 @@
   />
 </div>
 <?= $post_list ?>
+<?= $icon ?>
 <?= $advanced; ?>
 <div class="cp-widget-field cp-widget-type-section ">
 	<label class="section"><?php _e('Options', 'cppress')?></label>

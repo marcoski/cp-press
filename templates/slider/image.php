@@ -8,7 +8,7 @@
 		      id="<?= $fields['id']; ?>_displaytitle"
 		      name="<?= $fields['name']; ?>[displaytitle]"
 		      type="checkbox"
-		      value="1" <?php checked( '1', $values['displaytitle'] ); ?> />&nbsp;
+		      value="1" <?php checked( '1', $values['slides']['displaytitle'] ); ?> />&nbsp;
 		      <?php _e('Display title', 'cppress')?>
 		    </label>
 			<div class="cp-widget-field-description">
@@ -21,7 +21,7 @@
 		      id="<?= $fields['id']; ?>_displaycontent"
 		      name="<?= $fields['name']; ?>[displaycontent]"
 		      type="checkbox"
-		      value="1" <?php checked( '1', $values['displaycontent'] ); ?> />&nbsp;
+		      value="1" <?php checked( '1', $values['slides']['displaycontent'] ); ?> />&nbsp;
 		      <?php _e('Display content', 'cppress')?>
 		    </label>
 			<div class="cp-widget-field-description">

@@ -7,6 +7,16 @@
   />
 </div>
 <?= $editor ?>
+<div class="cp-widget-field">
+    <label for="<?= $widget->get_field_id( 'removep' ); ?>">
+    	<input class="widefat"
+      id="<?= $widget->get_field_id( 'removep' ); ?>"
+      name="<?= $widget->get_field_name( 'removep' ); ?>"
+      type="checkbox"
+      value="1" <?php checked( '1', $instance['removep'] ); ?> />&nbsp;
+      <?php _e('Remove p TAGS', 'cppress')?>
+    </label>
+</div>
 <?= $icon; ?>
 <div class="cp-widget-field cp-widget-type-section ">
 	<label class="section"><?php _e('Options', 'cppress')?></label>
@@ -24,16 +34,6 @@
 	      id="<?= $widget->get_field_id( 'containerclass' ); ?>"
 	      name="<?= $widget->get_field_name( 'containerclass' ); ?>"
 	      value="<? isset($instance['containerclass']) ? e($instance['containerclass']) : e(''); ?>"/>
-	  </div>
-	  <div class="cp-widget-field">
-	    <label for="<?= $widget->get_field_id( 'doshortcode' ); ?>">
-	    	<input class="widefat"
-	      id="<?= $widget->get_field_id( 'doshortcode' ); ?>"
-	      name="<?= $widget->get_field_name( 'doshortcode' ); ?>"
-	      type="checkbox"
-	      value="1" <?php checked( '1', $instance['doshortcode'] ); ?> />&nbsp;
-	      <?php _e('Apply shortcode', 'cppress')?>
-	    </label>
 	  </div>
 	  <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">

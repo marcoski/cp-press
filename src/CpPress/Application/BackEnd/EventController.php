@@ -5,7 +5,6 @@ use \Commonhelp\WP\WPController;
 use \Commonhelp\App\Http\RequestInterface;
 use \Commonhelp\App\Http\DataResponse;
 use CpPress\Application\WP\Admin\PostMeta;
-use CpPress\Application\WP\Admin\Options;
 use Commonhelp\App\Http\Http;
 
 class EventController extends WPController{
@@ -23,6 +22,11 @@ class EventController extends WPController{
 		}
 	}
 	
+	public function advanced($instance, $single){
+		$this->assign('values', $instance);
+		$this->assign('single', $single);
+	}
+	
 	public function when($post, $box){
 		$event = PostMeta::find($post->ID, 'cp-press-event');
 		if($event && isset($event['when'])){
@@ -35,7 +39,7 @@ class EventController extends WPController{
 	public function calendar_taxonomy_form($tags){
 		$calendar_color = '#FFFFFF';
 		if(isset($tags->term_id)){
-			$calendar_color = Options::getOption('category_bgcolor_'.$tags->term_id);
+			$calendar_color = get_option('category_bgcolor_'.$tags->term_id);
 		}
 		$this->assign('calendar_color', $calendar_color);
 	}
@@ -43,13 +47,13 @@ class EventController extends WPController{
 	public function calendar_taxonomy_save($term_id, $tt_id){
 		if (!$term_id) return new DataResponse(array('not saved'), Http::STATUS_NOT_ACCEPTABLE);
 		if(preg_match('/^#[a-zA-Z0-9]{6}$/', $this->getParam('category_bgcolor', ''))){
-			Options::addOption('category_bgcolor_'.$term_id, $this->getParam('category_bgcolor'));
+			add_option('category_bgcolor_'.$term_id, $this->getParam('category_bgcolor'));
 		}
 		return new DataResponse(array('msg' => 'saved'));
 	}
 	
 	public function calendar_taxonomy_delete($term_id){
-		Options::deleteOption('category_bgcolor_'.$term_id);
+		delete_option('category_bgcolor_'.$term_id);
 		return new DataResponse(array('msg' => 'deleted'));
 	}
 	

@@ -2,7 +2,7 @@
 namespace CpPress\Application\WP\Asset;
 use CpPress\Exception\CpPressException;
 
-class Scripts extends \WP_Scripts implements Asset{
+class Scripts implements Asset{
 	use AssetTrait;
 	
 	private $no = array(
@@ -40,58 +40,43 @@ class Scripts extends \WP_Scripts implements Asset{
 	);
 	
 	public function __construct($base, $child){
-		parent::__construct();
 		list($this->baseRoot, $this->baseUri) = $base;
 		list($this->childRoot, $this->childUri) = $child;
 	}
 	
-	public function register($asset, $deps = array(), $ver = false, $extra = false){
+	public function register($asset, $deps = array(), $ver = false, $extra = ''){
 		if($this->isDefault($asset)){
 			throw new CpPressException('Cannot register a default asset');
 		}
 		$src = $this->getAssetSrc($asset, 'js');
-		$registered = $this->add($asset, $src, $deps, $ver);
-		if ($extra) {
-			$this->add_data($handle, 'group', 1);
-		}
 		
-		return $registered;
+		$inFooter = $extra == '' ? false : true;
+		return wp_register_script($asset, $src, $deps, $ver, $inFooter);
 	}
 	
 	public function deregister($asset){
-		$current_filter = current_filter();
-		if((is_admin() && 'admin_enqueue_scripts' !== $current_filter) ||
-				('wp-login.php' === $GLOBALS['pagenow'] && 'login_enqueue_scripts' !== $current_filter)
-		){
-		
-			if (in_array($asset, $this->no )){
-				$message = sprintf( __( 'Do not deregister the %1$s script in the administration area. To target the frontend theme, use the %2$s hook.' ),
-						"<code>$asset</code>", '<code>wp_enqueue_scripts</code>' );
-				throw new CpPressException($message);
-			}
-		}
-		
-		$this->remove($asset);
+		wp_deregister_script($asset);
 	}
 	
-	public function enqueue($asset, $deps = array(), $ver = false, $extra = false){
-		if (!$this->isRegistered($asset) || $extra){
-			$_asset = explode('?', $asset);
-		
-			if (!$this->isRegistered($asset)) {
-				$src = $this->getAssetSrc($asset, 'js');
-				$this->add($_asset[0], $src, $deps, $ver);
-			}
-		
-			if ($extra){
-				$this->add_data($_asset[0], 'group', 1);
-			}
+	public function enqueue($asset, $deps = array(), $ver = false, $extra = ''){
+		$inFooter = $extra == '' ? false : $extra;
+		if ($this->isRegistered($asset)){
+			return wp_enqueue_script($asset, false, $deps, $ver, $inFooter);
 		}
-		parent::enqueue($asset);
+		$src = $this->getAssetSrc($asset, 'js');
+		if(is_null($src)){
+			return null;
+		}
+		
+		return wp_enqueue_script($asset, $src, $deps, $ver, $inFooter);
+	}
+	
+	public function isRegistered($asset){
+		return wp_script_is($asset, 'registered');
 	}
 	
 	public function localize($asset, $objectName, $data){
-		return parent::localize($asset, $objectName, $data);
+		return wp_localize_script($asset, $objectName, $data);
 	}
 	
 	public function inline($asset, $data){
