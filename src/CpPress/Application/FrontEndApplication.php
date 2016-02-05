@@ -13,6 +13,7 @@ use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\WP\Query\Query;
 use CpPress\Application\FrontEnd\FrontBreadcrumbController;
 use CpPress\Application\FrontEnd\FrontGalleryController;
+use CpPress\Application\WP\Theme\Embed;
 
 class FrontEndApplication extends CpPressApplication{
 	
@@ -101,6 +102,11 @@ class FrontEndApplication extends CpPressApplication{
 		});
 		$container->registerService('Query', function($c){
 			return new Query();
+		});
+		$container->registerService('Embed', function($c){
+			$request = $c->query('Request');
+			$filter = $c->query('FrontEndFilter');
+			return new Embed($request, $filter);
 		});
 	}
 	

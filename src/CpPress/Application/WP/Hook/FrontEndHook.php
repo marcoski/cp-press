@@ -35,6 +35,13 @@ class FrontEndHook extends Hook{
 		$this->register('the_post', function($post){
 			$this->app->setWPPost($post);
 		});
+		
+		$this->register('wp_enqueue_scripts', function(){
+			$scripts = $this->app->getScripts();
+			$styles = $this->app->getStyles();
+			$styles->enqueue('cp-press-lightbox');
+			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
+		});
 	}
 	
 }

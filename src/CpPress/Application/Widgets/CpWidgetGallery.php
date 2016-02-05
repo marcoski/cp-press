@@ -4,10 +4,11 @@ namespace CpPress\Application\Widgets;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\Application\FrontEndApplication;
+use CpPress\Application\WP\Theme\Embed;
+use Commonhelp\Util\OEmbed;
 
 class CpWidgetGallery extends CpWidgetBase{
-	//dump(apply_filters('the_content', '[embed]http://www.youtube.com/watch?v=dQw4w9WgXcQ[/embed]'));
-	//$post_embed = $wp_embed->run_shortcode('[embed]your-video-url[/embed]');
+	
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
 				__('Gallery Widget', 'cppress'),
@@ -28,10 +29,13 @@ class CpWidgetGallery extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
+		$embed = $this->container->query('Embed');
 		$gallery = array();
 		$options = array(
     	'enablelightbox' => isset($instance['enablelightbox']) ? true : false,
-    	'tperrow' => $instance['tperrow'] > 0 ? $instance['tperrow'] : 1
+    	'tperrow' => $instance['tperrow'] > 0 ? $instance['tperrow'] : 1,
+			'title' => $instance['wtitle'],
+			'galleryclass' => $instance['galleryclass']
 		);
 		if($instance['items']['countitem'] > 0){
 			for($i=0; $i<$instance['items']['countitem']; $i++){
@@ -46,17 +50,35 @@ class CpWidgetGallery extends CpWidgetBase{
 					$gallery['items'][$i]['isvideo'] = false;
 				}else if($instance['items']['img_ext'][$i]){
 					$gallery['items'][$i]['link'] = $instance['items']['img_ext'][$i];
+					try{
+						$gallery['items'][$i]['oembed'] = $embed->getEmbedObj($instance['items']['img_ext'][$i]);
+					}catch(Exception $e){
+						$gallery['items'][$i]['oembed'] = null;
+					}
 					$gallery['items'][$i]['isvideo'] = false;
 				}else if($items[$i]['video']){
 				}else if($instance['items']['video_ext'][$i]){
 					$gallery['items'][$i]['link'] = $instance['items']['video_ext'][$i];
+					$gallery['items'][$i]['oembed'] = $embed->getEmbedObj($instance['items']['video_ext'][$i]);
 					$gallery['items'][$i]['isvideo'] = true;
 				}
 			}
 		}
 		if($instance['template']){
-			$galleryHtml = FrontEndApplication::part('Gallery', $instance['template'], $this->container, array($gallery, $options));
+			$salt = md5(serialize($gallery).$options['wtitle']);
+			$gid = $this->filter->apply(
+				'cppress_widget_gallery_id', 'cppress-carousel-'. $salt , $gallery['items'], $options
+			);
+			$lid = $this->filter->apply(
+					'cppress_widget_gallery_lightbox_id', 'cppress-carousel-lightbox-'.$salt, $gallery['items'], $options
+			);
+			$lightbox = '';
+			if($options['enablelightbox']){
+				$lightbox = FrontEndApplication::part('Gallery', 'lightbox', $this->container, array($gid, $lid, $gallery['items'][0], $options));
+			}
+			$galleryHtml = FrontEndApplication::part('Gallery', $instance['template'], $this->container, array($gid, $lid, $gallery, $options));
 			$this->assign('galleryHtml', $galleryHtml);
+			$this->assign('lightbox', $lightbox);
 		}else{
 			$this->assign('galleryHtml', '');
 		}

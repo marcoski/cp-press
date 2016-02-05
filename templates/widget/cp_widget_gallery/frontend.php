@@ -5,5 +5,6 @@ if(isset($instance['showtitle']) && $instance['showtitle']){
 			'<h1>' .$instance['wtitle'].'</h1>', $instance['wtitle']);
 }
 echo $galleryHtml;
+echo $lightbox;
 echo $args['after_widget'];
 ?>

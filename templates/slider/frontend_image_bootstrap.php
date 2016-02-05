@@ -18,7 +18,7 @@
 		foreach($slides as $i => $slide){
 			$active = ''; if($i==0){ $active = 'class="active"'; }
 			echo '<li 
-					' . $filter->apply('cppress_widget_slider_navcolor', '', $options['navcolor']) . '
+					' . $filter->apply('cppress_carousel_indicators_styles', '', $options['navcolor']) . '
 					data-target="#' . $sliderAttrs['id'] .'" 
 					data-slide-to="' . $i . '" ' . $active . '>
 				</li>';
@@ -73,7 +73,7 @@
 	if(!$options['hidecontrol']){
 		echo '<a class="left carousel-control" href="#' . $sliderId . '" role="button" data-slide="prev">';
 		$leftClasses = $filter->apply(
-				'cppress_slider_bootstrap_control_left_classes', 
+				'cppress_carousel_control_left_classes', 
 				array('glyphicon glyphicon-chevron-left'),
 				$sliderId,
 				$slides
@@ -83,7 +83,7 @@
 		echo '</a>';
 		echo '<a class="right carousel-control" href="#' . $sliderId . '" role="button" data-slide="next">';
 		$rightClasses = $filter->apply(
-				'cppress_slider_bootstrap_control_left_classes',
+				'cppress_carousel_control_right_classes',
 				array('glyphicon glyphicon-chevron-right'),
 				$sliderId,
 				$slides

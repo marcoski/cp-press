@@ -37,7 +37,15 @@
 			<input type="number" min="1" max="12"
 				id="<?= $widget->get_field_id( 'tperrow' ); ?>"
 				name="<?= $widget->get_field_name( 'tperrow' ); ?>" 
-				value="<? $instance['tperrow'] != '' ? $istance['tperrow'] : e('3') ?>"/>
+				value="<? echo $instance['tperrow'] != '' ? $instance['tperrow'] : '3' ?>"/>
+		</div>
+		<div class="cp-widget-field cp-widget-input">
+		  <label for="<?= $widget->get_field_id( 'galleryclass' ); ?>"><?php _e('Gallery class', 'cppress')?>:</label>
+		  <input
+		    id="<?= $widget->get_field_id( 'galleryclass' ); ?>"
+		    name="<?= $widget->get_field_name( 'galleryclass' ); ?>"
+		    value="<?= $instance['galleryclass']; ?>"
+		  />
 		</div>
 		<div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">
