@@ -1,13 +1,15 @@
 <?php
 namespace CpPress\Application\WP\Theme;
 
-use Walker;
+use Walker_Nav_Menu;
 
 class Menu{
 	
 	private $id;
 	
 	private $slug;
+	
+	private $walker;
 	
 	private $showOptions = array(
 		'theme_location'  => "",
@@ -23,15 +25,15 @@ class Menu{
 		'link_before'     => "",
 		'link_after'      => "",
 		'items_wrap'      => "",
-		'walker'		  => null,
 		'depth'           => 0,
 		'pe_type'		  => "default"
 	);
 	
-	public function __construct($id, $slug){
+	public function __construct($id, $slug, Walker_Nav_Menu $walker){
 		$this->id = $id;
 		$this->showOptions['theme_location'] = $this->id;
 		$this->slug = $slug;
+		$this->walker = $walker;
 	}
 	
 	public function getId(){
@@ -74,8 +76,8 @@ class Menu{
 		return $this->showOptions;
 	}
 	
-	public function setWalker(Walker $walker){
-		$this->showOptions['walker'] = $walker;
+	public function setWalker(Walker_Nav_Menu $walker){
+		$this->walker = $walker;
 	}
 	
 	public function register(){
@@ -91,6 +93,7 @@ class Menu{
 	}
 	
 	public function show(){
+		$this->showOptions['walker'] = $this->walker;
 		wp_nav_menu($this->showOptions);
 	}
 	
