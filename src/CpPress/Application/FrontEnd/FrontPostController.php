@@ -6,6 +6,8 @@ use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Theme\Media\Image;
 use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
+use Commonhelp\WP\WPTemplate;
+use Commonhelp\Util\Inflector;
 
 class FrontPostController extends WPController{
 	
@@ -38,6 +40,26 @@ class FrontPostController extends WPController{
 		}
 		$this->assign('posts', $posts);
 		$this->assign('filter', $this->filter);
+		$this->assign('wpQuery', $this->wpQuery);
+	}
+	
+	public function single($query, $instance){
+		$query = $this->filter->apply('cppress_widget_post_queryargs', $query, $instance);
+		$template = new WPTemplate($this);
+		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+		if($instance['wtitle'] !== ''){
+			$templateName = $this->filter->apply('cppress_widget_post_template_name',
+				'template-parts/' . 'single-' . 
+					Inflector::delimit(Inflector::camelize($instance['wtitle']), '-'), $options);
+		}else{
+			$templateName = $this->filter->apply('cppress_widget_post_template_name',
+					'template-parts/' . 'single', $options);
+		}
+		$this->assign('templateName', $templateName);
+		$this->assign('template', $template);
+		$this->wpQuery->setLoop($query);
+		$this->assign('filter', $this->filter);
+		$this->assign('instance', $instance);
 		$this->assign('wpQuery', $this->wpQuery);
 	}
 	

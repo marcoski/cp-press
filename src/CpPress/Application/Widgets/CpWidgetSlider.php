@@ -36,7 +36,8 @@ class CpWidgetSlider extends CpWidgetBase{
 		}
 		$action = 'widget'.ucfirst($type);
 		$options = array(
-				'theme' => $instance['stheme'],
+				'title' => $instance['wtitle'],
+				'theme' => $instance['stheme'] == '' ? 'bootstrap' : $instance['stheme'],
 				'speed' => $instance['speed'],
 				'timeout' => $instance['timeout'],
 				'navcolor' => $instance['navcolor'],
@@ -51,11 +52,12 @@ class CpWidgetSlider extends CpWidgetBase{
 	}
 	
 	private function widgetImage($instance){
+		$embed = $this->container->query('Embed');
 		$slides = $instance['slides']; $count = $instance['slides']['countitem'];
 		$slider = array();
 		for($i=0; $i<$count; $i++){
 			if($slides['img'][$i] === "" && $slides['img_ext'][$i] !== ""){
-				$slider[$i]['img'] = $slides['img_ext'][$i];
+				$slider[$i]['img'] = $embed->getEmbedObj($slides['img_ext'][$i]);
 			}else{
 				$slider[$i]['img'] = $slides['img'][$i];
 			}
@@ -134,7 +136,7 @@ class CpWidgetSlider extends CpWidgetBase{
 		);
 		$image = BackEndApplication::part('SliderController', 'image', $this->container, $imageParams);
 		$parallax = BackEndApplication::part('SliderController', 'parallax', $this->container, $parallaxParams);
-		$advanced = $this->getAdvPost($in);
+		$advanced = $this->getAdvPost($instance);
 		$accordion = BackEndApplication::part(
 			'FieldsController', 'accordion', $this->container,
 			array(
@@ -212,7 +214,7 @@ class CpWidgetSlider extends CpWidgetBase{
 					'showthumbnail' => $this->get_field_name('post').'[showthumbnail]',
 					'hidecontent' => $this->get_field_name('post').'[hidecontent]',
 					'linkthumbnail' => $this->get_field_name('post').'[linkthumbnail]',
-					'postspercolumn' => $this->get_field_id('post').'[postspercolumn]'
+					'postspercolumn' => $this->get_field_name('post').'[postspercolumn]'
 					
 			),
 			'value' => $instance['post'],

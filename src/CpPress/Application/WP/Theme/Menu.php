@@ -53,11 +53,12 @@ class Menu{
 	}
 	
 	public function setShowOption($name, $value){
-		if(array_key_exists($name, $this->showOptions)){
-			$this->showOptions[$name] = $value;
+		if(!array_key_exists($name, $this->showOptions)){
+			throw new \InvalidArgumentException('Option '.$name.' not valid for menu show options');
 		}
 		
-		throw new \InvalidArgumentException('Option '.$name.' not valid for menu show options');
+		$this->showOptions[$name] = $value;
+		
 	}
 	
 	public function getShowOption($name){

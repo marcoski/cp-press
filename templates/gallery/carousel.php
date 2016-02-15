@@ -1,5 +1,4 @@
 <?php
-
 	$options = $filter->apply('cppress_widget_gallery_options', $options, $items);
 	$galleryClasses = $filter->apply('cppress_widget_gallery_classes', array('carousel', 'slide', $options['galleryclass']), $items, $options);
 	$galleryAttrs = $filter->apply('cppress_widget_gallery_attrs', array(
@@ -8,6 +7,7 @@
 			'data-ride' => 'carousel'
 	), $slides);
 	if(!empty($items)){
+		echo $filter->apply('cppress_widget_gallery_before', '', $items, $options, $galleryId);
 		echo '<' . $filter->apply('cppress_widget_gallery_tag', "div", $items, $options);
 		foreach($galleryAttrs as $name => $value){
 			echo ' ' . $name . '="' . $value . '"';
@@ -130,4 +130,5 @@
 			echo '</a>';
 		
 		echo '</' . $filter->apply('cppress_widget_gallery_tag', "div", $slides, $options) . '>';
+		echo $filter->apply('cppress_widget_gallery_after', '', $items, $options, $galleryId);
 	}

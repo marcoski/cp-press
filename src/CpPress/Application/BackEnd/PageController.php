@@ -97,6 +97,9 @@ class PageController extends WPController{
 		if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE){
 			return;
 		}
+		if($this->getParam('cp-press-page-subtitle', null) !== null){
+			update_post_meta($id, 'cp-press-page-subtitle', sanitize_text_field($this->getParam('cp-press-page-subtitle')));
+		}
 		
 		if(is_null($this->getParam('_cppress_nonce')) || !wp_verify_nonce($this->getParam('_cppress_nonce'), 'save')){
 			return;
@@ -107,9 +110,6 @@ class PageController extends WPController{
 		
 		if($this->getParam('cp-press-page-order', null) !== null){
 			update_post_meta($id, 'cp-press-page-order', $this->getParam('cp-press-page-order', null));
-		}
-		if($this->getParam('cp-press-page-subtitle', null) !== null){
-			update_post_meta($id, 'cp-press-page-subtitle', sanitize_text_field($this->getParam('cp-press-page-subtitle')));
 		}
 		
 		if($this->getParam('cp-press-page-layout', null) !== null){
