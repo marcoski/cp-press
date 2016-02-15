@@ -32,10 +32,10 @@ if(!function_exists('render_widget')){
 			$classes = array_map( 'sanitize_html_class', $classes );
 			
 			$args = array(
-				'before_widget' => apply_filters('cppress_widget_before', '', $classes, $id, $instance),
-				'after_widget' => apply_filters('cppress_widget_after', '', $classes, $id, $instance),
-				'before_title' => apply_filters('cppress_widget_before_title', '', $instance),
-				'after_title' => apply_filters('cppress_widget_after_title', '', $instance),
+				'before_widget' => apply_filters('cppress_widget_before', '', $classes, $id, $instance, $section),
+				'after_widget' => apply_filters('cppress_widget_after', '', $classes, $id, $instance, $section),
+				'before_title' => apply_filters('cppress_widget_before_title', '', $instance, $section),
+				'after_title' => apply_filters('cppress_widget_after_title', '', $instance, $section),
 				'widget_id' => 'widget-' . $grid . '-' . $cell . '-' . $panel
 			);
 			$args = apply_filters('cppress_layout_widget_args', $args);
@@ -55,7 +55,7 @@ echo $filter->apply('cppress_layout_before_content', "", $sections, $post->ID);
 
 foreach($sections as $skey => $grids){
 	$section = $grids['data'];
-	$sectionClasses = $filter->apply('cppress_layout_section_classes', array('cp-section-' . $section['slug']), $post->ID, $section);
+	$sectionClasses = $filter->apply('cppress_layout_section_classes', array('cp-section-' . $section['slug'], $section['slug']), $post->ID, $section);
 	$sectionAttrs = $filter->apply('cppress_layout_section_attrs', array(
 			'id' => 'cpsection-' . $post->ID . '-' . $skey,
 			'class' => implode(' ', $sectionClasses)

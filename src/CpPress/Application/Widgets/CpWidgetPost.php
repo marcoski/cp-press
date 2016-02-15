@@ -2,6 +2,10 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
+use CpPress\Application\BackEnd\FieldsController;
+use CpPress\Application\WP\Query\Query;
+use CpPress\Application\FrontEndApplication;
+
 class CpWidgetPost extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -15,6 +19,7 @@ class CpWidgetPost extends CpWidgetBase{
 			$templateDirs
 		);
 		$this->icon = 'dashicons-admin-post';
+		$this->wpQuery = new Query();
 	}
 
 	/**
@@ -24,6 +29,31 @@ class CpWidgetPost extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
+		if(isset($instance['enableadvanced'])){
+			$queryArgs = array(
+				'post_type'			=> 'post',
+				'posts_per_page'	=> 1,
+				'category__in'		=> isset($instance['categories']) ? $instance['categories'] : array(),
+				'tag__in'			=> isset($instance['tags']) ? $instance['tags'] : array(),
+				'offset'			=> $instance['offset'],
+				'order'				=> $instance['order'],
+				'orderby'			=> $instance['orderby'],
+				/* Set it to false to allow WPML modifying the query. */
+				'suppress_filters' => false
+			);
+			unset($instance['enableadvanced']);
+			unset($instance['categories']);
+			unset($instance['tags']);
+		}else if(isset($instance['postid']) && $instance['postid'] != ''){
+			$queryArgs = FieldsController::getLinkArgs($instance['postid']);
+			unset($instance['postid']);
+		}
+		unset($instance['offset']);
+		unset($instance['order']);
+		unset($instance['orderby']);
+		unset($instance['limit']);
+		$post = FrontEndApplication::part('Post', 'single', $this->container, array($queryArgs, $instance));
+		$this->assign('post', $post);
 		return parent::widget($args, $instance);
 	}
 

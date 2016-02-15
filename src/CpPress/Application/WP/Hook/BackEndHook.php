@@ -89,12 +89,13 @@ class BackEndHook extends Hook{
 				$metaBox->setCallback(function($post, $box) use ($c){
 					BackEndApplication::main('PageController', 'widgets', $c, array($post, $c));
 				});
-				$metaBox->add();
 				return $metaBox;
 			});
 			
 			$pageWidgets = $container->query('CpPageWidgets');
 			$pageWidgets->setPostType($container->query('PagePostType'));
+			$pageWidgets->add();
+			
 			$container->registerService('CpPageContent', function($c){
 				$metaBox = new MetaBox('cp-press-page-content', __('Content', 'cppress'));
 				$metaBox->setCallback(function($post, $box) use ($c){
@@ -104,15 +105,14 @@ class BackEndHook extends Hook{
 					$pdTemplate = BackEndApplication::part('PageController', 'dialog_template', $c);
 					BackEndApplication::main('PageController', 'content', $c, array($post, $dialog, $template, $fields, $pdTemplate));
 				});
-				$metaBox->add();
 				return $metaBox;
 			});
 			$pageContent = $container->query('CpPageContent');
 			$pageContent->setPostType($container->query('PagePostType'));
+			$pageContent->add();
 			
 			$container->registerService('CpPageSubtitle', function($c){
 				$metaBox = new MetaBox('cp-press-page-subtitle', __('Sub Title', 'cppress'));
-				$metaBox->setPostType($c->query('PagePostType'));
 				$metaBox->setCallback(function($post, $box) use ($c){
 					BackEndApplication::main('PageController', 'subtitle', $c, array($post->ID));
 				});
@@ -120,7 +120,9 @@ class BackEndHook extends Hook{
 				$metaBox->add();
 				return $metaBox;
 			});
-			$container->query('CpPageSubtitle');
+			$subTitle = $container->query('CpPageSubtitle');
+			$subTitle->setPostType($container->query('PagePostType'));
+			
 			$container->registerService('CpPostSettings', function($c){
 				$metaBox = new MetaBox('cp-press-post-settings', __('View options', 'cppress'));
 				$metaBox->setContext('side');

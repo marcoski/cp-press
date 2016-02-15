@@ -6,6 +6,7 @@ use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Theme\Media\Image;
 use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
+use Commonhelp\WP\WPTemplate;
 
 class FrontSliderController extends WPController{
 	
@@ -36,7 +37,7 @@ class FrontSliderController extends WPController{
 				$slideImg['src'] = $image->getImage($slides[$i]['img']);
 				$slideImg['title'] = $image->getTitle($slides[$i]['img']);
 				$slides[$i]['img'] = $slideImg;
-			}else{
+			}else if(is_array($slides[$i]['img'])){
 				$slides[$i]['img'][0] = $slides[$i]['img']; //uniform array
 			}
 		}
@@ -75,19 +76,35 @@ class FrontSliderController extends WPController{
 				'navcolor' => '#ffffff'
 		));
 		$qargs = array(
-				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
-				'posts_per_page'	=> $posts['limit'],
-				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
-				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
-				'offset'			=> $posts['offset'],
-				'order'				=> $posts['order'],
-				'orderby'			=> $posts['orderby'],
+				'post_type'			=> isset($posts['post']['posttype']) ? $posts['post']['posttype'] : 'post',
+				'posts_per_page'	=> $posts['post']['limit'],
+				'category__in'		=> isset($posts['post']['categories']) ? $posts['post']['categories'] : array(),
+				'tag__in'			=> isset($posts['post']['tags']) ? $posts['post']['tags'] : array(),
+				'offset'			=> $posts['post']['offset'],
+				'order'				=> $posts['post']['order'],
+				'orderby'			=> $posts['post']['orderby'],
 				/* Set it to false to allow WPML modifying the query. */
 				'suppress_filters' => false
 		);
-		$this->setAction('frontend_image_'.$options['theme']);
+		if($posts['post']['postspercolumn'] == 0){
+			$posts['post']['postspercolumn'] = 1;
+		}
+		$this->setAction('frontend_post_'.$options['theme']);
+		$template = new WPTemplate($this);
+		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+		$this->assign('template', $template);
+		$templateName = $this->filter->apply('cppress_widget_slider_post_template_name',
+				'template-parts/' . $posts['post']['posttype'].'-slider', $options);
+		$this->assign('templateName', $templateName);
 		$this->wpQuery->setLoop($qargs);
 		$this->assign('posts', $posts);
+		$this->assign('pColumn', $posts['post']['postspercolumn']);
+		$this->assign('col', $this->filter->apply('cppress_widget_slider_post_col', array(
+				'md' => floor(12/$posts['post']['postspercolumn']),
+				'lg' => floor(12/$posts['post']['postspercolumn']),
+				'sm' => floor(12/$posts['post']['postspercolumn'])*2
+		), $posts, $options));
+		$this->assign('indicators', ceil($this->wpQuery->found_posts/$posts['post']['postspercolumn']));
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);
 		$this->assign('wpQuery', $this->wpQuery);
