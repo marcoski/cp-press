@@ -15,7 +15,6 @@
 			echo '<div class="single-info">';
 			echo '<i class="icon-time"></i> ';
 			the_time(get_option( 'date_format' ));
-			echo '</span>';
 			echo '</div>';
 			if(isset($instance['showexcerpt']) && $instance['showexcerpt']){
 				echo '<p>';

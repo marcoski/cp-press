@@ -9,6 +9,7 @@ use Commonhelp\WP\WPContainer;
 use CpPress\Application\WP\Asset\Scripts;
 use CpPress\CpPress;
 use CpPress\Application\WP\Hook\Filter;
+use CpPress\Application\WP\Asset\Styles;
 
 abstract class CpWidgetBase extends WP_Widget implements WPIController{
 
@@ -17,11 +18,15 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	protected $icon;
 	protected $container;
 	protected $adminScripts=array();
+	protected $adminStyles=array();
+	protected $frontScripts=array();
+	protected $frontStyles=array();
 	private $template;
 	protected $uri;
 	protected $scriptsPath;
 	protected $action;
 	private $scripts;
+	private $styles;
 	protected $filter;
 
 	public function __construct($name, $widget_options = array(), $control_options = array(), array $templateDirs=array()){
@@ -76,6 +81,10 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 		$this->scripts = $scripts;
 	}
 	
+	public function setStylesObj(Styles $styles){
+		$this->styles = $styles;
+	}
+	
 	public function enqueueAdminScripts(){
 		$oldUris = $this->scripts->getUris();
 		$this->scripts->setUri(
@@ -83,9 +92,49 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 			array($this->scriptsPath, $this->uri)
 		);
 		foreach($this->adminScripts as $s){
-			$this->scripts->enqueue($s['source'], $s['deps']);
+			$deps = isset($s['deps']) && !empty($s['deps']) ? $s['deps'] : array();
+			$this->scripts->enqueue($s['source'], $deps);
 		}
-		$this->setUri($oldUris['base'], $oldUris['child']);
+		$this->scripts->setUri($oldUris['base'], $oldUris['child']);
+	}
+	
+	public function enqueueAdminStyles(){
+		$oldUris = $this->styles->getUris();
+		$this->styles->setUri(
+				array($this->scriptsPath, $this->uri),
+				array($this->scriptsPath, $this->uri)
+		);
+		foreach($this->adminStyles as $s){
+			$deps = isset($s['deps']) && !empty($s['deps']) ? $s['deps'] : array();
+			$this->styles->enqueue($s['source'], $deps);
+		}
+		$this->styles->setUri($oldUris['base'], $oldUris['child']);
+	}
+	
+	public function enqueueFrontScripts(){
+		$oldUris = $this->scripts->getUris();
+		$this->scripts->setUri(
+				array($this->scriptsPath, $this->uri),
+				array($this->scriptsPath, $this->uri)
+		);
+		foreach($this->frontScripts as $s){
+			$deps = isset($s['deps']) && !empty($s['deps']) ? $s['deps'] : array();
+			$this->scripts->enqueue($s['source'], $deps, false, true);
+		}
+		$this->scripts->setUri($oldUris['base'], $oldUris['child']);
+	}
+	
+	public function enqueueFrontStyles(){
+		$oldUris = $this->styles->getUris();
+		$this->styles->setUri(
+				array($this->scriptsPath, $this->uri),
+				array($this->scriptsPath, $this->uri)
+		);
+		foreach($this->frontStyles as $s){
+			$deps = isset($s['deps']) && !empty($s['deps']) ? $s['deps'] : array();
+			$this->styles->enqueue($s['source'], $deps);
+		}
+		$this->styles->setUri($oldUris['base'], $oldUris['child']);
 	}
 
 	public function assign($name, $value){

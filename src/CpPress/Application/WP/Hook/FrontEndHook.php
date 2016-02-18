@@ -27,6 +27,7 @@ class FrontEndHook extends Hook{
 					$w->setFilter($c->query('FrontEndFilter'));
 					$w->setUri($this->app->getThemeUri());
 					$w->setScriptsObj($this->app->getScripts());
+					$w->setStylesObj($this->app->getStyles());
 					return $w;
 				});
 			}
@@ -41,6 +42,12 @@ class FrontEndHook extends Hook{
 			$styles = $this->app->getStyles();
 			$styles->enqueue('cp-press-lightbox');
 			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
+			foreach(CpWidgetBase::getWidgets() as $widget){
+				$container = $this->app->getContainer();
+				$wObj = $container->query($widget);
+				$wObj->enqueueFrontScripts();
+				$wObj->enqueueFrontStyles();
+			}
 		});
 	}
 	

@@ -57,6 +57,7 @@ class BackEndHook extends Hook{
 					$w->setContainer($c);
 					$w->setUri($this->app->getThemeUri());
 					$w->setScriptsObj($this->app->getScripts());
+					$w->setStylesObj($this->app->getStyles());
 					return $w;
 				});
 			}
@@ -195,6 +196,7 @@ class BackEndHook extends Hook{
 				$container = $this->app->getContainer();
 				$wObj = $container->query($widget);
 				$wObj->enqueueAdminScripts();
+				$wObj->enqueueAdminStyles();
 			}
 			$this->create('cppress_admin_enqueue_scripts');
 		});

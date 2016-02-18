@@ -53,7 +53,7 @@
 		 */
 		initialize: function () {
 			"use strict";
-			_.bindAll( this, 'render', 'preserveFocus', 'close', 'save', 'doNothing' );
+			_.bindAll( this, 'render', 'close', 'save', 'doNothing' );
 			this.initialize_templates();
 		},
 
@@ -96,17 +96,6 @@
 				.append( this.content(args) );
 
 			this.trigger('content-loaded');
-		},
-
-		/**
-		 * Ensures that keyboard focus remains within the Modal dialog.
-		 * @param e {object} A jQuery-normalized event object.
-		 */
-		preserveFocus: function ( e ) {
-			"use strict";
-			if ( this.$el[0] !== e.target && ! this.$el.has( e.target ).length ) {
-				this.$el.focus();
-			}
 		},
 
 		getFormValues: function(formSelector){

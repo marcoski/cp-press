@@ -52,6 +52,13 @@ class PostType extends MetaType{
 		throw new PostTypeException('Canot register a defult post type');
 	}
 	
+	public function unregister($slug=''){
+		global $wp_post_types;
+		if(isset( $wp_post_types[$this->name])) {
+			unset($wp_post_types[$this->name]);
+		}
+	}
+	
 	public function addSupport($feature){
 		if(is_array($feature)){
 			if(in_array($feature, $this->validSupports)){

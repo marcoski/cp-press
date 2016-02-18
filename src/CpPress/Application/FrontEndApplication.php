@@ -14,6 +14,7 @@ use CpPress\Application\WP\Query\Query;
 use CpPress\Application\FrontEnd\FrontBreadcrumbController;
 use CpPress\Application\FrontEnd\FrontGalleryController;
 use CpPress\Application\WP\Theme\Embed;
+use CpPress\Application\FrontEnd\FrontContactFormController;
 
 class FrontEndApplication extends CpPressApplication{
 	
@@ -92,6 +93,18 @@ class FrontEndApplication extends CpPressApplication{
 							$this->themeRoot
 					),
 					$filter
+			);
+		});
+		$container->registerService('ContactForm', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontContactFormController(
+					'ContactFormApp',
+					$c->query('Request'),
+					array(
+						$this->themeRoot
+					),
+					$filter,
+					$c->query('ContactFormShortcode')
 			);
 		});
 		$container->registerService('FrontEndHook', function($c){

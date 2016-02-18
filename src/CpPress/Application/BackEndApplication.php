@@ -27,6 +27,7 @@ use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\BackEnd\FieldsController;
 use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\AttachmentController;
+use CpPress\Application\BackEnd\ContactFormController;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -110,8 +111,8 @@ class BackEndApplication extends CpPressApplication{
 		$hookObj->register('widget_search_post', function(){
 			self::main('PostController', 'xhr_widget_search_post', $this->getContainer());
 		});
-		$hookObj->register('add_link_modal', function(){
-			//CpOnePage::dispatch('AdminLink', 'modal');
+		$hookObj->register('contact_form_tag', function(){
+			self::main('ContactFormController', 'xhr_taggenerator', $this->getContainer());
 		});
 		$hookObj->register('process_link', function(){
 			//CpOnePage::dispatch('AdminLink', 'process');
@@ -372,6 +373,9 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('DialogController', function($c){
 			return new DialogController('DialogApp', $c->query('Request'), array($this->themeRoot));
+		});
+		$container->registerService('ContactFormController', function($c){
+			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot));
 		});
 	}
 

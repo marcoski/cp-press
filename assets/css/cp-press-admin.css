@@ -1855,3 +1855,11 @@ table.cp-link tr.cp-link textarea {
 .cp-press-attachment-files li span i.cp-widget-icon-featured.featured{
 	color: green;
 }
+
+.cp-widget-tag-generator-list{
+	margin: 5px 0 5px 0;
+}
+
+.cp-widget-tag-generator-list .cp-tag-generator-button{
+	margin-left: 5px !important;
+}

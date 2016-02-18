@@ -112,7 +112,7 @@
 		 */
 		initialize: function () {
 			"use strict";
-			_.bindAll( this, 'render', 'preserveFocus', 'close', 'save', 'doNothing', 'changeRow' );
+			_.bindAll( this, 'render', 'close', 'save', 'doNothing', 'changeRow' );
 			this.content = wp.template(this.content);
 			this.button = wp.template(this.button);
 			this.initialize_templates();

@@ -38,6 +38,7 @@ class FrontPostController extends WPController{
 		}else{
 			$this->assign('postWidth', floor(12/$this->wpQuery->found_posts));
 		}
+		$this->assignTemplate($posts, 'loop');
 		$this->assign('posts', $posts);
 		$this->assign('filter', $this->filter);
 		$this->assign('wpQuery', $this->wpQuery);
@@ -45,22 +46,26 @@ class FrontPostController extends WPController{
 	
 	public function single($query, $instance){
 		$query = $this->filter->apply('cppress_widget_post_queryargs', $query, $instance);
-		$template = new WPTemplate($this);
-		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
-		if($instance['wtitle'] !== ''){
-			$templateName = $this->filter->apply('cppress_widget_post_template_name',
-				'template-parts/' . 'single-' . 
-					Inflector::delimit(Inflector::camelize($instance['wtitle']), '-'), $options);
-		}else{
-			$templateName = $this->filter->apply('cppress_widget_post_template_name',
-					'template-parts/' . 'single', $options);
-		}
-		$this->assign('templateName', $templateName);
-		$this->assign('template', $template);
+		$this->assignTemplate($instance, 'single');
 		$this->wpQuery->setLoop($query);
 		$this->assign('filter', $this->filter);
 		$this->assign('instance', $instance);
 		$this->assign('wpQuery', $this->wpQuery);
+	}
+	
+	private function assignTemplate($instance, $tPreName){
+		$template = new WPTemplate($this);
+		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+		if($instance['wtitle'] !== ''){
+			$templateName = $this->filter->apply('cppress_widget_post_template_name',
+					'template-parts/' . $tPreName . '-' .
+					Inflector::delimit(Inflector::camelize($instance['wtitle']), '-'), $instance);
+		}else{
+			$templateName = $this->filter->apply('cppress_widget_post_template_name',
+					'template-parts/' . $tPreName, $instance);
+		}
+		$this->assign('templateName', $templateName);
+		$this->assign('template', $template);
 	}
 	
 	
