@@ -7,6 +7,8 @@ use CpPress\Application\WP\Theme\Media\Image;
 use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
+use Commonhelp\WP\WPTemplateResponse;
+use Commonhelp\WP\Commonhelp\WP;
 
 class FrontSliderController extends WPController{
 	
@@ -29,7 +31,6 @@ class FrontSliderController extends WPController{
 				'hideindicators' => 0,
 				'hidecontrol' => 0
 		));
-		$this->setAction('frontend_image_'.$options['theme']);
 		for($i=0; $i<count($slides); $i++){
 			if(is_numeric($slides[$i]['img'])){
 				$image = new Image();
@@ -44,6 +45,8 @@ class FrontSliderController extends WPController{
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);
 		$this->assign('slides', $slides);
+		
+		return new WPTemplateResponse($this, 'frontend_image_'.$options['theme']);
 	}
 	
 	public function frontend_parallax($slides, $options){
@@ -65,7 +68,8 @@ class FrontSliderController extends WPController{
 			$attrs['style'] = 'background-image: url(' . $slides['img'][0] . ');';
 			return $attrs;
 		}, 10, 2);
-		$this->setAction('frontend_image_'.$options['theme']);
+		
+		return new WPTemplateResponse($this, 'frontend_image_'.$options['theme']);
 	}
 	
 	public function frontend_post($posts, $options){
@@ -89,7 +93,7 @@ class FrontSliderController extends WPController{
 		if($posts['post']['postspercolumn'] == 0){
 			$posts['post']['postspercolumn'] = 1;
 		}
-		$this->setAction('frontend_post_'.$options['theme']);
+		
 		$template = new WPTemplate($this);
 		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
 		$this->assign('template', $template);
@@ -108,6 +112,8 @@ class FrontSliderController extends WPController{
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);
 		$this->assign('wpQuery', $this->wpQuery);
+		
+		return new WPTemplateResponse($this, 'frontend_post_'.$options['theme']);
 	}
 	
 }
