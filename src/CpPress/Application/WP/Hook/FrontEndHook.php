@@ -19,6 +19,7 @@ class FrontEndHook extends Hook{
 		
 		$this->register('init', function(){
 			$this->app->setup();
+			$this->app->registerFrontEndAjax();
 			$container = $this->app->getContainer();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container->registerService($widget, function($c) use ($widget){
@@ -42,10 +43,12 @@ class FrontEndHook extends Hook{
 			$styles = $this->app->getStyles();
 			$styles->enqueue('cp-press-lightbox');
 			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
+			$this->app->loadCpPressFont();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container = $this->app->getContainer();
 				$wObj = $container->query($widget);
 				$wObj->enqueueFrontScripts();
+				$wObj->localizeFrontScripts();
 				$wObj->enqueueFrontStyles();
 			}
 		});

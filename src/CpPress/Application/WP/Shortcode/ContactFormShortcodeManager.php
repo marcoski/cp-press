@@ -5,7 +5,7 @@ use Commonhelp\Util\Shortcode;
 use CpPress\Application\FrontEndApplication;
 use Commonhelp\WP\WPContainer;
 
-class ContactFormShortcode extends Shortcode{
+class ContactFormShortcodeManager extends Shortcode{
 	
 	public static $fields;
 	
@@ -31,6 +31,7 @@ class ContactFormShortcode extends Shortcode{
 	public function __construct(WPContainer $container){
 		$this->container = $container;
 		parent::__construct();
+		$this->enctype = null;
 	}
 	
 	public function register(){
@@ -46,6 +47,11 @@ class ContactFormShortcode extends Shortcode{
 	
 	public function getScannedTags(){
 		return $this->scannedTags;
+	}
+	
+	public function scanShortcode($content){
+		$this->doShortcode($content, false);
+		return $this->getScannedTags();
 	}
 	
 	public function doShortcode($content, $exec=true){
@@ -138,7 +144,7 @@ class ContactFormShortcode extends Shortcode{
 			}
 			if(!empty( $match[2])){
 				preg_match_all('/"[^"]*"|\'[^\']*\'/', $match[2], $matched_values);
-				$atts['values'] = $this->stripQuoteDepp($matched_values[0]);
+				$atts['values'] = self::stripQuoteDepp($matched_values[0]);
 			}
 		}else{
 			$atts = $text;
@@ -147,20 +153,20 @@ class ContactFormShortcode extends Shortcode{
 		return $atts;
 	}
 	
-	protected function stripQuoteDepp($arr){
+	public static function stripQuoteDepp($arr){
 		if(is_string($arr)){
-			return $this->stripQuote($arr);
+			return self::stripQuote($arr);
 		}
 		if(is_array($arr)){
 			$result = array();
 			foreach($arr as $key => $text){
-				$result[$key] = $this->stripQuoteDepp( $text );
+				$result[$key] = self::stripQuoteDepp( $text );
 			}
 			return $result;
 		}
 	}
 	
-	protected function stripQuote($text){
+	public static function stripQuote($text){
 		$text = trim( $text );
 		
 		if (preg_match('/^"(.*)"$/', $text, $matches)){
@@ -170,6 +176,43 @@ class ContactFormShortcode extends Shortcode{
 		}
 		
 		return $text;
+	}
+	
+	public static function flatJoin($input){
+		$input = self::flatten($input);
+		$output = array();
+		foreach((array) $input as $value){
+			$output[] = trim((string) $value); 
+		}
+		
+		return implode(', ', $output);
+	}
+	
+	public static function flatten($input){
+		if(!is_array($input)){
+			return array($input);
+		}
+		
+		$output = array();
+		foreach($input as $value){
+			$ouput = array_merge($output, self::flatten($value));
+		}
+		
+		return $output;
+	}
+	
+	public function isMultiPartForm(){
+		foreach($this->scannedTags as $tag){
+			if($tag['baseType'] == 'file'){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public function getEnctype(){
+		return $this->enctype;
 	}
 	
 	protected function isName($string){

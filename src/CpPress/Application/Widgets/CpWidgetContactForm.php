@@ -41,6 +41,19 @@ class CpWidgetContactForm extends CpWidgetBase{
 				)
 		);
 	}
+	
+	protected function initLocalize(){
+		$this->adminLocalize = array();
+		$this->frontLocalize = array(
+			'cp-contact-form-front' => array(
+				'name' => '_cf',
+				'data' => array(
+						'loaderUri' => $this->uri . '/img/loader.gif',
+						'sending' => __('Sending...', 'cppress')
+				)
+			)
+		);
+	}
 
 	/**
 	 * Outputs the content of the widget
@@ -49,10 +62,21 @@ class CpWidgetContactForm extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		$instance['desturi'] = FieldsController::getLinkPermalink($instance['desturi']);
-		$w = FrontEndApplication::part('ContactForm', 'form_template', $this->container, array($instance));
-		$this->assign('widget', $w);
-		return parent::widget($args, $instance);
+		$contactForm = $this->container->query('ContactForm');
+		$request = $this->container->query('Request');
+		if(!is_null($request->getParam('_cppress-cf-unit-tag', null))){
+			FrontEndApplication::main(
+					'ContactForm',
+					'submit',
+					$this->container,
+					array($this->container->query('ContactFormSubmitter'), $instance, $args)
+			);
+		}else{
+			$instance['desturi'] = FieldsController::getLinkPermalink($instance['desturi']);
+			$w = FrontEndApplication::part('ContactForm', 'form_template', $this->container, array($instance));
+			$this->assign('widget', $w);
+			return parent::widget($args, $instance);
+		}
 	}
 
 	/**
@@ -70,17 +94,33 @@ class CpWidgetContactForm extends CpWidgetBase{
 				'id' => $this->get_field_id('to'),
 				'name' => $this->get_field_name('to')
 			),
+			'from' => array(
+					'id' => $this->get_field_id('from'),
+					'name' => $this->get_field_name('from')
+			),
 			'subject' => array(
 				'id' => $this->get_field_id('subject'),
 				'name' => $this->get_field_name('subject')
 			),
-			'subjectpre' => array(
-				'id' => $this->get_field_id('subjectpre'),
-				'name' => $this->get_field_name('subject')
+			'additionalheaders' => array(
+				'id' => $this->get_field_id('additionalheaders'),
+				'name' => $this->get_field_name('additionalheaders')
 			),
 			'submit' => array(
 				'id' => $this->get_field_id('submit'),
 				'name' => $this->get_field_name('submit')
+			),
+			'body' => array(
+					'id' => $this->get_field_id('body'),
+					'name' => $this->get_field_name('body')
+			),
+			'excludeblank' => array(
+					'id' => $this->get_field_id('excludeblank'),
+					'name' => $this->get_field_name('excludeblank')
+			),
+			'usehtml' => array(
+					'id' => $this->get_field_id('usehtml'),
+					'name' => $this->get_field_name('usehtml')
 			)
 		);
 		$link = BackEndApplication::part(

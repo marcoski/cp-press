@@ -15,6 +15,10 @@ use CpPress\Application\FrontEnd\FrontBreadcrumbController;
 use CpPress\Application\FrontEnd\FrontGalleryController;
 use CpPress\Application\WP\Theme\Embed;
 use CpPress\Application\FrontEnd\FrontContactFormController;
+use CpPress\Application\WP\Submitter\ContactFormSubmitter;
+use CpPress\Application\WP\Admin\PostMeta;
+use Commonhelp\Util\Inflector;
+use CpPress\Application\BackEnd\FieldsController;
 
 class FrontEndApplication extends CpPressApplication{
 	
@@ -104,7 +108,7 @@ class FrontEndApplication extends CpPressApplication{
 						$this->themeRoot
 					),
 					$filter,
-					$c->query('ContactFormShortcode')
+					$c->query('ContactFormShortcodeManager')
 			);
 		});
 		$container->registerService('FrontEndHook', function($c){
@@ -121,6 +125,10 @@ class FrontEndApplication extends CpPressApplication{
 			$filter = $c->query('FrontEndFilter');
 			return new Embed($request, $filter);
 		});
+		$container->registerService('ContactFormSubmitter', function($c){
+			$request = $c->query('Request');
+			return new ContactFormSubmitter($request, $c->query('FrontEndFilter'), $c->query('FrontEndHook'));
+		});
 	}
 	
 	public function setWPPost($post){
@@ -135,6 +143,30 @@ class FrontEndApplication extends CpPressApplication{
 		parent::setup();
 		$hookObj = $this->getContainer()->query('FrontEndHook');
 		$hookObj->create('cppress_frontend_setup');
+	}
+	
+	public function registerFrontEndAjax(){
+		$container = $this->getContainer();
+		$hookObj = $this->getContainer()->query('AjaxHook');
+		$hookObj->registerFrontEnd('cppress_cf_ajax', function() use($container){
+			$request = $container->query('Request');
+			$layout = PostMeta::find($request->getParam('_cppress-cf-id'), 'cp-press-page-layout');
+			foreach($layout['widgets'] as $w){
+				if($w['widget_info']['id_base'] == 'cp_widget_contact_form'){
+					$pattern = "/cp_press_([a-z0-9]*)_([a-z0-9]*)_([a-z0-9_]*)/";
+					preg_match($pattern, Inflector::underscore($w['widget_info']['class']), $classParts);
+					$widget = (
+							'CpPress' . '\\' .
+							Inflector::camelize($classParts[1]) . '\\' .
+							Inflector::camelize($classParts[2]) . '\\' .
+							Inflector::camelize($classParts[3])
+					);
+					$widget = $container->query($widget);
+					return $widget->widget(array(), $w);
+				}
+			}
+		});
+		$hookObj->execAll();
 	}
 	
 	public function registerHooks(){
@@ -166,6 +198,13 @@ class FrontEndApplication extends CpPressApplication{
 	public function execFilters(){
 		$filter = $this->getContainer()->query('FrontEndFilter');
 		$filter->execAll();
+	}
+	
+	public function loadCpPressFont(){
+		$container = $this->getContainer();
+		$fields = new FieldsController('', $container->query('Request'));
+		$style = $this->getStyles();
+		$style->enqueueFonts($fields->getFontAssets());
 	}
 	
 }

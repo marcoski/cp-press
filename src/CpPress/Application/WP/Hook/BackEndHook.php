@@ -196,6 +196,7 @@ class BackEndHook extends Hook{
 				$container = $this->app->getContainer();
 				$wObj = $container->query($widget);
 				$wObj->enqueueAdminScripts();
+				$wObj->localizeAdminScripts();
 				$wObj->enqueueAdminStyles();
 			}
 			$this->create('cppress_admin_enqueue_scripts');

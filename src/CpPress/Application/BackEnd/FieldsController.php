@@ -148,6 +148,15 @@ class FieldsController extends WPController{
 	public function template(){
 	}
 	
+	public function getFontAssets(){
+		$assets = array();
+		foreach($this->boundle as $asset => $msg){
+			$assets[$asset] = plugins_url('/assets/icons/'.$asset.'/style.css', dirname(dirname(CpPress::$FILE)));
+		}
+		
+		return $assets;
+	}
+	
 	/** STATIC */
 	public static function getLinkArgs($val){
 		if(preg_match("/([a-zA-Z]*):\s([0-9]+)/", $val, $match)){

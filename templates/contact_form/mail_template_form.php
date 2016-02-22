@@ -13,6 +13,14 @@
 			</div>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
+		  <label for="<?= $widget['from']['id']; ?>"><?php _e('From email address', 'cppress')?>:</label>
+		  <input class="widefat" type="text"
+		    id="<?= $widget['from']['id']; ?>"
+		    name="<?= $widget['from']['name']; ?>"
+		    value="<?= $instance['from']; ?>"
+		  />
+		</div>
+		<div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget['subject']['id']; ?>"><?php _e('Default subject', 'cppress')?>:</label>
 		  <input class="widefat" type="text"
 		    id="<?= $widget['subject']['id']; ?>"
@@ -24,16 +32,41 @@
 			</div>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
-		  <label for="<?= $widget['subjectpre']['id']; ?>"><?php _e('Subject prefix', 'cppress')?>:</label>
-		  <input class="widefat" type="text"
-		    id="<?= $widget['subjectpre']['id']; ?>"
-		    name="<?= $widget['subjectpre']['name']; ?>"
-		    value="<?= $instance['subjectpre']; ?>"
-		  />
-		  <div class="cp-widget-field-description">
-				<?php _e('Prefix added to all incoming email subjects.', 'cppress'); ?>
-			</div>
+		  <label for="<?= $widget['additionalheaders']['id']; ?>"><?php _e('Additional Headers', 'cppress')?>:</label>
+		  <textarea class="large-text code" cols="100" rows="4"
+		    id="<?= $widget['additionalheaders']['id']; ?>"
+		    name="<?= $widget['additionalheaders']['name']; ?>">
+		  	<?= $instance['additionalheaders']; ?>
+		  </textarea>
 		</div>
+		<div class="cp-widget-field cp-widget-input">
+		  <label for="<?= $widget['body']['id']; ?>"><?php _e('Message Body', 'cppress')?>:</label>
+		 	<textarea class="large-text code" cols="100" rows="4"
+		    id="<?= $widget['body']['id']; ?>"
+		    name="<?= $widget['body']['name']; ?>">
+		  	<?= $instance['body']; ?>
+		  </textarea>
+		</div>
+		<div class="cp-widget-field">
+	    <label for="<?= $widget['excludeblank']['id']; ?>">
+	    	<input class="widefat"
+		      id="<?= $widget['excludeblank']['id']; ?>"
+		      name="<?= $widget['excludeblank']['name']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['excludeblank'] ); ?> />&nbsp;
+	    	<?php _e('Exclude lines with blank mail-tags from output', 'cppress')?>
+	    </label>
+	  </div>
+	  <div class="cp-widget-field">
+	    <label for="<?= $widget['usehtml']['id']; ?>">
+	    	<input class="widefat"
+		      id="<?= $widget['usehtml']['id']; ?>"
+		      name="<?= $widget['usehtml']['name']; ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['usehtml'] ); ?> />&nbsp;
+	    	<?php _e('Use html mail content', 'cppress')?>
+	    </label>
+	  </div>
 		<?php echo $link; ?>
 		<div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget['submit']['id']; ?>"><?php _e('Submit button text', 'cppress')?>:</label>

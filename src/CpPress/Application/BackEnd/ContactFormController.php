@@ -5,7 +5,7 @@ use \Commonhelp\WP\WPController;
 use \Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Admin\Settings;
 use CpPress\Application\WP\Admin\PostMeta;
-use CpPress\Application\WP\Shortcode\ContactFormShortcode;
+use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
 
 class ContactFormController extends WPController{
 	
@@ -15,7 +15,7 @@ class ContactFormController extends WPController{
 	public function __construct($appName, RequestInterface $request, $templateDirs = array()){
 		parent::__construct($appName, $request, $templateDirs);
 		$this->options = get_option('cppress-options-contactform');
-		$this->fields = ContactFormShortcode::$fields;
+		$this->fields = ContactFormShortcodeManager::$fields;
 	}
 	
 	public function form($instance, $widget){

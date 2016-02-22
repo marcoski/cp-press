@@ -18,6 +18,7 @@ use CpPress\Application\WP\MetaType\NewstagsTaxonomy;
 use CpPress\Application\WP\MetaType\PagePostType;
 use CpPress\Application\WP\MetaType\NewsPostType;
 use CpPress\Application\WP\Shortcode\ContactFormShortcode;
+use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
 
 abstract class CpPressApplication extends WPApplication{
 	
@@ -46,9 +47,9 @@ abstract class CpPressApplication extends WPApplication{
 			return new AjaxHook($this);
 		});
 		
-		$container->registerService('ContactFormShortcode', function($c){
-			ContactFormShortcode::init();
-			return new ContactFormShortcode($c);
+		$container->registerService('ContactFormShortcodeManager', function($c){
+			ContactFormShortcodeManager::init();
+			return new ContactFormShortcodeManager($c);
 		});
 		$this->registerPostTypes();
 	}
@@ -113,7 +114,7 @@ abstract class CpPressApplication extends WPApplication{
 		$container->query('NewsPostType')->register();
 		$container->query('NewsTaxonomy')->register();
 		$container->query('NewstagsTaxonomy')->register();
-		$container->query('ContactFormShortcode')->register();
+		$container->query('ContactFormShortcodeManager')->register();
 	}
 	
 	protected function registerPostTypes(){

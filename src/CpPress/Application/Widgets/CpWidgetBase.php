@@ -21,6 +21,8 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	protected $adminStyles=array();
 	protected $frontScripts=array();
 	protected $frontStyles=array();
+	protected $frontLocalize;
+	protected $adminLocalize;
 	private $template;
 	protected $uri;
 	protected $scriptsPath;
@@ -75,6 +77,12 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	public function setUri($uri){
 		$this->uri = $uri.'/templates/widget/'.$this->id_base;
 		$this->scriptsPath = $this->templateDirs[0].'/templates/widget/'.$this->id_base;
+		$this->initLocalize();
+	}
+	
+	protected function initLocalize(){
+		$this->adminLocalize = array();
+		$this->frontLocalize = array();
 	}
 	
 	public function setScriptsObj(Scripts $scripts){
@@ -98,6 +106,12 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 		$this->scripts->setUri($oldUris['base'], $oldUris['child']);
 	}
 	
+	public function localizeAdminScripts(){
+		foreach($this->adminLocalize as $asset => $object){
+			$this->scripts->localize($asset, $object['name'], $object['data']);
+		}
+	}
+	
 	public function enqueueAdminStyles(){
 		$oldUris = $this->styles->getUris();
 		$this->styles->setUri(
@@ -109,6 +123,12 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 			$this->styles->enqueue($s['source'], $deps);
 		}
 		$this->styles->setUri($oldUris['base'], $oldUris['child']);
+	}
+	
+	public function localizeFrontScripts(){
+		foreach($this->frontLocalize as $asset => $object){
+			$this->scripts->localize($asset, $object['name'], $object['data']);
+		}
 	}
 	
 	public function enqueueFrontScripts(){

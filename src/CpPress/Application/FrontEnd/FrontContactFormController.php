@@ -8,36 +8,45 @@ use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
 use Commonhelp\Util\Inflector;
-use CpPress\Application\WP\Shortcode\ContactFormShortcode;
 use CpPress\Application\WP\Admin\PostMeta;
+use CpPress\Application\WP\Submitter\ContactFormSubmitter;
+use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
+use CpPress\Application\WP\Shortcode\ContactFormShortcode;
 
 class FrontContactFormController extends WPController{
 	
 	private $filter;
 	private $cfShortcode;
-	
-	private $type;
-	private $baseType;
-	private $name = '';
-	private $options = array();
-	private $rawValues = array();
-	private $values = array();
-	private $labels = array();
-	private $attr = '';
-	private $content = '';
-	
 	private $unitTag;
-	
 	private $title;
+	private $tag;
 	
-	public function __construct($appName, RequestInterface $request, $templateDirs = array(), Filter $frontEndFilter, ContactFormShortcode $cfShortcode){
+	private $responseCount = 0;
+	
+	public function __construct($appName, RequestInterface $request, $templateDirs = array(), Filter $frontEndFilter, ContactFormShortcodeManager $cfShortcode){
 		parent::__construct($appName, $request, $templateDirs);
 		$this->filter = $frontEndFilter;
 		$this->cfShortcode = $cfShortcode;
 	}
 	
+	public function submit(ContactFormSubmitter $submitter, $winstance, $wargs){
+		if(!isset($_SERVER['REQUEST_METHOD'])){
+			return;
+		}
+		if($_SERVER['REQUEST_METHOD'] == 'POST' && !is_null($this->getParam('_cppress-cf-unit-tag', null))){
+			if(!is_null($this->getParam('_cppress-cf-isajaxcall'))){
+				$result = $submitter->ajaxSubmit($winstance, $wargs);
+				return $this->filter->apply('cppress-cf-ajax-json', $result);
+			}
+			
+			$submitter->nonajaxSubmit($winstance, $wargs);
+			$this->form_template($instance, true, $submitter);
+			return new WPTemplateResponse($this, 'form_template');
+		}
+	}
 	
-	public function form_template($instance){
+	
+	public function form_template($instance, $isPosted=false, $submitter=null){
 		$this->title = $instance['wtitle'];
 		$form = $instance['form'];
 		$content = $this->cfShortcode->doShortcode($form);
@@ -51,9 +60,11 @@ class FrontContactFormController extends WPController{
 		$url = '';
 		if($instance['desturi'] != '' && $instance['desturi'] != get_permalink()){
 			$url = $instance['desturi'];
+			$url .= '#' . $this->unitTag;
+			$url = $this->filter->apply('cppress-cf-form-action-url', $url);
+		}else{
+			$url = admin_url('admin-ajax.php');	
 		}
-		$url .= '#' . $this->unitTag;
-		$url = $this->filter->apply('cppress-cf-form-action-url', $url);
 		
 		$idAttr = $this->filter->apply('cppress-cf-form-id-attr', '', $this->title);
 		$nameAttr = $this->filter->apply('cppress-cf-form-name-attr', '', $this->title);
@@ -62,7 +73,12 @@ class FrontContactFormController extends WPController{
 		$classes = array_filter($classes);
 		$classes = array_unique($classes);
 		$class = implode( ' ', $classes);
-		$enctype = $this->filter->apply('cppress-cf-form-enctype', '', $this->title);
+		if($this->cfShortcode->isMultiPartForm()){
+			$enctype = 'multipart/form-data';
+		}else{
+			$enctype = null;
+		}
+		
 		$formAtts = array(
 			'action' => esc_url($url),
 			'method' => 'post',
@@ -71,6 +87,21 @@ class FrontContactFormController extends WPController{
 			'novalidate' => $novalidate ? 'novalidate' : '' 
 		);
 		$this->hiddenFields();
+		if($isPosted){
+			$this->assign('screenReaderContent', $this->screenReaderResponse($submitter));
+			$this->assign('responseOutput', $this->responseOuput($submitter));
+			$screenReaderAtts = array(
+				'class' => 'screen-reader-response',
+				'role' => 'alert'
+			);
+		}else{
+			$this->assign('screenReaderContent', '');
+			$this->assign('responseOutput', $this->responseOuput(null));
+			$screenReaderAtts = array(
+					'class' => 'screen-reader-response',
+			);
+		}
+		$this->assign('screenReaderAtts', $this->formatAtts($screenReaderAtts));
 		$this->assign('formAtts', $this->formatAtts($formAtts));
 		$this->assign('divAtts', $this->formatAtts($divAtts));
 		$this->assign('content', $content);
@@ -83,34 +114,27 @@ class FrontContactFormController extends WPController{
 	 * @responder string
 	 */
 	public function doShortcode($tag){
-		foreach($tag as $key => $value){
-			if(property_exists( __CLASS__, $key )){
-				$this->{$key} = $value;
-			}
-		}
-		
-		if(empty($this->name)){
+		$this->tag = new ContactFormShortcode($tag, $this->request, $this->filter);
+		if($this->tag->name == ''){
 			return '';
 		}
-		
 		$validationError = ''; /** TODO VALIDATION */
-		$class = $this->getFormClass($this->type);
+		$class = $this->getFormClass($this->tag->type);
 		if($validationError){
 			$class .= 'cppress-cf-not-valid';
 		}
 		
 		$atts = array();
-		$atts['class'] = $this->getClassOptions($class);
-		$atts['id'] = $this->getOption('id', 'id', true);
-		$atts['tabindex'] = $this->getOption('tabindex', 'int', true);
+		$atts['class'] = $this->tag->getClassOptions($class);
+		$atts['id'] = $this->tag->getOption('id', 'id', true);
+		$atts['tabindex'] = $this->tag->getOption('tabindex', 'int', true);
 		
-		if($this->isRequired()){
+		if($this->tag->isRequired()){
 			$atts['aria-required'] = true;
 		}
 		$atts['aria-invalid'] = $validationError ? 'true' : 'false';
 		
-		$handler = 'do' . ucfirst($this->baseType) . 'Shortcode';
-		
+		$handler = 'do' . ucfirst($this->tag->baseType) . 'Shortcode';
 		if(method_exists($this, $handler)){
 			return $this->$handler($atts, $validationError);
 		}
@@ -120,39 +144,40 @@ class FrontContactFormController extends WPController{
 	
 
 	public function doTextShortcode($atts, $validationError){
-		$atts['size'] = $this->getSizeOption('40');
-		$atts['maxlength'] = $this->getMaxLengthOption();
-		$atts['minlength'] = $this->getMinLengthOption();
+		$atts['size'] = $this->tag->getSizeOption('40');
+		$atts['maxlength'] = $this->tag->getMaxLengthOption();
+		$atts['minlength'] = $this->tag->getMinLengthOption();
 		if ($atts['maxlength'] && $atts['minlength'] && $atts['maxlength'] < $atts['minlength']){
 			unset( $atts['maxlength'], $atts['minlength'] );
 		}
 		
-		if($this->hasOption('readonly')){
+		if($this->tag->hasOption('readonly')){
 			$atts['readonly'] = 'readonly';
 		}
 		
-		$value = (string) reset($this->values);
+		$value = (string) implode(' ', $this->tag->values);
 		
-		if($this->hasOption('placeholder') || $this->hasOption('watermark')){
+		if($this->tag->hasOption('placeholder') || $this->tag->hasOption('watermark')){
 			$atts['placeholder'] = $value;
 			$value = '';
 		}
 		
-		$value = $this->getDefaultOption($value);
+		$value = $this->tag->getDefaultOption($value);
 		$atts['value'] = $value;
 		
 		$atts['type'] = 'text';
-		$atts['name'] = $this->name;
+		$atts['name'] = $this->tag->name;
 		
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 			$this->filter->apply(
 				'cppress-cf-text',
-				'<span class="cppress-cf-form-control-wrap %1$s"><input %2$s />%3$s</span>',
-				$this->name,
-				$this->title
+				'<span class="cppress-cf-control-wrap %1$s"><input %2$s />%3$s</span>',
+				$this->tag->name,
+				$this->title,
+					$this->tag
 			),
-			sanitize_html_class($this->name ), $atts, $validationError);
+			sanitize_html_class($this->tag->name ), $atts, $validationError);
 	}
 	
 
@@ -170,21 +195,21 @@ class FrontContactFormController extends WPController{
 	
 	public function doNumberShortcode($atts, $validationError){
 		$atts['class'] .= ' cppress-validates-as-number';
-		$atts['min'] = $this->getOption('number-min', 'signed_int', true);
-		$atts['max'] = $this->getOption('number-max', 'signed_int', true);
-		$atts['step'] = $this->getOption('number-step', 'int', true);
+		$atts['min'] = $this->tag->getOption('number-min', 'signed_int', true);
+		$atts['max'] = $this->tag->getOption('number-max', 'signed_int', true);
+		$atts['step'] = $this->tag->getOption('number-step', 'int', true);
 		
-		if($this->hasOption('readonly')){
+		if($this->tag->hasOption('readonly')){
 			$atts['readonly'] = 'readonly';
 		}
 		
-		$value = (string) reset($this->values);
-		if($this->hasOption('placeholder') || $this->hasOption('watermark')){
+		$value = (string) implode(' ', $this->tag->values);
+		if($this->tag->hasOption('placeholder') || $this->tag->hasOption('watermark')){
 			$atts['placeholder'] = $value;
 			$value = '';
 		}
 		
-		$value = $this->getDefaultOption($value);
+		$value = $this->tag->getDefaultOption($value);
 		$atts['value'] = $value;
 		$atts['type'] = 'number';
 		$atts['name'] = $this->name;
@@ -192,100 +217,103 @@ class FrontContactFormController extends WPController{
 		return sprintf(
 			$this->filter->apply(
 					'cppress-cf-number',
-					'<span class="cppress-cf-form-control-wrap %1$s"><input %2$s />%3$s</span>',
-					$this->name,
-					$this->title
+					'<span class="cppress-cf-control-wrap %1$s"><input %2$s />%3$s</span>',
+					$this->tag->name,
+					$this->title,
+					$this->tag
 			),
-			sanitize_html_class($this->name ), $atts, $validationError);
+			sanitize_html_class($this->tag->name ), $atts, $validationError);
 	}
 
 	public function doDateShortcode($atts, $validationError){
 		$atts['class'] .= ' cppress-validates-as-date';
-		$atts['min'] = $this->getDateOption('date-min');
-		$atts['max'] = $this->getDateOption('date-max');
-		$atts['step'] = $this->getOption('date-step', 'int', true);
+		$atts['min'] = $this->tag->getDateOption('date-min');
+		$atts['max'] = $this->tag->getDateOption('date-max');
+		$atts['step'] = $this->tag->getOption('date-step', 'int', true);
 		
-		if($this->hasOption('readonly')){
+		if($this->tag->hasOption('readonly')){
 			$atts['readonly'] = 'readonly';
 		}
 		
-		$value = (string) reset($this->values);
-		if($this->hasOption('placeholder') || $this->hasOption('watermark')){
+		$value = (string) reset();
+		if($this->tag->hasOption('placeholder') || $this->tag->hasOption('watermark')){
 			$atts['placeholder'] = $value;
 			$value = '';
 		}
 		
-		$value = $this->getDefaultOption($value);
+		$value = $this->tag->getDefaultOption($value);
 		$atts['value'] = $value;
 		$atts['type'] = 'date';
-		$atts['name'] = $this->name;
+		$atts['name'] = $this->tag->name;
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 			$this->filter->apply(
 					'cppress-cf-date',
-					'<span class="cppress-cf-form-control-wrap %1$s"><input %2$s />%3$s</span>',
-					$this->name,
-					$this->title
+					'<span class="cppress-cf-control-wrap %1$s"><input %2$s />%3$s</span>',
+					$this->tag->name,
+					$this->title,
+					$this->tag
 			),
-			sanitize_html_class($this->name ), $atts, $validationError);
+			sanitize_html_class($this->tag->name ), $atts, $validationError);
 	}
 	
 	public function doTextareaShortcode($atts, $validationError){
-		$atts['cols'] = $this->getColsOption('40');
-		$atts['rows'] = $this->getRowsOption('10');
-		$atts['maxlength'] = $this->getMaxLengthOption();
-		$atts['minlength'] = $this->getMinLengthOption();
+		$atts['cols'] = $this->tag->getColsOption('40');
+		$atts['rows'] = $this->tag->getRowsOption('10');
+		$atts['maxlength'] = $this->tag->getMaxLengthOption();
+		$atts['minlength'] = $this->tag->getMinLengthOption();
 		
 		if($atts['maxlength'] && $atts['minlength'] && $atts['maxlength'] < $atts['minlength']){
 			unset($atts['maxlength'], $atts['minlength']);
 		}
 		
-		if($this->hasOption('readonly')){
+		if($this->tag->hasOption('readonly')){
 			$atts['readonly'] = 'readonly';
 		}
 		
-		if($this->hasOption('placeholder') || $this->hasOption('watermark')){
+		if($this->tag->hasOption('placeholder') || $this->tag->hasOption('watermark')){
 			$atts['placeholder'] = $value;
 			$value = '';
 		}
 		
-		$value = empty($this->content) ? (string) reset($this->values) : $this->content;
+		$value = empty($this->tag->content) ? (string) implode(' ', $this->tag->values) : $this->tag->content;
 		
-		$value = $this->getDefaultOption($value);
-		$atts['name'] = $this->name;
+		$value = $this->tag->getDefaultOption($value);
+		$atts['name'] = $this->tag->name;
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 				$this->filter->apply(
 						'cppress-cf-textarea',
-						'<span class="cppress-cf-form-control-wrap %1$s"><textarea %2$s>%3$s</textarea>%4$s</span>',
-						$this->name,
-						$this->title
+						'<span class="cppress-cf-control-wrap %1$s"><textarea %2$s>%3$s</textarea>%4$s</span>',
+						$this->tag->name,
+						$this->title,
+						$this->tag
 				),
-				sanitize_html_class($this->name), $atts,
+				sanitize_html_class($this->tag->name), $atts,
 				esc_textarea($value), $validationError);
 		
 	}
 	
 	public function doSelectShortcode($atts, $validationError){
-		$multiple = $this->hasOption('multiple');
-		$includeBlank = $this->hasOption('blankfirst');
-		$firstAsLabel = $this->hasOption('firstaslabel');
-		$values = $this->values;
-		$labels = $this->labels;
-		if($data = (array) $this->getDataOption()){
+		$multiple = $this->tag->hasOption('multiple');
+		$includeBlank = $this->tag->hasOption('blankfirst');
+		$firstAsLabel = $this->tag->hasOption('firstaslabel');
+		$values = $this->tag->values;
+		$labels = $this->tag->labels;
+		if($data = (array) $this->tag->getDataOption()){
 			$values = array_merge( $values, array_values( $data ) );
 			$labels = array_merge( $labels, array_values( $data ) );
 		}
 		
 		$defaults = array();
-		$defaultChoice = $this->getDefaultOption(null, 'multiple=1');
+		$defaultChoice = $this->tag->getDefaultOption(null, 'multiple=1');
 		foreach($defaultChoice as $value){
 			$key = array_search($value, $values, true);
 			if(false !== $key){
 				$defaults[] = (int) $key + 1;
 			}
 		}
-		if($matches = $this->getFirstMatchOption( '/^default:([0-9_]+)$/')){
+		if($matches = $this->tag->getFirstMatchOption( '/^default:([0-9_]+)$/')){
 			$defaults = array_merge($defaults, explode('_', $matches[1]));
 		}
 		$defaults = array_unique($defaults);
@@ -319,25 +347,26 @@ class FrontContactFormController extends WPController{
 			$atts['multiple'] = 'multiple';
 		}
 		
-		$atts['name'] = $this->name . ( $multiple ? '[]' : '' );
+		$atts['name'] = $this->tag->name . ( $multiple ? '[]' : '' );
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 				$this->filter->apply(
 						'cppress-cf-select',
 						'<span class="wpcf7-form-control-wrap %1$s"><select %2$s>%3$s</select>%4$s</span>',
-						$this->name,
-						$this->title
+						$this->tag->name,
+						$this->title,
+						$this->tag
 				),
-				sanitize_html_class($this->name), $atts, $html, $validationError);
+				sanitize_html_class($this->tag->name), $atts, $html, $validationError);
 	}
 	
 	public function doCheckboxShortcode($atts, $validationError){
-		$labelFirst = $this->hasOption('labelfirst');
-		$useLabelElement = $this->hasOption('uselabelelement');
-		$exclusive = $this->hasOption('exclusive:on');
+		$labelFirst = $this->tag->hasOption('labelfirst');
+		$useLabelElement = $this->tag->hasOption('uselabelelement');
+		$exclusive = $this->tag->hasOption('exclusive:on');
 		$multiple = false;
 		
-		if('checkbox' == $this->baseType){
+		if('checkbox' == $this->tag->baseType){
 			$multiple = !$exclusive;
 		}else{ // radio
 			$exclusive = false;
@@ -355,10 +384,10 @@ class FrontContactFormController extends WPController{
 		
 		$html = '';
 		$count = 0;
-		$values = (array) $this->values;
-		$labels = (array) $this->labels;
+		$values = (array) $this->tag->values;
+		$labels = (array) $this->tag->labels;
 		
-		if ($data = (array) $this->getDataOption()) {
+		if ($data = (array) $this->tag->getDataOption()) {
 			if($freeText){
 				$values = array_merge(
 						array_slice($values, 0, -1),
@@ -374,7 +403,7 @@ class FrontContactFormController extends WPController{
 			}
 		}
 		$defaults = array();
-		$defaultChoice = $this->getDefaultOption(null, 'multiple=1');
+		$defaultChoice = $this->tag->getDefaultOption(null, 'multiple=1');
 		foreach($defaultChoice as $value){
 			$key = array_search($value, $values, true);
 			if(false !== $key){
@@ -382,7 +411,7 @@ class FrontContactFormController extends WPController{
 			}
 		}
 		
-		if ($matches = $this->getFirstMatchOption('/^default:([0-9_]+)$/')) {
+		if ($matches = $this->tag->getFirstMatchOption('/^default:([0-9_]+)$/')) {
 			$defaults = array_merge($defaults, explode('_', $matches[1]));
 		}
 		$defaults = array_unique($defaults);
@@ -399,7 +428,7 @@ class FrontContactFormController extends WPController{
 			}
 			
 			$itemAtts = array(
-				'type' => $this->baseType,
+				'type' => $this->tag->baseType,
 				'name' => $this->name . ( $multiple ? '[]' : '' ),
 				'value' => $value,
 				'checked' => $checked ? 'checked' : '',
@@ -412,8 +441,9 @@ class FrontContactFormController extends WPController{
 						$this->filter->apply(
 							'cppress-cf-list-item-label-first',
 							'<span class="cppress-cf-list-item-label">%1$s</span>&nbsp;<input %2$s />',
-							$this->name,
-							$this->title
+							$this->tag->name,
+							$this->title,
+							$this->tag
 						),
 						esc_html($label), $itemAtts);
 			}else{
@@ -421,8 +451,9 @@ class FrontContactFormController extends WPController{
 						$this->filter->apply(
 							'cppress-cf-list-item-label-last',
 							'<input %2$s />&nbsp;<span class="cppress-cf-list-item-label">%1$s</span>',
-							$this->name, 
-							$this->title
+							$this->tag->name, 
+							$this->title,
+							$this->tag
 						),
 						esc_html($label), $itemAtts);
 			}
@@ -450,11 +481,12 @@ class FrontContactFormController extends WPController{
 		return sprintf(
 				$this->filter->apply(
 						'cppress-cf-checkbox',
-						'<span class="cppress-cf-form-control-wrap %1$s"><span %2$s>%3$s</span>%4$s</span>',
-						$this->name,
-						$this->title
+						'<span class="cppress-cf-control-wrap %1$s"><span %2$s>%3$s</span>%4$s</span>',
+						$this->tag->name,
+						$this->title,
+						$this->tag
 				),
-				sanitize_html_class($this->name), $atts, $html, $validationError);
+				sanitize_html_class($this->tag->name), $atts, $html, $validationError);
 		
 	}
 	
@@ -463,49 +495,41 @@ class FrontContactFormController extends WPController{
 	}
 	
 	public function doAcceptanceShortcode($atts, $validationError){
-		if($this->hasOption('default:on')){
+		if($this->tag->hasOption('default:on')){
 			$atts['checked'] = 'checked';
 		}
 		$atts['type'] = 'checkbox';
-		$atts['name'] = $this->name;
+		$atts['name'] = $this->tag->name;
 		$atts['value'] = '1';
 		
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 				$this->filter->apply(
 						'cppress-cf-acceptance',
-						'<span class="cppress-cf-form-control-wrap %1$s"><input %2$s />%3$s</span>',
-						$this->name,
-						$this->title
+						'<span class="cppress-cf-control-wrap %1$s"><input %2$s />%3$s</span>',
+						$this->tag->name,
+						$this->title,
+						$this->tag
 				),
-				sanitize_html_class($this->name), $atts, $validationError);
+				sanitize_html_class($this->tag->name), $atts, $validationError);
 		
 	}
 	
 	public function doFileShortcode($atts, $validationError){
-		$atts['size'] = $this->getSizeOption('40');
+		$atts['size'] = $this->tag->getSizeOption('40');
 		$atts['type'] = 'file';
-		$atts['name'] = $this->name;
+		$atts['name'] = $this->tag->name;
 		
 		$atts = $this->formatAtts($atts);
 		return sprintf(
 			$this->filter->apply(
 					'cppress-cf-file',
-					'<span class="cppress-cf-form-control-wrap %1$s"><input %2$s />%3$s</span>',
-					$this->name,
-					$this->title
+					'<span class="cppress-cf-control-wrap %1$s"><input %2$s />%3$s</span>',
+					$this->tag->name,
+					$this->title,
+					$this->tag
 			),
-			sanitize_html_class($this->name), $atts, $validationError);
-	}
-	
-	
-	public function isRequired(){
-		return ('*' == substr( $this->type, -1 ));
-	}
-	
-	public function hasOption($opt){
-		$pattern = sprintf('/^%s(:.+)?$/i', preg_quote($opt, '/'));
-		return (bool) preg_grep($pattern, $this->options);
+			sanitize_html_class($this->tag->name), $atts, $validationError);
 	}
 	
 	
@@ -518,242 +542,14 @@ class FrontContactFormController extends WPController{
 		$required = ('*' == substr( $type, -1 ));
 		$classes[] = 'cppress-cf-' . $typebase;
 		if ($required){
-			$classes[] = 'cpprss-cf-validates-as-required';
+			$classes[] = 'cppress-cf-validates-as-required';
 		}
 		$classes = $this->filter->apply('cppress-cf-form-classes', array_unique($classes), $this->title);
 		return implode(' ', $classes);
 	}
 	
-	private function getClassOptions($default=''){
-		if(is_string($default)){
-			$default = explode(' ', $default);
-		}
-		$options = array_merge(
-				(array) $default,
-				(array) $this->getOption('class', 'class'));
-		$options = array_filter(array_unique($options));
-		return implode(' ', $options);
-	}
 	
-	private function getOption($opt, $pattern = '', $single = false){
-		$presetPatterns = array(
-				'date' => '([0-9]{4}-[0-9]{2}-[0-9]{2}|today(.*))',
-				'int' => '[0-9]+',
-				'signed_int' => '-?[0-9]+',
-				'class' => '[-0-9a-zA-Z_]+',
-				'id' => '[-0-9a-zA-Z_]+'
-		);
-		
-		if(isset($presetPatterns[$pattern])){
-			$pattern = $presetPatterns[$pattern];
-		}
-		
-		if('' == $pattern){
-			$pattern = '.+';
-		}
-		
-		$pattern = sprintf('/^%s:%s$/i', preg_quote($opt, '/'), $pattern);
-		
-		if($single){
-			$matches = $this->getFirstMatchOption($pattern);
-			if(!$matches){
-				return false;
-			}
-			
-			return substr($matches[0], strlen($opt) + 1);
-		}else{
-			$matchesAll = $this->getAllMatchOptions($pattern);
-			if(!$matchesAll){
-				return false;
-			}
-			
-			$results = array();
-			foreach($matchesAll as $matches){
-				$results[] = substr($matches[0], strlen($opt) + 1);
-			}
-			
-			return $results;
-		}
-	}
-	
-	private function getDefaultOption($default = '', $args = ''){
-		$args = wp_parse_args($args, array('multiple' => false));
-		$options = (array) $this->getOption('default');
-		$values = array();
-		
-		if(empty($options)){
-			return $args['multiple'] ? $values : $default;
-		}
-		
-		foreach($options as $opt){
-			$opt = sanitize_key($opt);
-			if('user_' == substr($opt, 0, 5) && is_user_logged_in()){
-				$primaryProps = array('user_login', 'user_email', 'user_url');
-				$opt = in_array($opt, $primaryProps) ? $opt : substr($opt, 5);
-				$user = wp_get_current_user();
-				$userProp = $user->get($opt);
-				if(!empty($userProp)){
-					if($args['multiple']){
-						$values[] = $userProp;
-					}else{
-						return $userProp;
-					}
-				}
-			}else if('post_meta' == $opt && in_the_loop()){
-				if($args['multiple']){
-					$values = array_merge( $values, PostMeta::find(get_the_ID(), $this->name));
-				}else{
-					$val = (string) PostMeta::find(get_the_ID(), $this->name, true);
-					if(strlen($val)){
-						return $val;
-					}
-				}
-			}else if(('get' == $opt || 'post' == $opt) && !is_null($this->getParam($this->name, null))){
-				$vals = (array) $this->getParam($this->name);
-				$vals = array_map(function($text){
-					return $this->sanitizeQueryVar($text);
-				}, $vals);
-				
-				if ($args['multiple']){
-					$values = array_merge($values, $vals);
-				}else{
-					$val = isset($vals[0]) ? (string) $vals[0] : '';
-					if(strlen($val)){
-						return $val;
-					}
-				}
-			}
-		}
-		
-		if($args['multiple']){
-			$values = array_unique($values);
-			return $values;
-		}else{
-			return $default;
-		}
-		
-	}
-	
-	private function getSizeOption($default=''){
-		$option = $this->getOption('size', 'int', true);
-		if ($option){
-			return $option;
-		}
-		
-		$matchesAll = $this->getAllMatchOptions( '%^([0-9]*)/[0-9]*$%' );
-		foreach ((array) $matchesAll as $matches) {
-			if(isset($matches[1]) && '' !== $matches[1]){
-				return $matches[1];
-			}
-		}
-		
-		return $default;
-	}
-	
-	private function getMaxLengthOption($default=''){
-		$option = $this->getOption('maxlength', 'int', true);
-		if($option){
-			return $option;
-		}
-		$matchesAll = $this->getAllMatchOptions('%^(?:[0-9]*x?[0-9]*)?/([0-9]+)$%');
-		foreach((array) $matchesAll as $matches){
-			if(isset($matches[1]) && '' !== $matches[1]){
-				return $matches[1];
-			}
-		}
-		
-		return $default;
-	}
-	
-	private function getMinLengthOption($default=''){
-		$option = $this->getOption( 'minlength', 'int', true );
-		if($option){
-			return $option;
-		}
-		
-		return $default;
-	}
-	
-	private function getRowsOption($default=''){
-		$matchesAll = $this->getAllMatchOptions('%^([0-9]*)x([0-9]*)(?:/[0-9]+)?$%');
-		foreach((array) $matchesAll as $matches){
-			if (isset( $matches[2] ) && '' !== $matches[2]){
-				return $matches[2];
-			}
-		}
-		
-		return $default;
-	}
-	
-	private function getColsOption($default=''){
-		$matchesAll = $this->getAllMatchOptions('%^([0-9]*)x([0-9]*)(?:/[0-9]+)?$%');
-		foreach((array) $matchesAll as $matches){
-			if(isset( $matches[1] ) && '' !== $matches[1]){
-				return $matches[1];
-			}
-		}
-		
-		return $default;
-	}
-	
-	private function getDateOption($opt){
-		$option = $this->getOption($opt, 'date', true);
-		if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $option)){
-			return $option;
-		}
-		if(preg_match('/^today(?:([+-][0-9]+)([a-z]*))?/', $option, $matches)){
-			$number = isset($matches[1]) ? (int) $matches[1] : 0;
-			$unit = isset($matches[2]) ? $matches[2] : '';
-			if(!preg_match( '/^(day|month|year|week)s?$/', $unit)){
-				$unit = 'days';
-			}
-			$date = gmdate('Y-m-d', strtotime(sprintf('today %1$s %2$s', $number, $unit)));
-			return $date;
-		}
-		
-		return false;
-	}
-	
-	private function getDataOption($args = ''){
-		$options = (array) $this->getOption('data');
-		return $this->filter->apply( 'cppress-cf-tag-data-options', null, $options, $args);
-	}
-	
-	private function getFirstMatchOption($pattern){
-		foreach((array) $this->options as $option){
-			if(preg_match($pattern, $option, $matches)){
-				return $matches;
-			}
-		}
-		
-		return false;
-	}
-	
-	private function getAllMatchOptions($pattern){
-		$result = array();
-		foreach((array) $this->options as $option){
-			if(preg_match($pattern, $option, $matches)){
-				$result[] = $matches;
-			}
-		}
-		
-		return $result;
-	}
-	
-	private function sanitizeQueryVar($text){
-		$text = wp_unslash($text);
-		$text = wp_check_invalid_utf8($text);
-		if (false !== strpos($text, '<')) {
-			$text = wp_pre_kses_less_than($text);
-			$text = wp_strip_all_tags($text);
-		}
-		$text = preg_replace('/%[a-f0-9]{2}/i', '', $text);
-		$text = preg_replace('/ +/', ' ', $text);
-		$text = trim($text, ' ');
-		return $text;
-	}
-	
-	private function formatAtts($atts){
+	public function formatAtts($atts){
 		$html = '';
 		$prioritizedAtts = array( 'type', 'name', 'value' );
 		foreach($prioritizedAtts as $att){
@@ -779,7 +575,7 @@ class FrontContactFormController extends WPController{
 		return $html;
 	}
 	
-	private function enctypeValue($enctype){
+	public function enctypeValue($enctype){
 		$enctype = trim($enctype);
 		if(empty($enctype)){
 			return '';
@@ -801,15 +597,18 @@ class FrontContactFormController extends WPController{
 		return '';
 	}
 	
-	private function hiddenFields(){
+	public function hiddenFields(){
+		$tags = htmlspecialchars(json_encode($this->cfShortcode->getScannedTags(), JSON_HEX_TAG));
 		$hiddenFields = array(
 			'_cppress-cf-unit-tag' => $this->unitTag,
-			'_wpnonce' => wp_create_nonce('cppress-cf')
+			'_wpnonce' => wp_create_nonce('cppress-cf'),
+			'_cppress-cf-scannedtag' => $tags,
+			'_cppress-cf-id' => get_the_ID()
 		);
 		$this->assign('hiddenFields', $hiddenFields);
 	}
 	
-	private static function getUnitTag($id = 0){
+	public static function getUnitTag($id = 0){
 		static $globalCount = 0;
 		
 		$globalCount += 1;
@@ -822,6 +621,66 @@ class FrontContactFormController extends WPController{
 					absint($id), $global_count);
 		}
 		return $unitTag;
+	}
+	
+	private function screenReaderResponse(ContactFormSubmitter $submitter){
+		$content = '';
+		if($response = $submitter->getResponse()){
+			$content = esc_html($response);
+		}
+		
+		if($invalidFields = $submitter->getUploadedFiles()){
+			$content .= "\n" . '<ul>' . "\n";
+			foreach((array) $invalidFields as $name => $field){
+				if($field['idref']){
+					$link = sprintf('<a href="#%1s">%2$s</a>',
+						esc_attr($field['idref']),
+						esc_attr($field['reason'])	
+					);
+					$content .= sprintf('<li>%s</li>', $link);
+				}else{
+					$content .= sprintf('<li>%</li>', esc_html($field['reason']));
+				}
+				$content .= "\n";
+			}
+			
+			$content .= "</ul>\n";
+		}
+		
+		return $this->filter->apply('cppress-cf-screenreadercontent', $content, $submitter, $this->title);
+	}
+	
+	private function responseOuput(ContactFormSubmitter $submitter = null){
+		$class = 'cppress-cf-response-output';
+		$role = '';
+		$content = '';
+		
+		if(!is_null($submitter)){
+			$role = 'alert';
+			$content = $submitter->getResponse();
+			if($submitter->is('validation_failed')){
+				$class .= ' cppress-cf-validation-errors';
+			}else if($submitter->is('spam')){
+				$class .= ' cppress-cf-spam-blocked';
+			}else if($submitter->is('mail_sent')){
+				$class .= ' cppress-cf-mail-sent-ok';
+			}else if($submitter->is('mail_failed')){
+				$class .= 'cppress-cf-mail-sent-ng';
+			}
+		}else{
+			$class .= ' cppress-cf-display-none';
+		}
+		
+		$atts = array(
+			'class' => trim($class),
+			'role' => trim($role)
+		);
+		$atts = $this->formatAtts($atts);
+		$output = sprintf('<div %1$s>%2$s</div>', $atts, esc_html($content));
+		$output = $this->filter->apply('cppress-cf-response-output', $output, $content, $submitter, $this->title);
+		$this->responseCount += 1;
+		
+		return $output;
 	}
 	
 	private function assignTemplate($instance, $tPreName){

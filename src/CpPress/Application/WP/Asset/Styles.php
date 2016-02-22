@@ -45,6 +45,12 @@ class Styles implements Asset{
 		return wp_enqueue_style($asset, $src, $deps, $ver, $media);
 	}
 	
+	public function enqueueFonts($fonts){
+		foreach($fonts as $name => $asset){
+			wp_enqueue_style($name, $asset);
+		}
+	}
+	
 	public function deregister($asset){
 		wp_deregister_style($asset);
 	}

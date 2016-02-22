@@ -15,6 +15,16 @@ class AjaxHook extends Hook{
 		parent::register($hook, $closure, $priority, $acceptedArgs);
 	}
 	
+	public function registerNoPriv($hook, Closure $closure, $priority=10, $acceptedArgs = 1){
+		$hook = 'wp_ajax_nopriv_' . $hook;
+		parent::register($hook, $closure, $priority, $acceptedArgs);
+	}
+	
+	public function registerFrontEnd($hook, Closure $closure, $priority=10, $acceptedArgs = 1){
+		$this->registerNoPriv($hook, $closure, $priority, $acceptedArgs);
+		$this->register($hook, $closure, $priority, $acceptedArgs);
+	}
+	
 	public function exec($hook){
 		if(!preg_match('/^wp_ajax_*/', $hook)){
 			$hook = 'wp_ajax_'.$hook;

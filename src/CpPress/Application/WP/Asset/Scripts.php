@@ -76,7 +76,8 @@ class Scripts implements Asset{
 	}
 	
 	public function localize($asset, $objectName, $data){
-		return wp_localize_script($asset, $objectName, $data);
+		wp_localize_script($asset, $objectName, $data);
+		return wp_enqueue_script($asset);
 	}
 	
 	public function inline($asset, $data){

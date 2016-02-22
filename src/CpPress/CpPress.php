@@ -15,7 +15,7 @@ class CpPress{
 	}
 	
 	public static function start(){
-		if(is_admin()){
+		if(is_admin() && !isset($_POST['_cppress_front_ajax'])){
 			self::$App = new BackEndApplication();
 			self::$App->registerHook('init', function(){
 				self::$App->setup();
