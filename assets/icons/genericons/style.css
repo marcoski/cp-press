@@ -1,0 +1,29 @@
+@font-face {
+	font-family: 'cp-genericons';
+	src:url('font/genericons.eot?map0iz');
+	src:url('font/genericons.eot?#iefixmap0iz') format('embedded-opentype'),
+	url('font/genericons.woff?map0iz') format('woff'),
+	url('font/genericons.ttf?map0iz') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.cp-icon-genericons {
+	font-family: 'cp-genericons';
+	display: inline-block;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1em;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-align: center;
+}
+
+.cp-icon-genericons[data-cp-icon]:before {
+	display: inline-block;
+	content: attr(data-cp-icon);
+}
