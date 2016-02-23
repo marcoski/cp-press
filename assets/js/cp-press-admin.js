@@ -1,22 +1,3 @@
-jQuery(document).ready(function(){
-	var $ = jQuery;
-
-	$('.chpress_header_colorpick, .cp-color-picker').wpColorPicker();
-	$('#cppress_logo_button').click(function() {
-		formfield = $('#cppress_logo').attr('name');
-		tb_show('', 'media-upload.php?type=image&TB_iframe=true');
-		return false;
-	});
-
-	window.send_to_editor = function(html) {
-		imgurl = $('img',html).attr('src');
-		$('#cppress_logo').val(imgurl);
-		$('#cppress_logo_img').attr('src', imgurl);
-		tb_remove();
-	};
-
-});
-
 (function($){
 
 	var CpDragDrop = function (element, $dropable){
