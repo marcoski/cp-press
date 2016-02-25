@@ -19,10 +19,14 @@ use CpPress\Application\WP\Submitter\ContactFormSubmitter;
 use CpPress\Application\WP\Admin\PostMeta;
 use Commonhelp\Util\Inflector;
 use CpPress\Application\BackEnd\FieldsController;
+use CpPress\Application\FrontEnd\FrontMailPoetController;
+use CpPress\Application\WP\Submitter\MailPoetSubmitter;
 
 class FrontEndApplication extends CpPressApplication{
 	
 	private $post;
+	
+	private static $formResult = array();
 	
 	public function __construct($urlParams=array()){
 		parent::__construct(
@@ -129,6 +133,16 @@ class FrontEndApplication extends CpPressApplication{
 			$request = $c->query('Request');
 			return new ContactFormSubmitter($request, $c->query('FrontEndFilter'), $c->query('FrontEndHook'));
 		});
+		
+		$container->registerService('MailPoet', function($c){
+			$filter = $c->query('FrontEndFilter');
+			$mailPoetController = new FrontMailPoetController('MailPoetApp', $c->query('Request'), array($this->themeRoot), $filter);
+			return $mailPoetController;
+		});
+		$container->registerService('MailPoetSubmitter', function($c){
+			$request = $c->query('Request');
+			return new MailPoetSubmitter($request, $c->query('FrontEndFilter'), $c->query('FrontEndHook'));
+		});
 	}
 	
 	public function setWPPost($post){
@@ -141,8 +155,14 @@ class FrontEndApplication extends CpPressApplication{
 	
 	public function setup(){
 		parent::setup();
-		$hookObj = $this->getContainer()->query('FrontEndHook');
+		$container = $this->getContainer();
+		$hookObj = $this->container->query('FrontEndHook');
 		$hookObj->create('cppress_frontend_setup');
+		$request = $this->container->query('Request');
+		if(!is_null($request->getParam('_cppress-mailpoet'))){
+			self::$formResult['cppress-mailpoet'] = 
+				json_decode(FrontEndApplication::part('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter'))), true);
+		}
 	}
 	
 	public function registerFrontEndAjax(){
@@ -167,6 +187,14 @@ class FrontEndApplication extends CpPressApplication{
 			}
 		});
 		$hookObj->execAll();
+	}
+	
+	public static function getFormResult($form){
+		if(isset(self::$formResult[$form]) && self::$formResult[$form] !== null){
+			return self::$formResult[$form];
+		}
+		
+		return null;
 	}
 	
 	public function registerHooks(){

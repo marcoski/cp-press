@@ -62,6 +62,11 @@ abstract class Submitter{
 		return $this->data;
 	}
 	
+	public function checkNonce($nonce){
+		return is_null($this->request->getParam('_wpnonce')) || 
+		!wp_verify_nonce($this->request->getParam('_wpnonce'), $nonce);
+	}
+	
 	protected function submit(){
 		
 	}

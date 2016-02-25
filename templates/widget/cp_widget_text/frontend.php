@@ -15,11 +15,7 @@
 	}
 	echo $filter->apply('cppress_widget_text_before_the_content', '', $instance);
 	$text = $instance['text'];
-	if(isset($instance['removep']) && $instance['removep']){
-		$text = wpautop($text);
-	}else{
-		$text = wpautop($text, false);
-	}
+	
 	echo $filter->apply('cppress_widget_text_the_content', $text, $instance);
 	echo $filter->apply('cppress_widget_text_after_the_content', '', $instance);
 	echo $filter->apply('cppress_widget_text_container_close', '', $instance['containerclass'], $instance);

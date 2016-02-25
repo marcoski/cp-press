@@ -2,6 +2,8 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
+use Commonhelp\Util\Commonhelp\Util;
+
 class CpWidgetText extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -31,6 +33,20 @@ class CpWidgetText extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
+		$content = $instance['text'];
+		if(isset($instance['removep']) && $instance['removep']){
+			$content = wpautop($content);
+		}else{
+			$content = wpautop($content, false);
+		}
+		if(strpos($content, '[')){
+			$content = do_shortcode($content);
+		}
+		if(strpos($content, 'cppress_addmailpoet_form')){
+			$mpShortcode = $this->container->query('MailPoetShortcodeManager');
+			$content = $mpShortcode->doShortcode($content);
+		}
+		$instance['text'] = $content;
 		return parent::widget($args, $instance);
 	}
 

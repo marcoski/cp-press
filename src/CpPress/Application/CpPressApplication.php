@@ -19,6 +19,7 @@ use CpPress\Application\WP\MetaType\PagePostType;
 use CpPress\Application\WP\MetaType\NewsPostType;
 use CpPress\Application\WP\Shortcode\ContactFormShortcode;
 use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
+use CpPress\Application\WP\Shortcode\MailPoetShortcodeManager;
 
 abstract class CpPressApplication extends WPApplication{
 	
@@ -50,6 +51,13 @@ abstract class CpPressApplication extends WPApplication{
 		$container->registerService('ContactFormShortcodeManager', function($c){
 			ContactFormShortcodeManager::init();
 			return new ContactFormShortcodeManager($c);
+		});
+		$container->registerService('MailPoetShortcodeManager', function($c){
+			if(class_exists('WYSIJA')){
+				return new MailPoetShortcodeManager($c);
+			}
+			
+			return null;
 		});
 		$this->registerPostTypes();
 	}
@@ -115,6 +123,10 @@ abstract class CpPressApplication extends WPApplication{
 		$container->query('NewsTaxonomy')->register();
 		$container->query('NewstagsTaxonomy')->register();
 		$container->query('ContactFormShortcodeManager')->register();
+		$mpShortcode = $container->query('MailPoetShortcodeManager');
+		if(!is_null($mpShortcode)){
+			$mpShortcode->register();
+		}
 	}
 	
 	protected function registerPostTypes(){
