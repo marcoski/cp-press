@@ -53,7 +53,7 @@ class ContactFormValidator extends Validator{
 		}
 		$evaluator = trim($evaluator, '*');
 		if(!($evaluator instanceof ContactFormEvaluator)){
-			if($evaluator == 'email' || $evaluator == 'tel'){
+			if($evaluator == 'email' || $evaluator == 'phone'){
 				$evaluator = 'text';
 			}else if($evaluator == 'radio'){
 				$evaluator = 'checkbox';
