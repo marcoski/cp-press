@@ -1,6 +1,6 @@
 
 @font-face {
-	font-family: 'cp-fontawesome';
+	font-family: 'FontAwesome';
 	src: url('font/fontawesome-webfont.eot?v=4.4.0');
 	src: url('font/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'),
 	url('font/fontawesome-webfont.woff2?v=4.4.0') format('woff2'),
@@ -12,7 +12,7 @@
 }
 
 .cp-icon-fontawesome {
-	font-family: 'cp-fontawesome';
+	font-family: 'FontAwesome';
 	display: inline-block;
 	speak: none;
 	font-style: normal;

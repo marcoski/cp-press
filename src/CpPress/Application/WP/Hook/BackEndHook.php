@@ -118,11 +118,11 @@ class BackEndHook extends Hook{
 					BackEndApplication::main('PageController', 'subtitle', $c, array($post->ID));
 				});
 				$metaBox->setPriority('high');
-				$metaBox->add();
 				return $metaBox;
 			});
 			$subTitle = $container->query('CpPageSubtitle');
 			$subTitle->setPostType($container->query('PagePostType'));
+			$subTitle->add();
 			
 			$container->registerService('CpPostSettings', function($c){
 				$metaBox = new MetaBox('cp-press-post-settings', __('View options', 'cppress'));

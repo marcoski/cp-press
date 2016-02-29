@@ -1,5 +1,5 @@
 @font-face {
-	font-family: 'cp-icomoon';
+	font-family: 'icomoon';
 	src:url('font/icomoon.eot?map0iz');
 	src:url('font/icomoon.eot?#iefixmap0iz') format('embedded-opentype'),
 	url('font/icomoon.woff?map0iz') format('woff'),
@@ -9,7 +9,7 @@
 }
 
 .cp-icon-icomoon {
-	font-family: 'cp-icomoon';
+	font-family: 'icomoon';
 	speak: none;
 	font-style: normal;
 	font-weight: normal;
