@@ -11,6 +11,18 @@
 	<label class="section"><?php _e('Options', 'cppress')?></label>
 	<div class="cp-widget-section cp-widget-section-hide">
 		 <div class="cp-widget-field">
+	    <label for="<?= $widget->get_field_id( 'paginate' ); ?>">
+	    	<input class="widefat"
+		      id="<?= $widget->get_field_id( 'paginate' ); ?>"
+		      name="<?= $widget->get_field_name( 'paginate' ); ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['paginate'] ); ?> />&nbsp;
+	    	<?php _e('Paginate', 'cppress'); ?>
+	    </label>
+	  </div>
+	</div>
+	<div class="cp-widget-section cp-widget-section-hide">
+		 <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">
 	    	<input class="widefat"
 		      id="<?= $widget->get_field_id( 'showtitle' ); ?>"

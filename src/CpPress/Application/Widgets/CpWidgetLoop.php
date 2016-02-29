@@ -26,6 +26,11 @@ class CpWidgetLoop extends CpWidgetBase{
 	 */
 	public function widget($args, $instance) {
 		$loop = FrontEndApplication::part('Post', 'loop', $this->container, array($instance));
+		$paginate = '';
+		if(isset($instance['paginate'])){
+			$paginate = FrontEndApplication::part('Post', 'paginate', $this->container, array($instance));
+		}
+		$this->assign('paginate', $paginate);
 		$this->assign('loop', $loop);
 		return parent::widget($args, $instance);
 	}

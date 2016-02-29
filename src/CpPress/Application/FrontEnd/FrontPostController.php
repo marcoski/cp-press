@@ -21,12 +21,21 @@ class FrontPostController extends WPController{
 	}
 	
 	public function loop($posts){
+		$offset = $posts['offset'];
+		if(isset($posts['paginate'])){
+			$page = $this->getParam('paged', 1);
+			if($posts['offset'] > 0){
+				$offset = ($posts['limit'] * ($page-1)) + $offset;
+			}else{
+				$offset = $posts['limit'] * ($page-1);
+			}
+		}
 		$qargs = array(
 				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
 				'posts_per_page'	=> $posts['limit'],
 				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
 				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
-				'offset'			=> $posts['offset'],
+				'offset'			=> $offset,
 				'order'				=> $posts['order'],
 				'orderby'			=> $posts['orderby'],
 				/* Set it to false to allow WPML modifying the query. */
@@ -51,6 +60,84 @@ class FrontPostController extends WPController{
 		$this->assign('filter', $this->filter);
 		$this->assign('instance', $instance);
 		$this->assign('wpQuery', $this->wpQuery);
+	}
+	
+	/**
+	 * @responder string
+	 */
+	public function paginate($instance){
+		if($this->wpQuery->max_num_pages <= 1){
+			return '';
+		}
+		$paged = $this->getParam('paged', 1);
+		$max = intval($this->wpQuery->max_num_pages);
+		
+		if($paged >= 1){
+			$links[] = $paged;
+		}
+		
+		if($paged >= 3){
+			$links[] = $paged - 1;
+			$links[] = $paged - 2;
+		}
+		
+		if(($paged+2) <= $max){
+			$links[] = $paged + 2;
+			$links[] = $paged + 1;
+		}
+		
+		$paginationClass = $this->filter->apply('cppress-pagination-ulclass', array('pagination'), $instance);
+		$beforePagination = $this->filter->apply('cppress-pagination-ulbefore', '', $instance);
+		$afterPagination = $this->filter->apply('cppress-pagination-ulafter', '', $instance);
+		$pagination = $beforePagination . '<ul class="' . implode(' ', $paginationClass) . '">%s</ul>' . $afterPagination;
+		
+		$els = array();
+		
+		if($this->filter->apply('cppress-pagination-show-prevlink', true, $instance) && $paged > 1){
+			$prevLinkText = $this->filter->apply('cppress-pagination-prevlink-text', '&laquo; ' . __('Prev', 'cppress'), $instance);
+			$els[] = sprintf('<li><a href="%s">%s</a></li>', get_pagenum_link($paged-1), $prevLinkText);
+		}
+		
+		if(!in_array(1, $links)){
+			$class = 1 == $paged ? ' class="active"' : '';
+			$els[] = sprintf(
+				'<li%s><a href="%s">%s</a></li>', 
+				$class,
+				esc_url(get_pagenum_link(1)),
+				'1' 
+			);
+		}
+		
+		sort($links);
+		foreach((array) $links as $link){
+			$class = $paged == $link ? ' class="active"' : '';
+			$els[] = sprintf(
+				'<li %s><a href="%s">%s</a></li>',
+				$class,
+				esc_url(get_pagenum_link($link)),
+				$link
+			);
+		}
+		
+		if(!in_array($max, $links)){
+			if(!in_array($max-1, $links)){
+				$els[] = '<li>...</li>';
+			}
+			$class = $paged == $max ? ' class="active"' : '';
+			$els[] = sprintf(
+				'<li %s><a href="%s">%s</a></li>',
+				$class,
+				esc_url(get_pagenum_link($max)),
+				$max
+			);
+		}
+		
+		if($this->filter->apply('cppress-pagination-show-nextlink', true, $instance) && $paged < $max){
+			$nextLinkText = $this->filter->apply('cppress-pagination-naexlink-text', __('Next', 'cppress') . ' &raquo;');
+			$els[] = sprintf('<li><a href="%s">%s</a></li>', get_pagenum_link($paged+1), $nextLinkText);
+		}
+		
+		return sprintf($pagination, implode("\n", $els));
 	}
 	
 	private function assignTemplate($instance, $tPreName){
