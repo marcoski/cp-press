@@ -60,7 +60,7 @@
 					the_content();
 				}
 			}
-			echo $filter->apply('cppress_widget_post_content_after', '', get_post(), $posts['wtitle']);
+			echo $filter->apply('cppress_widget_post_content_after', '', get_post(), $posts['wtitle'], $thumbHtml);
 			echo $filter->apply('cppress_widget_loop_item_after', '', $posts['wtitle']);
 			echo '</div>';
 		}

@@ -41,6 +41,38 @@ class MailPoetSubmitter extends Submitter{
 		return array('valid' => true);
 	}
 	
+	protected function submitTemplate($id){
+		$values = $this->request->getParam('cppress-mailpoet');
+		$result = array();
+		if(is_null($id) || !is_numeric($id)){
+			return array('valid' => false, 'message' => __('Invalid or empty form', 'cppress'));
+		}
+		
+		$data = array();
+		foreach($values as $name => $val){
+			if(strpos($name, '*')){
+				$n = trim($name, '*');
+				if($n == 'email' && ($n == '' || !sanitize_email($val))){
+					return array('valid' => false, 'message' => __('Invalid or empty email address', 'cppress'));
+				}
+				if(($n == 'firstname' || $n == 'lastnam') && $n == ''){
+					return array('valid' => false, 'message' => __('Invalid or empty field', 'cppress'));
+				}
+			}
+			$name = trim($name, '*');
+			$data[$name] = $val;
+		}
+		$dataSubscriber = array(
+				'user' => $data,
+				'user_list' => array('list_ids' => array($id))
+		);
+		
+		$helperUser = \WYSIJA::get('user', 'helper');
+		$helperUser->addSubscriber($dataSubscriber);
+		
+		return array('valid' => true);
+	}
+	
 	public function ajaxSubmit($instance, $args){
 		return $this->submit();
 	}

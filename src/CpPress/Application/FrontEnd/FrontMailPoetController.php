@@ -49,7 +49,17 @@ class FrontMailPoetController extends WPController{
 			$this->assign('mailpoetConfig', \WYSIJA::get('config', 'model'));
 			$this->assign('id', $atts['id']);
 			$this->assign('formResult', FrontEndApplication::getFormResult('cppress-mailpoet'));
-			return new WPTemplateResponse($this, $atts['type']);
+			if($atts['type'] == 'default'){
+				$template = 'default';
+			}else if($atts['type'] == 'template'){
+				if(!isset($atts['template'])){
+					$template = 'template-parts/mailpoet-form';
+				}else{
+					$template = 'template-parts/' . $atts['template'];
+				}
+				$this->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+			}
+			return new WPTemplateResponse($this, $template);
 		}
 		
 		return '';
@@ -65,7 +75,7 @@ class FrontMailPoetController extends WPController{
 		$this->assign('hiddenFields', $hiddenFields);
 	}
 	
-	private function assignTemplate($instance, $tPreName){
+	private function getTemplate($instance, $tPreName){
 		$template = new WPTemplate($this);
 		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
 		if($instance['wtitle'] !== ''){
