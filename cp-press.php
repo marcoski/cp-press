@@ -20,7 +20,7 @@ use CpPress\CpPress;
  * Plugin Name: CpPress Commonhelp App
  * Plugin URI: https://github.com/marcoski/cp-press
  * Description: Commonhelp Plugin App
- * Version: 1.0
+ * Version: 0.6.7
  * Author: Marco Trognoni
  * Author URI: http://www.commonhelp.it
  * License: MIT
