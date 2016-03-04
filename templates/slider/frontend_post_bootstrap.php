@@ -1,7 +1,7 @@
 <?php 
 	$options = $filter->apply('cppress_widget_slider_options', $options, $wpQuery);
 	$sliderClasses = $filter->apply('cppress_widget_slider_classes', array('carousel', 'slide'), $wpQuery, $options);
-	$sliderId = $filter->apply('cppress_widget_slider_id', 'cppress-carousel-'.md5(serialize($slides)), $slides);
+	$sliderId = $filter->apply('cppress_widget_slider_id', 'cppress-carousel-'.md5(serialize($slides)), $slides, $options);
 	$sliderAttrs = $filter->apply('cppress_widget_slider_attrs', array(
 			'id' => $sliderId,
 			'class' => implode(' ', $sliderClasses),

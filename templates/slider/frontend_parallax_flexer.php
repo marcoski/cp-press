@@ -7,7 +7,7 @@
 	echo '<div class="' . implode(' ', $parallaxClasses) .'">';
 	echo '<div class="container">';
 	echo $filter->apply('cppress_widget_slider_parallax_logo', '', $slides);
-	$sliderClasses = $filter->apply('cppress_widget_slider_classes', array('carousel', 'slide'), $slides);
+	$sliderClasses = $filter->apply('cppress_widget_slider_classes', array('carousel', 'slide'), $slides, $options);
 	$sliderAttrs = $filter->apply('cppress_widget_slider_attrs', array(
 			'id' => 'cppress-carousel-'.md5(serialize($slides)),
 			'class' => implode(' ', $sliderClasses),

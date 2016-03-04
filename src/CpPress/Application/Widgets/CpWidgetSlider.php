@@ -21,6 +21,17 @@ class CpWidgetSlider extends CpWidgetBase{
 						'deps' => array('jquery')
 				)
 		);
+		$this->frontScripts = array(
+				array(
+						'source' => 'flexslider',
+						'deps' => array('jquery')
+				),
+		);
+		$this->frontStyles = array(
+				array(
+						'source' => 'flexslider'
+				)
+		);
 	}
 
 	/**

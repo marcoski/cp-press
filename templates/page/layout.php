@@ -67,6 +67,9 @@ foreach($sections as $skey => $grids){
 	} 
 	echo '>';
 	unset($grids['data']);
+	if($section['title'] != ''){
+		echo $filter->apply('cppress-layout_section_title', '', $section, $section['slug']);
+	}
 	echo $filter->apply('cppress_layout_grid_container_open', '<div class="container">', $section['slug']);
 	foreach($grids as $gkey => $cells){
 		$grid = $cells['data'];
