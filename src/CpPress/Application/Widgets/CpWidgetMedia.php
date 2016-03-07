@@ -56,13 +56,20 @@ class CpWidgetMedia extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		if($instance['extarnal'] != '' && filter_var($instance['external'], FILTER_VALIDATE_URL)){
-			$instance['link'] = $instance['extrenal'];
+		$embed = $this->container->query('Embed');
+		if($instance['external'] != '' && filter_var($instance['external'], FILTER_VALIDATE_URL)){
+			try{
+				$instance['oembed'] = $embed->getEmbedObj($instance['external']);
+			}catch(Exception $e){
+				$instance['link'] = $instance['extrenal'];
+				$instance['oembed'] = null;
+			}
 		}else if($instance['media'] != ''){
 			$image = new Image();
 			$image->set($instance['media']);
 			$imageSrc = $image->getImage($instance['media']);
 			$instance['link'] = $imageSrc[0];
+			$instance['oembed'] = null;
 		}
 		
 		unset($instance['external']);

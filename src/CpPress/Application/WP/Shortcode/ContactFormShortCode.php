@@ -7,6 +7,7 @@ use CpPress\Application\WP\Hook\Filter;
 
 class ContactFormShortcode{
 	
+	
 	private $type;
 	private $baseType;
 	private $name;
