@@ -28,6 +28,7 @@ use CpPress\Application\BackEnd\FieldsController;
 use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
+use CpPress\Application\BackEnd\MultiLanguageController;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -319,6 +320,8 @@ class BackEndApplication extends CpPressApplication{
 		$event->save($id);
 		$attachment = $container->query('AttachmentController');
 		$attachment->save($id);
+		$multiLanguage = $container->query('MultiLanguageController');
+		$multiLanguage->save($id);
 	}
 
 	private function registerControllers(){
@@ -376,6 +379,9 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('ContactFormController', function($c){
 			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot));
+		});
+		$container->registerService('MultiLanguageController', function($c){
+			return new MultiLanguageController('LanguageApp', $c->query('Request'), array($this->themeRoot));
 		});
 	}
 

@@ -78,6 +78,15 @@ class BackEndHook extends Hook{
 				
 				return $metaBox;
 			});
+			$container->registerService('CpLanguage', function($c){
+				$metaBox = new MetaBox('cp-press-language', __('Language', 'cppress'));
+				$metaBox->setContext('side');
+				$metaBox->setCallback(function($post, $box) use($c){
+					BackEndApplication::main('MultiLanguageController', 'language', $c, array($post));
+				});
+			
+					return $metaBox;
+			});
 			$container->registerService('CpLink', function($c){
 				$metaBox = new MetaBox('cp-press-link', __('Link', 'cppress'));
 				$metaBox->setCallback(function($post, $box) use ($c){
@@ -190,6 +199,7 @@ class BackEndHook extends Hook{
 			$scripts->enqueue('cp-press-field-tinymce', array('editor', 'quicktags'));
 			$scripts->enqueue('media-upload');
 			$styles->enqueue('jquery-ui');
+			$styles->enqueue('cp-press-flag-icon');
 			$styles->enqueue('cp-press-dialog');
 			$styles->enqueue('cp-press-admin');
 			foreach(CpWidgetBase::getWidgets() as $widget){
