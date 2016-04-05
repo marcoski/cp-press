@@ -9,6 +9,7 @@ use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
 use Commonhelp\WP\WPTemplateResponse;
 use Commonhelp\WP\Commonhelp\WP;
+use Commonhelp\Util\Inflector;
 
 class FrontSliderController extends WPController{
 	
@@ -45,6 +46,13 @@ class FrontSliderController extends WPController{
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);
 		$this->assign('slides', $slides);
+		$templateTitle = str_replace(' ', '_', strtolower($options['title']));
+		$template = new WPTemplate($this);
+		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+		$this->assign('template', $template);
+		$templateName = $this->filter->apply('cppress_widget_slider_post_template_name',
+				'template-parts/slider_' . $templateTitle, $options);
+		$this->assign('templateName', $templateName);
 		
 		return new WPTemplateResponse($this, 'frontend_image_'.$options['theme']);
 	}

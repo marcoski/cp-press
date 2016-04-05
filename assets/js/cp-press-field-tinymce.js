@@ -16,22 +16,11 @@
 			var id = $textarea.attr('id');
 			if(typeof tinymce != 'undefined'){
 				var mceSettings = tinyMCEPreInit.mceInit['cp-widget-fake-editor'];
-				var content;
-				var curEd = tinymce.get(id);
-				if(curEd != null){
-					content = curEd.getContent();
-					curEd.remove();
-				}
 				var setupEditor = function(editor){
 					editor.on('change', function(){
 						tinymce.get(id).save();
 						$textarea.trigger('change');
 						$textarea.val(window.switchEditors.pre_wpautop(editor.getContent()));
-					});
-					editor.on('init', function(){
-						if(content){
-							editor.setContent(content);
-						}
 					});
 					$textarea.on('keyup', function(){
 						editor.setContent(window.switchEditors.wpautop($textarea.val()));

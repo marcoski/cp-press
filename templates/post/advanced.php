@@ -81,6 +81,22 @@
 			</select>
 		</div>
 		<div class="cp-widget-field">
+			<label><?php _e('Exclude to Category', 'cppress')?>:</label>
+			<select multiple="multiple" style="width:100%;" id="<?= $values['id']['excludecat'] ?>"
+				name="<?= $values['name']['excludecat']; ?>[]">
+				<optgroup label="Categories">
+					<?php $categories = get_terms('category', array('hide_empty' => false)); ?>
+					<?php foreach( $categories as $category ) { ?>
+						<option value="<?php echo $category->term_id; ?>" 
+							<?php if (is_array( $values['value']['excludecat']) && 
+									in_array( $category->term_id, $values['value']['excludecat'])){
+										echo ' selected="selected"';
+									} ?>><?php echo $category->name; ?></option>
+					<?php } ?>
+				</optgroup>
+			</select>
+		</div>
+		<div class="cp-widget-field">
 			<label><?php _e('Filter to Tag', 'cppress')?>:</label>
 			<select style="width:100%;" multiple="multiple" id="<?= $values['id']['tags'] ?>"
 				name="<?= $values['name']['tags']; ?>[]">
@@ -90,6 +106,22 @@
 						<option value="<?php echo $post_tag->term_id; ?>" 
 							<?php if (is_array($values['value']['tags']) && 
 									in_array($post_tag->term_id, $values['value']['tags'])){
+										echo ' selected="selected"'; 
+									} ?>><?php echo $post_tag->name; ?></option>
+					<?php } ?>
+				</optgroup>
+			</select>
+		</div>
+		<div class="cp-widget-field">
+			<label><?php _e('Exclude to Tag', 'cppress')?>:</label>
+			<select style="width:100%;" multiple="multiple" id="<?= $values['id']['excludetags'] ?>"
+				name="<?= $values['name']['excludetags']; ?>[]">
+				<optgroup label="Tags">
+					<?php $tags = get_terms('post_tag', array('hide_empty' => false)); ?>
+					<?php foreach( $tags as $post_tag ) { ?>
+						<option value="<?php echo $post_tag->term_id; ?>" 
+							<?php if (is_array($values['value']['excludetags']) && 
+									in_array($post_tag->term_id, $values['value']['excludetags'])){
 										echo ' selected="selected"'; 
 									} ?>><?php echo $post_tag->name; ?></option>
 					<?php } ?>

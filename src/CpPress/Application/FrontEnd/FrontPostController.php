@@ -23,7 +23,10 @@ class FrontPostController extends WPController{
 	public function loop($posts){
 		$offset = $posts['offset'];
 		if(isset($posts['paginate'])){
-			$page = $this->getParam('paged', 1);
+			$page = get_query_var('paged', 1);
+			if($page === 0){
+				$page = 1;
+			}
 			if($posts['offset'] > 0){
 				$offset = ($posts['limit'] * ($page-1)) + $offset;
 			}else{
@@ -34,7 +37,9 @@ class FrontPostController extends WPController{
 				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
 				'posts_per_page'	=> $posts['limit'],
 				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
+				'category__not_in' => isset($posts['excludecat']) ? $posts['excludecat'] : array(),
 				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
+				'tag__not_in' => isset($posst['excludetags']) ? $posts['excludetags'] : array(),
 				'offset'			=> $offset,
 				'order'				=> $posts['order'],
 				'orderby'			=> $posts['orderby'],
@@ -69,7 +74,10 @@ class FrontPostController extends WPController{
 		if($this->wpQuery->max_num_pages <= 1){
 			return '';
 		}
-		$paged = $this->getParam('paged', 1);
+		$paged = get_query_var('paged', 1);
+		if($paged === 0){
+			$paged = 1;
+		}
 		$max = intval($this->wpQuery->max_num_pages);
 		
 		if($paged >= 1){

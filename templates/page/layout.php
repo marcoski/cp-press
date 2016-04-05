@@ -30,10 +30,13 @@ if(!function_exists('render_widget')){
 			$classes = array_filter( $classes );
 			$classes = array_unique( $classes );
 			$classes = array_map( 'sanitize_html_class', $classes );
-			
+			$before = apply_filters('cppress_widget_before', '', $classes, $id, $instance, $section) . 
+				apply_filters('cppress_widget_before_' . $the_widget->id_base, '', $classes, $id, $instance, $section);
+			$after = apply_filters('cppress_widget_after', '', $classes, $id, $instance, $section) .
+				apply_filters('cppress_widget_after_' . $the_widget->id_base, '', $classes, $id, $instance, $section);
 			$args = array(
-				'before_widget' => apply_filters('cppress_widget_before', '', $classes, $id, $instance, $section),
-				'after_widget' => apply_filters('cppress_widget_after', '', $classes, $id, $instance, $section),
+				'before_widget' => $before,
+				'after_widget' => $after,
 				'before_title' => apply_filters('cppress_widget_before_title', '', $instance, $section),
 				'after_title' => apply_filters('cppress_widget_after_title', '', $instance, $section),
 				'widget_id' => 'widget-' . $grid . '-' . $cell . '-' . $panel

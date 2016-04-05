@@ -85,7 +85,7 @@ class BackEndHook extends Hook{
 					BackEndApplication::main('MultiLanguageController', 'language', $c, array($post));
 				});
 			
-					return $metaBox;
+				return $metaBox;
 			});
 			$container->registerService('CpLink', function($c){
 				$metaBox = new MetaBox('cp-press-link', __('Link', 'cppress'));

@@ -34,7 +34,9 @@ class CpWidgetPost extends CpWidgetBase{
 				'post_type'			=> 'post',
 				'posts_per_page'	=> 1,
 				'category__in'		=> isset($instance['categories']) ? $instance['categories'] : array(),
+				'category__not_in' => isset($instance['excludecat']) ? $instance['excludecat'] : array(),
 				'tag__in'			=> isset($instance['tags']) ? $instance['tags'] : array(),
+				'tag_not_in' => isset($instance['excludetags']) ? $instance['excludetags'] : array(),
 				'offset'			=> $instance['offset'],
 				'order'				=> $instance['order'],
 				'orderby'			=> $instance['orderby'],
@@ -71,7 +73,9 @@ class CpWidgetPost extends CpWidgetBase{
 					'order' => $this->get_field_id( 'order' ),
 					'orderby' => $this->get_field_id( 'orderby' ),
 					'categories' => $this->get_field_id( 'categories' ),
-					'tags' => $this->get_field_id( 'tags' )
+					'excludecat' => $this->get_field_id('excludecat'),
+					'tags' => $this->get_field_id( 'tags' ),
+					'excludetags' => $this->get_field_id('excludetags')
 			),
 			'name' => array(
 					'enableadvanced' => $this->get_field_name( 'enableadvanced' ),
@@ -80,7 +84,9 @@ class CpWidgetPost extends CpWidgetBase{
 					'order' => $this->get_field_name( 'order' ),
 					'orderby' => $this->get_field_name( 'orderby' ),
 					'categories' => $this->get_field_name( 'categories' ),
-					'tags' => $this->get_field_name( 'tags' )
+					'excludecat' => $this->get_field_name('excludecat'),
+					'tags' => $this->get_field_name( 'tags' ),
+					'excludetags' => $this->get_field_name('excludetags')
 			),
 			'value' => $instance
 		);

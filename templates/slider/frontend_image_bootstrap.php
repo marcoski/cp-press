@@ -28,66 +28,81 @@
 	echo '<div class="carousel-inner">';
 	foreach($slides as $i => $slide){
 		$active = ''; if($i==0){ $active = 'active'; }
-			echo '<div class="item '. $active . '">';
-			/**
-			 * SLIDE CONTENT MARKUP START
-			 */
-			if($options['link'] == 'slide' && !empty($slide['link']) ){
-				$new = $slide['link']['isext'] ? 'target="_new"' : '';
-				echo '<a href="' . $slide['link']['url'] . '" ' . $new . '>';
-			}
-			if(is_object($slide['img'])){
-				$itemClassArray = array('cp-embed-responsive');
-				$divClasses = $filter->apply('cppress_widget_slider_embed_classes', $itemClassArray, $slide, $options);
-				$divAttrArray = array(
-						'class' => implode(' ', $divClasses),
-				);
-				$divAttrs = $filter->apply('cppress_widget_slider_embed_classes', $divAttrArray, $slide);
-				echo '<div ';
-				foreach($divAttrs as $name => $value){
-					echo ' ' . $name . '="' . $value . '"';
+		if(!$template->issetTemplate($templateName)){
+				echo '<div class="item '. $active . '">';
+				/**
+				 * SLIDE CONTENT MARKUP START
+				 */
+				if($options['link'] == 'slide' && !empty($slide['link']) ){
+					$new = $slide['link']['isext'] ? 'target="_new"' : '';
+					echo '<a href="' . $slide['link']['url'] . '" ' . $new . '>';
 				}
-				echo '>';
-				echo $slide['img']->html;
-				echo '</div>';
-				if($slide['displaytitle']){
-					echo '<h4 class="main">' . $slide['title'] . '</h4>';
-				}
-				if($slide['displaycontent']){
-					echo '<p class="description">' . $slide['content'] . '</p>';
-				}
-			}else{
-				$imageClasses = $filter->apply('cppress_widget_slider_image_classes', array(), $slide);
-				$imageAttrs = $filter->apply('cppress_widget_slider_image_attrs', array(
-					'src' => $slide['img']['src'][0],
-					'alt' => $slide['img']['title']
-				), $slide);
-				echo '<img ';
-				foreach($imageAttrs as $name => $value){
-					echo ' ' . $name . '="' . $value . '"';
-				}
-				echo ' />';
-				if($slide['displaytitle'] || $slide['displaycontent']){
-					$captionClasses = $filter->apply('cppress_widget_slider_caption_classes', array('caption'), $slide);
-					echo '<div class="' . implode(' ', $captionClasses) . '">';
-				}
-				if($slide['displaytitle']){
-					echo '<span class="main">' . $slide['title'] . '</span>';
-				}
-				if($slide['displaycontent']){
-					echo '<span class="secondary clearfix">' . $slide['content'] . '</span>';
-				}
-				if($slide['displaytitle'] || $slide['displaycontent']){
+				if(is_object($slide['img'])){
+					$itemClassArray = array('cp-embed-responsive');
+					$divClasses = $filter->apply('cppress_widget_slider_embed_classes', $itemClassArray, $slide, $options);
+					$divAttrArray = array(
+							'class' => implode(' ', $divClasses),
+					);
+					$divAttrs = $filter->apply('cppress_widget_slider_embed_classes', $divAttrArray, $slide);
+					echo '<div ';
+					foreach($divAttrs as $name => $value){
+						echo ' ' . $name . '="' . $value . '"';
+					}
+					echo '>';
+					echo $slide['img']->html;
 					echo '</div>';
+					if($slide['displaytitle']){
+						echo '<h4 class="main">' . $slide['title'] . '</h4>';
+					}
+					if($slide['displaycontent']){
+						echo '<p class="description">' . $slide['content'] . '</p>';
+					}
+				}else{
+					$imageClasses = $filter->apply('cppress_widget_slider_image_classes', array(), $slide);
+					$imageAttrs = $filter->apply('cppress_widget_slider_image_attrs', array(
+						'src' => $slide['img']['src'][0],
+						'alt' => $slide['img']['title']
+					), $slide);
+					echo '<img ';
+					foreach($imageAttrs as $name => $value){
+						echo ' ' . $name . '="' . $value . '"';
+					}
+					echo ' />';
+					if($slide['displaytitle'] || $slide['displaycontent']){
+						$captionClasses = $filter->apply('cppress_widget_slider_caption_classes', array('caption'), $slide);
+						echo '<div class="' . implode(' ', $captionClasses) . '">';
+					}
+					if($slide['displaytitle']){
+						echo '<span class="main">' . $slide['title'] . '</span>';
+					}
+					if($slide['displaycontent']){
+						echo '<span class="secondary clearfix">' . $slide['content'] . '</span>';
+					}
+					if($slide['displaytitle'] || $slide['displaycontent']){
+						echo '</div>';
+					}
 				}
-			}
-			if($options['link'] == 'slide' && !empty($slide['link']) ){
-				echo '</a>';
-			}
-			/**
-			 * SLIDE CONTENT MARKUP END
-			 */
-			echo '</div>';
+				if($options['link'] == 'slide' && !empty($slide['link']) ){
+					echo '</a>';
+				}
+				/**
+				 * SLIDE CONTENT MARKUP END
+				 */
+				echo '</div>';
+		}else{
+			echo $filter->apply(
+				'cppress_widget_slider_image_template_content',
+				$template->inc(
+						$templateName,
+						array(
+								'slide' => $slide,
+								'active' => $active,
+						)
+				),
+				get_post(),
+				$options
+			);
+		}
 			
 	}
 	echo '</div>';
