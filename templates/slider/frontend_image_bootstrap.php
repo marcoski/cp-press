@@ -69,6 +69,7 @@
 					}
 					echo ' />';
 					if($slide['displaytitle'] || $slide['displaycontent']){
+						echo $filter->apply('cppress_widget_slider_before_caption', '', $slide, $sliderId);
 						$captionClasses = $filter->apply('cppress_widget_slider_caption_classes', array('caption'), $slide);
 						echo '<div class="' . implode(' ', $captionClasses) . '">';
 					}
@@ -80,6 +81,7 @@
 					}
 					if($slide['displaytitle'] || $slide['displaycontent']){
 						echo '</div>';
+						echo $filter->apply('cppress_widget_slider_after_caption', '', $slide, $sliderId);
 					}
 				}
 				if($options['link'] == 'slide' && !empty($slide['link']) ){
