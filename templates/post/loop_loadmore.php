@@ -1,7 +1,6 @@
 <?php
 	echo $filter->apply('cppress_widget_loop_row_before', '<div class="row">', $posts['wtitle']);
 	if(!$template->issetTemplate($templateName)){
-		$pageId = get_the_ID();
 		while($wpQuery->have_posts()){
 			$wpQuery->the_post();
 			$thumbHtml = '';
@@ -65,35 +64,19 @@
 			echo $filter->apply('cppress_widget_loop_item_after', '', $posts['wtitle']);
 			echo '</div>';
 		}
-		if($posts['paginateajax']){
-			$id = $posts['wtitle'];
-			if($id === ''){
-				$id = md5(serialize($posts));
-			}
-			echo '<div id="cppress_more_posts_' . $id . '"></div>';
-			echo '<div class="text-center cppress_load_more"><p>';
-			echo '<a href="#"';
-			echo		'data-url="' . admin_url('admin-ajax.php') . '"';
-			echo		 'data-options="' . htmlspecialchars(json_encode($options, JSON_HEX_TAG)) . '"';
-			echo		 'data-pageid="' . $pageId . '"';
-			echo		 'data-wtitle="' . $options['wtitle'] . '"';
-			echo     'class="btn btn-primary">';
-			echo		$options['ajaxbutton'];
-			echo '</a>';
-			echo '</p></div>';
-		}
 	}else{
 		echo $filter->apply(
-			'cppress_widget_loop_template_content',
-			$template->inc(
-				$templateName,
-				array(
-						'wpQuery' => $wpQuery,
-						'options' => $posts,
-				)
-			),
-			get_post(),
-			$options
+				'cppress_widget_loop_loadmore_template_content',
+				$template->inc(
+						$templateName,
+						array(
+								'wpQuery' => $wpQuery,
+								'options' => $posts,
+						)
+				),
+				get_post(),
+				$options
 		);
 	}
+	
 	echo $filter->apply('cppress_widget_loop_row_after', '</div>', $posts['wtitle']);

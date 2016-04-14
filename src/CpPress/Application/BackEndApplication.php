@@ -271,7 +271,7 @@ class BackEndApplication extends CpPressApplication{
 		$hook->massRegister();
 	}
 
-	public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1){
+	public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1){+
 		$hookObj = $this->getContainer()->query('BackEndHook');
 		$hookObj->register($hook, $closure, $priority, $acceptedArgs);
 	}
@@ -282,20 +282,8 @@ class BackEndApplication extends CpPressApplication{
 	}
 
 	public function registerFilters(){
-		$container = $this->getContainer();
-		$filter = $container->query('BackEndFilter');
-		$filter->register('tiny_mce_before_init', function($settings, $editor) use ($container){
-
-			return $settings;
-		}, 10, 2);
-		$filter->register('quicktags_settings', function($settings, $editor) use ($container){
-
-			return $settings;
-		}, 10, 2);
-		$filter->register('manage_page_posts_columns' , function($cols){
-			return $cols;
-		});
-		$filter->execAll();
+		$filter = $this->getContainer()->query('BackEndFilter');
+		$filter->massRegister();
 	}
 
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){

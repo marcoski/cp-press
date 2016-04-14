@@ -212,8 +212,8 @@ class BackEndHook extends Hook{
 			$this->create('cppress_admin_enqueue_scripts');
 		});
 		$this->register('plugins_loaded', function(){
-			//CpOnePage::include_widgets();
-		}, 1);
+			
+		});
 		$this->register('manage_section_posts_custom_column' , function($col, $post){
 		}, 10, 2 );
 	}

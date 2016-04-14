@@ -20,8 +20,24 @@
 	    	<?php _e('Paginate', 'cppress'); ?>
 	    </label>
 	  </div>
-	</div>
-	<div class="cp-widget-section cp-widget-section-hide">
+		 <div class="cp-widget-field">
+	    <label for="<?= $widget->get_field_id( 'paginateajax' ); ?>">
+	    	<input class="widefat"
+		      id="<?= $widget->get_field_id( 'paginateajax' ); ?>"
+		      name="<?= $widget->get_field_name( 'paginateajax' ); ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['paginateajax'] ); ?> />&nbsp;
+	    	<?php _e('Ajax Paginate', 'cppress'); ?>
+	    </label>
+	  </div>
+	  <div class="cp-widget-field cp-widget-input">
+		  <label for="<?= $widget->get_field_id( 'ajaxbutton' ); ?>"><?php _e('Load ajax text', 'cppress')?>:</label>
+		  <input class="widefat"
+		    id="<?= $widget->get_field_id( 'ajaxbutton' ); ?>"
+		    name="<?= $widget->get_field_name( 'ajaxbutton' ); ?>"
+		    value="<?= $instance['ajaxbutton']; ?>"
+		  />
+		</div>
 		 <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">
 	    	<input class="widefat"

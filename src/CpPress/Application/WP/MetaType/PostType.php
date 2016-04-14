@@ -46,7 +46,11 @@ class PostType extends MetaType{
 		if(!in_array($this->name, $this->default)){
 			$args = $this->args;
 			$args['labels'] = $this->labels;
-			return register_post_type($this->name, $args);
+			$return = register_post_type($this->name, $args);
+			if($return instanceof \WP_Error){
+				throw new PostTypeException($return->get_error_message());
+			}
+			return $return;
 		}
 		
 		throw new PostTypeException('Canot register a defult post type');

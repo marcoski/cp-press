@@ -16,6 +16,12 @@ class CpWidgetLoop extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-update';
+		$this->frontScripts = array(
+				array(
+						'source' => 'ajaxloop',
+						'deps' => array('jquery')
+				),
+		);
 	}
 
 	/**

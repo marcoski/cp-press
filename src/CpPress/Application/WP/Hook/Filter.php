@@ -10,6 +10,7 @@ class Filter extends Hook{
 	}
 	
 	public function massRegister(){
+		
 	}
 	
 	public function exec($hook, $flush=true){

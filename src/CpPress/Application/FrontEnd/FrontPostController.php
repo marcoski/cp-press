@@ -58,6 +58,40 @@ class FrontPostController extends WPController{
 		$this->assign('wpQuery', $this->wpQuery);
 	}
 	
+	/**
+	 * @responder wpjson
+	 */
+	public function loop_loadmore(){
+		$data = $this->getParams();
+		$posts = $data['options'];
+		$offset = (int) $posts['limit'] + $posts['offset'];
+		$qargs = array(
+				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
+				'posts_per_page'	=> $posts['limit'],
+				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
+				'category__not_in' => isset($posts['excludecat']) ? $posts['excludecat'] : array(),
+				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
+				'tag__not_in' => isset($posst['excludetags']) ? $posts['excludetags'] : array(),
+				'offset'			=> $offset,
+				'order'				=> $posts['order'],
+				'orderby'			=> $posts['orderby'],
+				/* Set it to false to allow WPML modifying the query. */
+				'suppress_filters' => false
+		);
+		$this->wpQuery->setLoop($qargs);
+		if($this->wpQuery->post_count > 0){
+			$this->setWpAjaxData('hasmore', true);
+			$data['options']['offset'] = $offset;
+		}else{
+			$this->setWpAjaxData('hasmore', false);
+		}
+		$this->assignTemplate($posts, 'loop_loadmore');
+		$this->assign('posts', $posts);
+		$this->assign('filter', $this->filter);
+		$this->assign('wpQuery', $this->wpQuery);
+		$this->setWpAjaxData('data', $data);
+	}
+	
 	public function single($query, $instance){
 		$query = $this->filter->apply('cppress_widget_post_queryargs', $query, $instance);
 		$this->assignTemplate($instance, 'single');

@@ -1,14 +1,14 @@
-<?php 
+<?php
 	$options = $filter->apply('cppress_widget_slider_options', $options, $wpQuery);
 	$sliderClasses = $filter->apply('cppress_widget_slider_classes', array('carousel', 'slide'), $wpQuery, $options);
-	$sliderId = $filter->apply('cppress_widget_slider_id', 'cppress-carousel-'.md5(serialize($slides)), $slides, $options);
+	$sliderId = $filter->apply('cppress_widget_slider_id', 'cppress-carousel-'.md5(serialize($slides)), $wpQuery, $options);
 	$sliderAttrs = $filter->apply('cppress_widget_slider_attrs', array(
 			'id' => $sliderId,
 			'class' => implode(' ', $sliderClasses),
 			'data-interval' => $options['timeout'],
 			'data-ride' => 'carousel'
-	), $slides);
-	echo $filter->apply('cppress_widget_slider_before', '', $slides, $options, $sliderId);
+	), $wpQuery);
+	echo $filter->apply('cppress_widget_slider_before', '', $wpQuery, $options, $sliderId);
 	echo '<' . $filter->apply('cppress_widget_slider_tag', "section", $wpQuery, $options);
 	foreach($sliderAttrs as $name => $value){
 		echo ' ' . $name . '="' . $value . '"';
@@ -26,9 +26,9 @@
 		}
 		echo '</ol>';
 	}
+	
 	echo '<div class="carousel-inner">';
 	$i=0;
-	
 	while($wpQuery->have_posts()){
 		$wpQuery->the_post();
 		$active = ''; if($i==0){ $active = 'active'; }
@@ -43,7 +43,7 @@
 			echo '<article class="item '. $active . '">';
 		}  
 			$itemClasses = $filter->apply('cppress_widget_slider_post_item_classes', 
-					array('col-sm-' . $col['sm'], 'col-md-' . $col['md'], 'col-lg-' . $col['lg']), $slides, $options);
+					array('col-sm-' . $col['sm'], 'col-md-' . $col['md'], 'col-lg-' . $col['lg']), $wpQuery, $options);
 			echo '<div class="' . implode(' ', $itemClasses) . '">';
 			if(!$template->issetTemplate($templateName)){
 				if(has_post_thumbnail() && (isset($posts['showthumbnail']) && $posts['showthumbnail'])){
@@ -130,9 +130,9 @@
 	echo '</div>';
 	
 	if(!$options['hidecontrol']){
-		echo $filter->apply('cppress_slider_control_before', '', $slides, $options);
+		echo $filter->apply('cppress_slider_control_before', '', $wpQuery, $options);
 		$leftAClasses = $filter->apply('cppress_slider_control_a_classes', 
-				array('carousel-controll'), $slides, $options);
+				array('carousel-control'), $slides, $options);
 		echo '<a class="left ' . implode(' ', $leftAClasses) . '" href="#' . $sliderId . '" role="button" data-slide="prev">';
 		$leftClasses = $filter->apply(
 				'cppress_slider_control_left_classes',
@@ -153,8 +153,8 @@
 		echo '<span class="' . implode(' ', $rightClasses) . '" aria-hidden="true"></span>';
 		echo '<span class="sr-only">' . __('Next', 'cppress') . '</span>';
 		echo '</a>';
-		echo $filter->apply('cppress_slider_control_after', '', $slides, $options);
+		echo $filter->apply('cppress_slider_control_after', '', $wpQuery, $options);
 	}
 	
-	echo '</' . $filter->apply('cppress_widget_slider_tag', "section", $slides, $options) . '>';
-	echo $filter->apply('cppress_widget_slider_after', '', $slides, $options, $sliderId);
+	echo '</' . $filter->apply('cppress_widget_slider_tag', "section", $wpQuery, $options) . '>';
+	echo $filter->apply('cppress_widget_slider_after', '', $wpQuery, $options, $sliderId);

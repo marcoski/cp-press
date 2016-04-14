@@ -28,7 +28,7 @@ class AjaxHook extends Hook{
 	public function exec($hook){
 		if(!preg_match('/^wp_ajax_*/', $hook)){
 			$hook = 'wp_ajax_'.$hook;
-		}	
+		}
 		parent::exec($hook);
 	}
 	

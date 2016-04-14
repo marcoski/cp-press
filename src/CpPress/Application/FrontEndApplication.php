@@ -171,20 +171,12 @@ class FrontEndApplication extends CpPressApplication{
 		$hookObj->registerFrontEnd('cppress_cf_ajax', function() use($container){
 			$request = $container->query('Request');
 			$layout = PostMeta::find($request->getParam('_cppress-cf-id'), 'cp-press-page-layout');
-			foreach($layout['widgets'] as $w){
-				if($w['widget_info']['id_base'] == 'cp_widget_contact_form'){
-					$pattern = "/cp_press_([a-z0-9]*)_([a-z0-9]*)_([a-z0-9_]*)/";
-					preg_match($pattern, Inflector::underscore($w['widget_info']['class']), $classParts);
-					$widget = (
-							'CpPress' . '\\' .
-							Inflector::camelize($classParts[1]) . '\\' .
-							Inflector::camelize($classParts[2]) . '\\' .
-							Inflector::camelize($classParts[3])
-					);
-					$widget = $container->query($widget);
-					return $widget->widget(array(), $w);
-				}
-			}
+			$widget = $this->getWidget($layout, 'cp_widget_contact_form', $container);
+			return $widget['widget']->widget(array(), $widget['data']);
+		});
+		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
+			$request = $container->query('Request');
+			self::main('Post', 'loop_loadmore', $container);
 		});
 		$hookObj->execAll();
 	}
@@ -233,6 +225,23 @@ class FrontEndApplication extends CpPressApplication{
 		$fields = new FieldsController('', $container->query('Request'));
 		$style = $this->getStyles();
 		$style->enqueueFonts($fields->getFontAssets());
+	}
+	
+	private function getWidget($layout, $idBase, $container){
+		foreach($layout['widgets'] as $w){
+			if($w['widget_info']['id_base'] == $idBase){
+				$pattern = "/cp_press_([a-z0-9]*)_([a-z0-9]*)_([a-z0-9_]*)/";
+				preg_match($pattern, Inflector::underscore($w['widget_info']['class']), $classParts);
+				$widget = (
+						'CpPress' . '\\' .
+						Inflector::camelize($classParts[1]) . '\\' .
+						Inflector::camelize($classParts[2]) . '\\' .
+						Inflector::camelize($classParts[3])
+				);
+				$widget = $container->query($widget);
+				return array('widget' => $widget, 'data' => $w);
+			}
+		}
 	}
 	
 }
