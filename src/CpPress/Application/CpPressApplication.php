@@ -20,6 +20,7 @@ use CpPress\Application\WP\MetaType\NewsPostType;
 use CpPress\Application\WP\Shortcode\ContactFormShortcode;
 use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
 use CpPress\Application\WP\Shortcode\MailPoetShortcodeManager;
+use CpPress\Application\WP\MetaType\PostPostType;
 
 abstract class CpPressApplication extends WPApplication{
 	
@@ -151,6 +152,9 @@ abstract class CpPressApplication extends WPApplication{
 		});
 		$container->registerService('NewstagsTaxonomy', function($c){
 			return new NewstagsTaxonomy();
+		});
+		$container->registerService('PostPostType', function($c){
+			return new PostPostType();
 		});
 	}
 	
