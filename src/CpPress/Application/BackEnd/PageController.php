@@ -43,6 +43,7 @@ class PageController extends WPController{
 		$this->assign('layout', $layout);
 		$this->assign('json_layout', htmlspecialchars(json_encode($layout, JSON_HEX_TAG)));
 		$this->assign('post_id', $post->ID);
+		$this->assign('post_name', $post->post_name);
 	}
 
 	public function widgets($post){

@@ -833,6 +833,7 @@ jQuery(document).ready(function(){
   $.CpPage.View.PageBuilder = Backbone.View.extend({
     template: wp.template('cppress-page'),
     layout: null,
+    elData: null,
 
     $input: null,
     $rowHead: null,
@@ -852,13 +853,17 @@ jQuery(document).ready(function(){
 		dropOptions: {},
 
     events: {
-      "click #cp_add_section" : "addSection"
+      "click #cp_add_section" : "addSection",
+      "click #cp_export_content": "export",
+      "click #cp_import_content": "import",
+      "change #cp_import_content .cp-importer": "importJsonFile"
     },
 
     initialize: function(){
 			_.bindAll(this, 'sort');
       this.$input = $('#cp-press-layout-input');
       this.$rowHead = $('#cp_press_rows_head');
+      this.elData = this.$el.data();
       this.layout = JSON.parse(this.$input.val());
       this.listenTo(this.model.sections, "add", this.onSectionAdd);
 			this.listenTo(this.model, "change:data", this.storeLayout);
@@ -977,6 +982,42 @@ jQuery(document).ready(function(){
 				this.$input.trigger("change");
 				this.trigger("layout-changed");
 			}
+		},
+		
+		export: function(e){
+		  var data = this.$input.val();
+		  var file = new Blob([data], {type: 'application/json'});
+		  var fileName = 'export-' + this.elData.postname + '-' + this.elData.post + '.json';
+		  var a = document.createElement('a');
+		  a.href = URL.createObjectURL(file);
+		  a.download = fileName;
+		  a.click();
+		},
+		
+		import: function(e){
+		  var $$ = $(e.target);
+		  $$.find('#cp-importer').click();
+		},
+		
+		importJsonFile: function(e){
+		  var file = e.target.files[0];
+		  if(!file){
+		    return;
+		  }
+		  var reader = new FileReader();
+		  var _that = this;
+		  reader.onload = function(e){
+		    var contents = e.target.result;
+		    try{
+		      _that.layout = JSON.parse(contents);
+		      _that.$input.val(contents);
+		      _that.render().load();
+		    }catch(e){
+		      console.log(e);
+		      alert('File must be JSON encoded: not a JSON encoded file');
+		    }
+		  };
+		  reader.readAsText(file);
 		}
 
   });
