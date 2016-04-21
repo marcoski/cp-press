@@ -71,7 +71,6 @@ class CpWidgetMedia extends CpWidgetBase{
 			$instance['link'] = $imageSrc[0];
 			$instance['oembed'] = null;
 		}
-		
 		unset($instance['external']);
 		unset($instance['media']);
 		return parent::widget($args, $instance);

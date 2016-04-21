@@ -4,9 +4,12 @@
 		echo $filter->apply('cppress_widget_the_title',
 				'<h4>' .$instance['wtitle'].'</h4>', $instance['wtitle']);
 	}
-	
 	if($instance['oembed'] === null){
 		$figClasses = $filter->apply('cppress_widget_media_figure_classes', array('figure'), $instance['wtitle'], $instance);
+		if($instance['desturi'] !== ''){
+			$opennew = isset($instance['opennewwindow']) ? 'target="_new"' : '';
+			echo '<a href="' . $instance['desturi'] . '" ' . $opennew . '>';
+		}
 		echo '<figure class=" ' . implode(' ', $figClasses) . '">';
 			$imgClasses = $filter->apply('cppress_widget_media_image_classes', array('figure-img', 'img-responsive', 'img-rounded'), $instance['wtitle'], $instance);
 			echo '<img src="' . $instance['link'] . '" class="' . implode(' ', $imgClasses) . '" />';
@@ -15,6 +18,9 @@
 			echo '<figcaption class="' . implode(' ', $figCapClasses) . '">'.$instance['alttext'].'</figcaption>';
 		}
 		echo '</figure>';
+		if($instance['desturi'] !== ''){
+			echo '</a>';
+		}
 	}else{
 		echo '<div class="cp-embed-responsive">';
 		echo $instance['oembed']->html;
