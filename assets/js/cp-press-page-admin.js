@@ -432,7 +432,7 @@ jQuery(document).ready(function(){
 					if(typeof i === "string" && i[0] === '_'){
 						delete vals[i];
 					}else if(_.isObject(vals[i])){
-						clenaClone(vals[i]);
+						cleanClone(vals[i]);
 					}
 				});
 				return vals;
