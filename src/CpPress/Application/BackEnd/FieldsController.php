@@ -146,7 +146,7 @@ class FieldsController extends WPController{
 		);
 		$settings = wp_parse_args($settings, $default);
 		$editor = new Editor();
-		$editor->init($id, $value, $settings);
+		$editor->init($id . uniqid(), $value, $settings);
 		$this->assign('editor', $editor);
 	}
 	

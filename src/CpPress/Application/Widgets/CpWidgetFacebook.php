@@ -2,7 +2,11 @@
 namespace CpPress\Application\Widgets;
 
 class CpWidgetFacebook extends CpWidgetBase{
-
+	
+	/**
+	 * 
+	 * @SEE https://github.com/dannyvankooten/wordpress-recent-facebook-posts
+	 */
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
 				__('Facebook Widget', 'cppress'),

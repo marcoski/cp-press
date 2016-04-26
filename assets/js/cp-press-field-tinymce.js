@@ -14,6 +14,7 @@
 			var $container = $field.find('.cp-widget-tinymce-container');
 			var $textarea = $container.find('textarea');
 			var id = $textarea.attr('id');
+			console.log($textarea);
 			if(typeof tinymce != 'undefined'){
 				var mceSettings = tinyMCEPreInit.mceInit['cp-widget-fake-editor'];
 				var setupEditor = function(editor){
@@ -22,6 +23,7 @@
 						$textarea.trigger('change');
 						$textarea.val(window.switchEditors.pre_wpautop(editor.getContent()));
 					});
+					
 					$textarea.on('keyup', function(){
 						editor.setContent(window.switchEditors.wpautop($textarea.val()));
 					});

@@ -63,7 +63,7 @@
 			<label for="<?= $widget->get_field_id( 'fbapp' ); ?>"><?php _e('Facebook App ID/API Key', 'cppress'); ?></label>
 			<input type="text" class="widefat" placeholder="Eg: 123456789012345"
 				id="<?= $widget->get_field_id( 'fbapp' ); ?>"
-				name="<?= $widget->get_field_id( 'fbapp' ); ?>" 
+				name="<?= $widget->get_field_name( 'fbapp' ); ?>" 
 				value="<?= esc_attr($instance['fbapp']) ?>"/>
 			<div class="cp-widget-field-description">
 				<?php printf( __( 'Get your App ID from %s.', 'cppress' ), '<a href="https://developers.facebook.com/apps">developers.facebook.com/apps</a>' ); ?>
@@ -73,7 +73,7 @@
 			<label for="<?= $widget->get_field_id( 'fbappsecret' ); ?>"><?php _e('Facebook App Secret', 'cppress'); ?></label>
 			<input type="text" class="widefat" placeholder="Eg: 16vgrz4hk45wvh29k2puk45wvk2h29pu"
 				id="<?= $widget->get_field_id( 'fbappsecret' ); ?>"
-				name="<?= $widget->get_field_id( 'fbappsecret' ); ?>" 
+				name="<?= $widget->get_field_name( 'fbappsecret' ); ?>" 
 				value="<?= esc_attr($instance['fbappsecret']) ?>"/>
 			<div class="cp-widget-field-description">
 				<?php printf( __( 'Get your App Secret from %s.', 'cppress' ), '<a href="https://developers.facebook.com/apps">developers.facebook.com/apps</a>' ); ?>
@@ -83,7 +83,7 @@
 			<label for="<?= $widget->get_field_id( 'fbid' ); ?>"><?php _e('Facebook Page ID or Slug', 'cppress'); ?></label>
 			<input type="text" class="widefat" placeholder="Eg: CommonHelp"
 				id="<?= $widget->get_field_id( 'fbid' ); ?>"
-				name="<?= $widget->get_field_id( 'fbid' ); ?>" 
+				name="<?= $widget->get_field_name( 'fbid' ); ?>" 
 				value="<?= esc_attr($instance['fbid']) ?>"/>
 			<div class="cp-widget-field-description">
 				<?php printf( __( 'Use <a href="%s">this tool</a> to find the numeric ID of your Facebook page.', 'cppress' ), 'http://findmyfacebookid.com' ); ?>
@@ -98,7 +98,7 @@
 			<label for="<?= $widget->get_field_id( 'linktext' ); ?>"><?php _e( 'Link text', 'cppress' ); ?></label>
 			<input type="text" class="widefat" placeholder="<?php _e( 'Find us on Facebook', 'cppress' ); ?>"
 				id="<?= $widget->get_field_id( 'linktext' ); ?>"
-				name="<?= $widget->get_field_id( 'linktext' ); ?>" 
+				name="<?= $widget->get_field_name( 'linktext' ); ?>" 
 				value="<?= esc_attr($instance['linktext']) ?>"/>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
@@ -127,14 +127,14 @@
 				<?php _e('Max Width', 'cppress'); ?><br />
 				<input type="number" min="0" max="1600" size="3" 
 					id="<?= $widget->get_field_id( 'imgwidth' ); ?>" 
-					name="<?= $widget->get_field_id( 'imgwidth' ); ?>" 
+					name="<?= $widget->get_field_name( 'imgwidth' ); ?>" 
 					value="<?php echo esc_attr( $instance['imgwidth'] ); ?>" />
 			</label>
 			<label style="float:left; margin-right:20px;">
 				<?php _e('Max Height', 'cppress'); ?><br />
 				<input type="number" min="0" max="1600" size="3" 
 					id="<?= $widget->get_field_id( 'imgheight' ); ?>" 
-					name="<?= $widget->get_field_id( 'imgheight' ); ?>" 
+					name="<?= $widget->get_field_name( 'imgheight' ); ?>" 
 					value="<?php echo esc_attr( $instance['imgheight'] ); ?>" />
 			</label>
 			<div class="cp-widget-field-description">
