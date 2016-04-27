@@ -116,9 +116,9 @@
 			<select 
 				id="<?= $widget->get_field_id( 'imagesize' ); ?>" 
 				name="<?= $widget->get_field_name( 'imagesize' ); ?>">
-				<option value="dont_show" <?php selected( $instance['imgsize'], 'dont_show' ); ?>><?php _e("Don't show images", 'cppress'); ?></option>
-				<option value="thumbnail" <?php selected( $instance['imgsize'], 'thumbnail' ); ?>><?php _e('Thumbnail', 'cppress'); ?></option>
-				<option value="normal" <?php selected( $instance['imgsize'], 'normal' ); ?>><?php _e('Normal', 'cppress'); ?></option>
+				<option value="dont_show" <?php selected( $instance['imagesize'], 'dont_show' ); ?>><?php _e("Don't show images", 'cppress'); ?></option>
+				<option value="thumbnail" <?php selected( $instance['imagesize'], 'thumbnail' ); ?>><?php _e('Thumbnail', 'cppress'); ?></option>
+				<option value="normal" <?php selected( $instance['imagesize'], 'normal' ); ?>><?php _e('Normal', 'cppress'); ?></option>
 			</select>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
