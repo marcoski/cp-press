@@ -48,7 +48,7 @@
 				$info .= '</span>';
 				$info .= $filter->apply('cppress_post_info_divider', ' | ');
 				$info .= '<span class="author"><i class="icon-user"></i> ';
-				$info .= get_the_author();
+				$info .= $filter->apply('cppress_post_info_author', get_the_author(), get_post(), $posts['wtitle']);
 				$info .= '</span>';
 				$info .= '</div>';
 				echo $filter->apply('cppress_post_info', $info, get_post(), $posts['wtitle']);
