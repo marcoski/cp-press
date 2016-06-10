@@ -12,7 +12,6 @@ use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\Application\WP\Theme\Media\Video;
 use CpPress\Application\BackEnd\PortfolioController;
 use CpPress\Application\Widgets\CpWidgetBase;
-use CpPress\Application\WP\Admin\CpPress\Application\WP\Admin;
 
 class BackEndHook extends Hook{
 
@@ -173,43 +172,49 @@ class BackEndHook extends Hook{
 		$this->register('save_post', function($post_id, $post, $update){
 			$this->app->save($post_id);
 		}, 10, 3);
-		$this->register('admin_enqueue_scripts', function(){
-			$scripts = $this->app->getScripts();
-			$styles = $this->app->getStyles();
-			wp_enqueue_media();
-			add_thickbox();
-			$scripts->enqueue('jquery');
-			$scripts->enqueue('jquery-ui-sortable');
-			$scripts->enqueue('jquery-ui-accordion');
-			$scripts->enqueue('jquery-ui-draggable');
-			$scripts->enqueue('jquery-ui-droppable');
-			$scripts->enqueue('jquery-ui-datepicker');
-			$scripts->enqueue('jquery-ui-selectable');
-			$scripts->enqueue('jquery-ui-dialog');
-			$scripts->enqueue('utils');
-			$scripts->enqueue('wp-color-picker');
-			$styles->enqueue('wp-color-picker');
-			$scripts->enqueue('cp-press-dialog', array('backbone', 'underscore', 'wp-util'));
-			$scripts->enqueue('cp-press-dragbg');
-			$scripts->enqueue('cp-press-admin');
-			$scripts->enqueue('cp-press-page-admin-dialog', array('backbone', 'underscore', 'wp-util'));
-			$scripts->enqueue('cp-press-page-admin', array('backbone', 'underscore'));
-			$scripts->enqueue('cp-press-field-admin', array('backbone', 'underscore'));
-			$scripts->enqueue('cp-press-attachment-admin', array('backbone', 'underscore'));
-			$scripts->enqueue('cp-press-field-tinymce', array('editor', 'quicktags'));
-			$scripts->enqueue('media-upload');
-			$styles->enqueue('jquery-ui');
-			$styles->enqueue('cp-press-flag-icon');
-			$styles->enqueue('cp-press-dialog');
-			$styles->enqueue('cp-press-admin');
-			foreach(CpWidgetBase::getWidgets() as $widget){
-				$container = $this->app->getContainer();
-				$wObj = $container->query($widget);
-				$wObj->enqueueAdminScripts();
-				$wObj->localizeAdminScripts();
-				$wObj->enqueueAdminStyles();
+		
+		
+		$this->register('admin_enqueue_scripts', function($page){
+			if(BackEndApplication::isAlowedPage($page)){
+				$scripts = $this->app->getScripts();
+				$styles = $this->app->getStyles();
+				wp_enqueue_media();
+				add_thickbox();
+				$scripts->enqueue('jquery');
+				$scripts->enqueue('jquery-ui-sortable');
+				$scripts->enqueue('jquery-ui-accordion');
+				$scripts->enqueue('jquery-ui-draggable');
+				$scripts->enqueue('jquery-ui-droppable');
+				$scripts->enqueue('jquery-ui-datepicker');
+				$scripts->enqueue('jquery-ui-selectable');
+				$scripts->enqueue('jquery-ui-dialog');
+				$scripts->enqueue('utils');
+				$scripts->enqueue('wp-color-picker');
+				$styles->enqueue('wp-color-picker');
+				$scripts->enqueue('cp-press-dialog', array('backbone', 'underscore', 'wp-util'));
+				$scripts->enqueue('cp-press-dragbg');
+				$scripts->enqueue('cp-press-admin');
+				$scripts->enqueue('cp-press-page-admin-dialog', array('backbone', 'underscore', 'wp-util'));
+				$scripts->enqueue('cp-press-page-admin', array('backbone', 'underscore'));
+				$scripts->enqueue('cp-press-field-admin', array('backbone', 'underscore'));
+				$scripts->enqueue('cp-press-attachment-admin', array('backbone', 'underscore'));
+				$scripts->enqueue('cp-press-field-tinymce');
+				$scripts->enqueue('cp-press-event-admin');
+				$scripts->enqueue('media-upload');
+				$styles->enqueue('cp-press-flag-icon');
+				$styles->enqueue('cp-press-dialog');
+				$styles->enqueue('cp-press-event-admin');
+				$styles->enqueue('cp-press-admin');
+				
+				foreach(CpWidgetBase::getWidgets() as $widget){
+					$container = $this->app->getContainer();
+					$wObj = $container->query($widget);
+					$wObj->enqueueAdminScripts();
+					$wObj->localizeAdminScripts();
+					$wObj->enqueueAdminStyles();
+				}
+				$this->create('cppress_admin_enqueue_scripts');
 			}
-			$this->create('cppress_admin_enqueue_scripts');
 		});
 		$this->register('plugins_loaded', function(){
 			

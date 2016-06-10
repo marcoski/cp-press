@@ -66,6 +66,7 @@
 		</div>
 		<div class="cp-widget-field">
 			<label><?php _e('Filter to Category', 'cppress')?>:</label>
+			<label class="cp-clear-all"><?php _e('Clear all', 'cppress'); ?></label>
 			<select multiple="multiple" style="width:100%;" id="<?= $values['id']['categories'] ?>"
 				name="<?= $values['name']['categories']; ?>[]">
 				<optgroup label="Categories">
@@ -82,6 +83,7 @@
 		</div>
 		<div class="cp-widget-field">
 			<label><?php _e('Exclude to Category', 'cppress')?>:</label>
+			<label class="cp-clear-all"><?php _e('Clear all', 'cppress'); ?></label>
 			<select multiple="multiple" style="width:100%;" id="<?= $values['id']['excludecat'] ?>"
 				name="<?= $values['name']['excludecat']; ?>[]">
 				<optgroup label="Categories">
@@ -98,6 +100,7 @@
 		</div>
 		<div class="cp-widget-field">
 			<label><?php _e('Filter to Tag', 'cppress')?>:</label>
+			<label class="cp-clear-all"><?php _e('Clear all', 'cppress'); ?></label>
 			<select style="width:100%;" multiple="multiple" id="<?= $values['id']['tags'] ?>"
 				name="<?= $values['name']['tags']; ?>[]">
 				<optgroup label="Tags">
@@ -114,6 +117,7 @@
 		</div>
 		<div class="cp-widget-field">
 			<label><?php _e('Exclude to Tag', 'cppress')?>:</label>
+			<label class="cp-clear-all"><?php _e('Clear all', 'cppress'); ?></label>
 			<select style="width:100%;" multiple="multiple" id="<?= $values['id']['excludetags'] ?>"
 				name="<?= $values['name']['excludetags']; ?>[]">
 				<optgroup label="Tags">

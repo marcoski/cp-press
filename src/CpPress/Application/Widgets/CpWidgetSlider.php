@@ -2,6 +2,7 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
+use CpPress\Application\BackEnd\FieldsController;
 class CpWidgetSlider extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -111,6 +112,28 @@ class CpWidgetSlider extends CpWidgetBase{
 	private function widgetPost($instance){
 		return $instance;
 	}
+	
+	private function widgetSinglePost($instance){
+		$posts = array();
+		$postTypes = array();
+		for($i=0; $i<$instance['posts']['countitem']; $i++){
+			if(isset($instance['posts']['post'][$i])){
+				$args = FieldsController::getLinkArgs($instance['posts']['post'][$i]);
+				$posts[$i] = $args['p'];
+				if(!in_array($args['post_type'], $postTypes)){
+					$postTypes[$i] = $args['post_type'];
+				} 
+			}
+		}
+		return array(
+			'title' => $instance['wtitle'],
+			'args' => array(
+				'post_type' => $postTypes,
+				'post__in' => $posts
+			),
+			'countitem' => $instance['posts']['countitem']
+		);
+	}
 
 	/**
 	 * Outputs the options form on admin
@@ -145,16 +168,30 @@ class CpWidgetSlider extends CpWidgetBase{
 			),
 			$this->getMedia($instance['parallax'], 'parallax')	
 		);
+		$singlePostParams = array(
+				array('id' => $this->get_field_id('singlepost'), 'name' => $this->get_field_name('singlepost')),
+				$instance,
+				$this->getRepeater(
+						'posts',
+						$instance['posts'],
+						array('add' => 'widget_slider_add_singlepost'),
+						array(
+								'title' => __('Posts', 'cppress'),
+								'item' => __('Post', 'cppress')
+						)
+				),
+		);
 		$image = BackEndApplication::part('SliderController', 'image', $this->container, $imageParams);
 		$parallax = BackEndApplication::part('SliderController', 'parallax', $this->container, $parallaxParams);
 		$advanced = $this->getAdvPost($instance);
+		$singlePost = BackEndApplication::part('SliderController', 'single_post', $this->container, $singlePostParams);
 		$accordion = BackEndApplication::part(
 			'FieldsController', 'accordion', $this->container,
 			array(
 				__('Sliders', 'cppress'),
-				array(__('Image slider', 'cppress'), __('Parallax slider', 'cppress'), __('Post slider', 'cppress')),
-				array('image', 'parallax', 'post'),
-				array($image, $parallax, $advanced),
+				array(__('Image slider', 'cppress'), __('Parallax slider', 'cppress'), __('Posts slider', 'cppress'), __('Single post slider', 'cppress')),
+				array('image', 'parallax', 'post', 'singlepost'),
+				array($image, $parallax, $advanced, $singlePost),
 				array(
 					'name' => $this->get_field_name('type'),
 					'value' => $instance['type'] != '' ? $instance['type'] : array()

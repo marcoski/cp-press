@@ -29,8 +29,18 @@
     if($.inArray('accordion', options.exclude) < 0){
       $.CpField.fn.enableAccordion($el);
     }
+    if($.inArray('clearall', options.exclude) < 0){
+      $.CpField.fn.clearAllMultipleSelect($el);
+    }
     $el.trigger('cpsetupform');
    };
+   
+  $.CpField.fn.clearAllMultipleSelect = function($el){
+    $el.find('.cp-clear-all').click(function(){
+      $select = $(this).siblings('select');
+      $select.find('option:selected').prop('selected', false);
+    });
+  };
 	
 	$.CpField.fn.enableToggler = function($el){
 	 $el.find('.cp-widget-type-section').each(function(){

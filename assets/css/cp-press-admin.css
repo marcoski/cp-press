@@ -1863,3 +1863,9 @@ table.cp-link tr.cp-link textarea {
 .cp-widget-tag-generator-list .cp-tag-generator-button{
 	margin-left: 5px !important;
 }
+
+.cp-clear-all{
+	cursor: pointer;
+	color: red;
+	text-decoration: underline;
+}

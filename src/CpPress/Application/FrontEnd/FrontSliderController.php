@@ -124,4 +124,29 @@ class FrontSliderController extends WPController{
 		return new WPTemplateResponse($this, 'frontend_post_'.$options['theme']);
 	}
 	
+	public function frontend_singlepost($posts, $options){
+		$options = wp_parse_args($options, array(
+				'theme' => 'bootstrap',
+				'speed' => 800,
+				'timeout' => 8000,
+				'navcolor' => '#ffffff'
+		));
+		$template = new WPTemplate($this);
+		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
+		$this->assign('template', $template);
+		$templateName = $this->filter->apply('cppress_widget_slider_post_template_name',
+				'template-parts/' . $posts['title'].'-slider', $options);
+		$this->assign('templateName', $templateName);
+		$this->wpQuery->setLoop($posts['args']);
+		$this->assign('posts', $posts);
+		$this->assign('pColumn', 1);
+		$this->assign('col', array('md'=> 12, 'sm' => 12, 'lg' => 12));
+		$this->assign('indicators', count($posts['countitem']));
+		$this->assign('options', $options);
+		$this->assign('filter', $this->filter);
+		$this->assign('wpQuery', $this->wpQuery);
+		
+		return new WPTemplateResponse($this, 'frontend_post_'.$options['theme']);
+	}
+	
 }

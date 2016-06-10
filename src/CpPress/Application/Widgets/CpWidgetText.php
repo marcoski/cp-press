@@ -44,7 +44,11 @@ class CpWidgetText extends CpWidgetBase{
 		}
 		if(strpos($content, 'cppress_addmailpoet_form')){
 			$mpShortcode = $this->container->query('MailPoetShortcodeManager');
-			$content = $mpShortcode->doShortcode($content);
+			if(null !== $mpShortcode){
+				$content = $mpShortcode->doShortcode($content);
+			}else{
+				$content = '';
+			}
 		}
 		$instance['text'] = $content;
 		return parent::widget($args, $instance);

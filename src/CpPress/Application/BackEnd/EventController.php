@@ -62,10 +62,20 @@ class EventController extends WPController{
 		if($event !== null){
 			if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
 				return;
-			$startDateStr = $event['cp-press-event']['when']['event_start_date'].' '.$event['cp-press-event']['when']['event_start_time'];
-			$dtStart = \DateTime::createFromFormat('d/m/Y G:i', $startDateStr);
-			$endDateStr = $event['cp-press-event']['when']['event_end_date'].' '.$event['cp-press-event']['when']['event_end_time'];
-			$dtEnd = \DateTime::createFromFormat('d/m/Y G:i', $endDateStr);
+			if($event['when']['event_start_time'] !== ''){
+				$startDateStr = $event['when']['event_start_date'].' '.$event['when']['event_start_time'];
+				$dtStart = \DateTime::createFromFormat('d/m/Y G:i', $startDateStr);
+			}else{
+				$startDateStr = $event['when']['event_start_date'];
+				$dtStart = \DateTime::createFromFormat('d/m/Y', $startDateStr);
+			}
+			if($event['when']['event_end_time'] !== ''){
+				$endDateStr = $event['when']['event_end_date'].' '.$event['when']['event_end_time'];
+				$dtEnd = \DateTime::createFromFormat('d/m/Y G:i', $endDateStr);
+			}else{
+				$endDateStr = $event['when']['event_end_date'];
+				$dtEnd = \DateTime::createFromFormat('d/m/Y', $endDateStr);
+			}
 			update_post_meta($id, 'cp-press-event-start', $dtStart->getTimestamp());
 			update_post_meta($id, 'cp-press-event-end', $dtEnd->getTimestamp());
 			update_post_meta($id, 'cp-press-event', $_POST['cp-press-event']);

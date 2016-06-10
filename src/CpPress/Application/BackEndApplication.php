@@ -33,6 +33,8 @@ use CpPress\Application\BackEnd\MultiLanguageController;
 class BackEndApplication extends CpPressApplication{
 
 	private $logo;
+	
+	public static $deniedPages = array('toplevel_page_wysija_campaigns', 'media-upload-popup');
 
 	public function __construct($urlParams=array()){
 		parent::__construct(
@@ -259,6 +261,26 @@ class BackEndApplication extends CpPressApplication{
 		$hookObj->register('widget_slider_add_sentences', function(){
 			self::main('SliderController', 'xhr_add_parallax', $this->getContainer());
 		});
+		$hookObj->register('widget_slider_add_singlepost', function(){
+			$container = $this->getContainer();
+			$request = $container->query('Request');
+			$val = $request->getParam('values', array());
+			if(!empty($val)){
+				$link = $val['post'];
+			}else{
+				$link = '';
+			}
+			$linker = self::part(
+					'FieldsController', 'link_button', $container,
+					array(
+							$request->getParam('id').'_post',
+							$request->getParam('name').'[post][]',
+							$link,
+							$validPostTypes
+					)
+			);
+			self::main('SliderController', 'xhr_add_singlepost', $this->getContainer(), array($linker));
+		});
 		$hookObj->execAll();
 	}
 
@@ -371,6 +393,10 @@ class BackEndApplication extends CpPressApplication{
 		$container->registerService('MultiLanguageController', function($c){
 			return new MultiLanguageController('LanguageApp', $c->query('Request'), array($this->themeRoot));
 		});
+	}
+	
+	public static function isAlowedPage($page){
+		return !in_array($page, self::$deniedPages);
 	}
 
 }

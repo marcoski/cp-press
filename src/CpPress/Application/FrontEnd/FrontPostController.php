@@ -50,7 +50,11 @@ class FrontPostController extends WPController{
 		if($posts['postspercolumn'] != '' && $posts['postspercolumn'] > 0){
 			$this->assign('postWidth', floor(12/$posts['postspercolumn']));
 		}else{
-			$this->assign('postWidth', floor(12/$this->wpQuery->found_posts));
+			if($this->wpQuery->found_posts > 0){
+				$this->assign('postWidth', floor(12/$this->wpQuery->found_posts));
+			}else{
+				$this->assign('postWidth', 12);
+			}
 		}
 		$this->assignTemplate($posts, 'loop');
 		$this->assign('posts', $posts);

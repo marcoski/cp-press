@@ -27,6 +27,12 @@ class SliderController extends WPController{
 		$this->assign('media', $media);
 	}
 	
+	public function single_post($fields, $values, $postRepeater){
+		$this->assign('fields', $fields);
+		$this->assign('values', $values);
+		$this->assign('post', $postRepeater);
+	}
+	
 	/**
 	 * @responder wpjson
 	 */
@@ -51,4 +57,10 @@ class SliderController extends WPController{
 		$this->assign('values', $this->getParam('values', array()));
 	}
 	
+	/**
+	 * @responder wpjson
+	 */
+	public function xhr_add_singlepost($linker){
+		$this->assign('linker', $linker);
+	}
 }
