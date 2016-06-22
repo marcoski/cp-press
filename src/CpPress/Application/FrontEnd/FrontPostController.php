@@ -167,7 +167,7 @@ class FrontPostController extends WPController{
 		
 		if(!in_array($max, $links)){
 			if(!in_array($max-1, $links)){
-				$els[] = '<li>...</li>';
+				$els[] = '<li><a>...</a></li>';
 			}
 			$class = $paged == $max ? ' class="active"' : '';
 			$els[] = sprintf(
@@ -189,11 +189,17 @@ class FrontPostController extends WPController{
 	private function assignTemplate($instance, $tPreName){
 		$template = new WPTemplate($this);
 		$template->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
-		if($instance['wtitle'] !== ''){
+		$templateName = '';
+		if(isset($instance['templatename']) && $instance['templatename'] !== ''){
+			$templateName = $this->filter->apply('cppress_widget_post_template_name',
+					'template-parts/' . $instance['templatename'], $instance);
+		}
+		if(!$template->issetTemplate($templateName) && $instance['wtitle'] !== ''){
 			$templateName = $this->filter->apply('cppress_widget_post_template_name',
 					'template-parts/' . $tPreName . '-' .
 					Inflector::delimit(Inflector::camelize($instance['wtitle']), '-'), $instance);
-		}else{
+		}
+		if(!$template->issetTemplate($templateName)){
 			$templateName = $this->filter->apply('cppress_widget_post_template_name',
 					'template-parts/' . $tPreName, $instance);
 		}

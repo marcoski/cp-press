@@ -97,7 +97,6 @@ class CpWidgetPost extends CpWidgetBase{
 						$this->get_field_id( 'postid' ),
 						$this->get_field_name( 'postid' ),
 						$instance['postid'],
-						array('post')
 				)
 		);
 		$this->assign('post_list', $posts);

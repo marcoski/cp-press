@@ -22,14 +22,26 @@
 	}
 	echo $filter->apply('cppress_widget_text_container_open', $textContainerOpen, $instance);
 	if(isset($instance['showtitle']) && $instance['showtitle']){
-		echo $filter->apply('cppress_widget_the_title', 
-				'<h1>' .$instance['wtitle'].'</h1>', $instance['wtitle']);
+		if(isset($instance['linktitle'])){
+			echo $filter->apply('cppress_widget_the_title',
+					'<h1><a href="' . $instance['link'] . '">' . $instance['wtitle'] . '</a>', '', $instance);
+		}else{
+			$title = $filter->apply('cppress_widget_the_title', 
+					'<h1>' .$instance['wtitle'].'</h1>', $instance['wtitle']);
+			echo $filter->apply('cppress_widget_text_the_title', 
+					$title, $instance['wtitle'], $instance);
+		}
 	}
 	echo $filter->apply('cppress_widget_text_before_the_content', '', $instance);
 	$text = $instance['text'];
 	
 	echo $filter->apply('cppress_widget_text_the_content', $text, $instance);
 	echo $filter->apply('cppress_widget_text_after_the_content', '', $instance);
+	if(isset($instance['linkbutton'])){
+		$button = '<a class="btn btn-default" href="' . $instance['link'] . '">%s</a>';
+		$readMore = $filter->apply('cppress_widget_text_read_more', __('Read more', 'cppress'));
+		echo sprintf($button, $readMore);
+	}
 	echo $filter->apply('cppress_widget_text_container_close', $textContainerClose, $instance['containerclass'], $instance);
 	echo $filter->apply('cppress_widget_text_maincontainer_close', '</div>', $instance['wtitle']);
 	echo $args['after_widget'];

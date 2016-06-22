@@ -14,7 +14,6 @@
 			var $container = $field.find('.cp-widget-tinymce-container');
 			var $textarea = $container.find('textarea');
 			var id = $textarea.attr('id');
-			console.log($textarea);
 			if(typeof tinymce != 'undefined'){
 				var mceSettings = tinyMCEPreInit.mceInit['cp-widget-fake-editor'];
 				var setupEditor = function(editor){

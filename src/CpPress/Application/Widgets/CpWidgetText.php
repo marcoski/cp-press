@@ -3,6 +3,7 @@ namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
 use Commonhelp\Util\Commonhelp\Util;
+use CpPress\Application\BackEnd\FieldsController;
 
 class CpWidgetText extends CpWidgetBase{
 
@@ -33,6 +34,9 @@ class CpWidgetText extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
+		if(!filter_var($instance['link'], FILTER_VALIDATE_URL)){
+			$instance['link'] = FieldsController::getLinkPermalink($instance['link']);
+		}
 		$content = $instance['text'];
 		if(isset($instance['removep']) && $instance['removep']){
 			$content = wpautop($content);
@@ -84,6 +88,15 @@ class CpWidgetText extends CpWidgetBase{
 				true
 			)
 		);
+		$link = BackEndApplication::part(
+			'FieldsController', 'link_button', $this->container,
+			array(
+					$this->get_field_id( 'link' ),
+					$this->get_field_name( 'link' ),
+					$instance['link'],
+			)
+		);
+		$this->assign('link', $link);
 		$this->assign('icon', $icon);
 		$this->assign('editor', $editor);
 		return parent::form($instance);

@@ -183,6 +183,36 @@ class BackEndApplication extends CpPressApplication{
 			);
 			self::main('GalleryController', 'xhr_add', $this->getContainer(), array($image, $video));
 		});
+		$hookObj->register('widget_maps_add_marker', function(){
+			$container = $this->getContainer();
+			$request = $container->query('Request');
+			$val = $request->getParam('values', array());
+			if(!empty($val)){
+				$content = $val['content'];
+			}else{
+				$content = '';
+			}
+			$editor = self::part(
+					'FieldsController', 'editor', $container,
+					array(
+							$request->getParam('id').'_editor_'.$request->getParam('count'),
+							$content,
+							array(
+									'textarea_name' => $request->getParam('name').'[content][]',
+									'teeny' => false,
+									'media_buttons' => false,
+									'editor_height' => 230
+							)
+					)
+			);
+			self::main('FieldsController', 'xhr_marker', $container, array($editor));
+		});
+		$hookObj->register('widget_maps_add_customstyles', function(){
+			$container = $this->getContainer();
+			$request = $container->query('Request');
+			
+			self::main('FieldsController', 'xhr_gmap_customstyles', $container, array());
+		});
 		$hookObj->register('widget_portfolio_add', function(){
 			$container = $this->getContainer();
 			$request = $container->query('Request');

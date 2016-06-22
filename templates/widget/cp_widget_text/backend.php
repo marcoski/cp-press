@@ -7,6 +7,7 @@
   />
 </div>
 <?= $editor ?>
+<?= $link ?>
 <div class="cp-widget-field">
     <label for="<?= $widget->get_field_id( 'removep' ); ?>">
     	<input class="widefat"
@@ -34,6 +35,26 @@
 	      id="<?= $widget->get_field_id( 'containerclass' ); ?>"
 	      name="<?= $widget->get_field_name( 'containerclass' ); ?>"
 	      value="<? isset($instance['containerclass']) ? e($instance['containerclass']) : e(''); ?>"/>
+	  </div>
+	  <div class="cp-widget-field">
+	    <label for="<?= $widget->get_field_id( 'linkbutton' ); ?>">
+	    	<input class="widefat"
+		      id="<?= $widget->get_field_id( 'linkbutton' ); ?>"
+		      name="<?= $widget->get_field_name( 'linkbutton' ); ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['linkbutton'] ); ?> />&nbsp;
+	    	<?php _e('Make link button', 'cppress')?>
+	    </label>
+	  </div>
+	  <div class="cp-widget-field">
+	    <label for="<?= $widget->get_field_id( 'linktitle' ); ?>">
+	    	<input class="widefat"
+		      id="<?= $widget->get_field_id( 'linktitle' ); ?>"
+		      name="<?= $widget->get_field_name( 'linktitle' ); ?>"
+		      type="checkbox"
+		      value="1" <?php checked( '1', $instance['linktitle'] ); ?> />&nbsp;
+	    	<?php _e('Link title', 'cppress')?>
+	    </label>
 	  </div>
 	  <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">

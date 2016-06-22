@@ -141,7 +141,7 @@ class FrontSliderController extends WPController{
 		$this->assign('posts', $posts);
 		$this->assign('pColumn', 1);
 		$this->assign('col', array('md'=> 12, 'sm' => 12, 'lg' => 12));
-		$this->assign('indicators', count($posts['countitem']));
+		$this->assign('indicators', $posts['countitem']);
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);
 		$this->assign('wpQuery', $this->wpQuery);
