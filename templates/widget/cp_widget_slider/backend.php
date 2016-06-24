@@ -1,6 +1,6 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
-  <input class="widefat"
+  <input class="widefat cp-widget-title-noedit"
     id="<?= $widget->get_field_id( 'wtitle' ); ?>"
     name="<?= $widget->get_field_name( 'wtitle' ); ?>"
     value="<?= $instance['wtitle']; ?>"
