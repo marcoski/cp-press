@@ -43,6 +43,7 @@ class FrontEndHook extends Hook{
 			$styles = $this->app->getStyles();
 			$styles->enqueue('cp-press-lightbox');
 			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
+			$scripts->enqueue('cp-social-share-kit', array(), false, true);
 			$this->app->loadCpPressFont();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container = $this->app->getContainer();
