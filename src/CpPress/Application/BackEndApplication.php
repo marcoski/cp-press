@@ -29,6 +29,7 @@ use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
 use CpPress\Application\BackEnd\MultiLanguageController;
+use Commonhelp\Util\Inflector;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -117,24 +118,6 @@ class BackEndApplication extends CpPressApplication{
 		$hookObj->register('contact_form_tag', function(){
 			self::main('ContactFormController', 'xhr_taggenerator', $this->getContainer());
 		});
-		$hookObj->register('process_link', function(){
-			//CpOnePage::dispatch('AdminLink', 'process');
-		});
-		$hookObj->register('delete_link', function(){
-			//CpOnePage::dispatch('AdminLink', 'delete');
-		});
-		$hookObj->register('event', function(){
-			//CpEvent::dispatch('AdminEvent', 'select_event');
-		});
-		$hookObj->register('select_event_portfolio', function(){
-			//self::main('EventController', 'select_event_portfolio', $this->getContainer());
-		});
-		$hookObj->register('select_event_slider', function(){
-			//CpEvent::dispatch('AdminEvent', 'select_event_slider', func_get_args());
-		});
-		$hookObj->register('select_event_calendar', function(){
-			//CpEvent::dispatch('AdminEvent', 'select_event_calendar', func_get_args());
-		});
 		$hookObj->register('widget_social_add', function(){
 			self::main('SocialmediaController', 'xhr_add', $this->getContainer());
 		});
@@ -212,6 +195,15 @@ class BackEndApplication extends CpPressApplication{
 			$request = $container->query('Request');
 			
 			self::main('FieldsController', 'xhr_gmap_customstyles', $container, array());
+		});
+		$hookObj->register('post_advanced_add_taxonomy', function(){
+			self::main('PostController', 'xhr_taxonomies', $this->getContainer(), array());
+		});
+		$hookObj->register('change_taxonomy', function(){
+			$container = $this->getContainer();
+			$request = $container->query('Request');
+			$widget = 'CpPress\\Application\\Widgets\\' . Inflector::camelize($request->getParam('widget'));
+			self::main('PostController', 'xhr_change_taxonomy', $container, array($container->query($widget)));
 		});
 		$hookObj->register('widget_portfolio_add', function(){
 			$container = $this->getContainer();

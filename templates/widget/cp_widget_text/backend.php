@@ -37,14 +37,17 @@
 	      value="<? isset($instance['containerclass']) ? e($instance['containerclass']) : e(''); ?>"/>
 	  </div>
 	  <div class="cp-widget-field">
-	    <label for="<?= $widget->get_field_id( 'linkbutton' ); ?>">
-	    	<input class="widefat"
-		      id="<?= $widget->get_field_id( 'linkbutton' ); ?>"
-		      name="<?= $widget->get_field_name( 'linkbutton' ); ?>"
-		      type="checkbox"
-		      value="1" <?php checked( '1', $instance['linkbutton'] ); ?> />&nbsp;
-	    	<?php _e('Make link button', 'cppress')?>
-	    </label>
+	    <label for="<?= $widget->get_field_id( 'linkbutton' ); ?>"><?php _e('Make link button', 'cppress')?></label>
+    	<input class="widefat"
+	      id="<?= $widget->get_field_id( 'linkbutton' ); ?>"
+	      name="<?= $widget->get_field_name( 'linkbutton' ); ?>"
+	      type="checkbox"
+	      value="1" <?php checked( '1', $instance['linkbutton'] ); ?> />&nbsp;
+	      <input
+	      	placeholder="<?php _e('Insert link button text...', 'cppress'); ?>"
+		      id="<?= $widget->get_field_id( 'linkbuttontext' ); ?>"
+		      name="<?= $widget->get_field_name( 'linkbuttontext' ); ?>"
+		      value="<? isset($instance['linkbuttontext']) ? e($instance['linkbuttontext']) : e(''); ?>"/>
 	  </div>
 	  <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'linktitle' ); ?>">

@@ -8,6 +8,9 @@ use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
 use Commonhelp\Util\Inflector;
+use CpPress\Application\BackEnd\FieldsController;
+use Commonhelp\Util\Hash;
+use CpPress\Application\BackEnd\PostController;
 
 class FrontPostController extends WPController{
 	
@@ -21,32 +24,7 @@ class FrontPostController extends WPController{
 	}
 	
 	public function loop($posts){
-		$offset = $posts['offset'];
-		if(isset($posts['paginate'])){
-			$page = get_query_var('paged', 1);
-			if($page === 0){
-				$page = 1;
-			}
-			if($posts['offset'] > 0){
-				$offset = ($posts['limit'] * ($page-1)) + $offset;
-			}else{
-				$offset = $posts['limit'] * ($page-1);
-			}
-		}
-		$qargs = array(
-				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
-				'posts_per_page'	=> $posts['limit'],
-				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
-				'category__not_in' => isset($posts['excludecat']) ? $posts['excludecat'] : array(),
-				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
-				'tag__not_in' => isset($posst['excludetags']) ? $posts['excludetags'] : array(),
-				'offset'			=> $offset,
-				'order'				=> $posts['order'],
-				'orderby'			=> $posts['orderby'],
-				/* Set it to false to allow WPML modifying the query. */
-				'suppress_filters' => false
-		);
-		$this->wpQuery->setLoop($qargs);
+		$this->wpQuery->setLoop(FrontPostController::getQueryArgs($posts));
 		if($posts['postspercolumn'] != '' && $posts['postspercolumn'] > 0){
 			$this->assign('postWidth', floor(12/$posts['postspercolumn']));
 		}else{
@@ -69,20 +47,7 @@ class FrontPostController extends WPController{
 		$data = $this->getParams();
 		$posts = $data['options'];
 		$offset = (int) $posts['limit'] + $posts['offset'];
-		$qargs = array(
-				'post_type'			=> isset($posts['posttype']) ? $posts['posttype'] : 'post',
-				'posts_per_page'	=> $posts['limit'],
-				'category__in'		=> isset($posts['categories']) ? $posts['categories'] : array(),
-				'category__not_in' => isset($posts['excludecat']) ? $posts['excludecat'] : array(),
-				'tag__in'			=> isset($posts['tags']) ? $posts['tags'] : array(),
-				'tag__not_in' => isset($posst['excludetags']) ? $posts['excludetags'] : array(),
-				'offset'			=> $offset,
-				'order'				=> $posts['order'],
-				'orderby'			=> $posts['orderby'],
-				/* Set it to false to allow WPML modifying the query. */
-				'suppress_filters' => false
-		);
-		$this->wpQuery->setLoop($qargs);
+		$this->wpQuery->setLoop(FrontPostController::getQueryArgs($posts, $offset));
 		if($this->wpQuery->post_count > 0){
 			$this->setWpAjaxData('hasmore', true);
 			$data['options']['offset'] = $offset;
@@ -96,10 +61,14 @@ class FrontPostController extends WPController{
 		$this->setWpAjaxData('data', $data);
 	}
 	
-	public function single($query, $instance){
-		$query = $this->filter->apply('cppress_widget_post_queryargs', $query, $instance);
+	public function single($instance){
+		if(isset($instance['postid']) && $instance['postid'] != ''){
+			$this->wpQuery->setLoop(FieldsController::getLinkArgs($instance['postid']));
+		}else{
+			$this->wpQuery->setLoop(FrontPostController::getQueryArgs($instance));
+		}
+		
 		$this->assignTemplate($instance, 'single');
-		$this->wpQuery->setLoop($query);
 		$this->assign('filter', $this->filter);
 		$this->assign('instance', $instance);
 		$this->assign('wpQuery', $this->wpQuery);
@@ -205,6 +174,140 @@ class FrontPostController extends WPController{
 		}
 		$this->assign('templateName', $templateName);
 		$this->assign('template', $template);
+	}
+	
+	public static function getQueryArgs($instance, $offset=null){
+		if($offset === null){
+			$offset = $instance['offset'];
+		}
+		if(isset($instance['paginate'])){
+			$page = get_query_var('paged', 1);
+			if($page === 0){
+				$page = 1;
+			}
+			if($instance['offset'] > 0){
+				$offset = ($instance['limit'] * ($page-1)) + $offset;
+			}else{
+				$offset = $instance['limit'] * ($page-1);
+			}
+		}
+		return array(
+				'post_type'			=> isset($instance['posttype']) ? $instance['posttype'] : 'post',
+				'posts_per_page'	=> isset($instance['limit']) ? $instance['limit'] : '1',
+				'tax_query' 	=> FrontPostController::getTaxQuery($instance),
+				'offset'			=> $offset,
+				'order'				=> $instance['order'],
+				'orderby'			=> $instance['orderby'],
+				/* Set it to false to allow WPML modifying the query. */
+				'suppress_filters' => false
+		);
+	}
+	
+	private static function getTaxQuery($instance){
+		$instance = PostController::correctInstanceForCompatibility($instance);
+		$convertTaxonomyToFormForCompatibility = array(
+			'category' => array('categories', 'excludecat'),
+			'post_tag' => array('tags', 'excludetags')
+		);
+		$taxQuery = array();
+		foreach(get_object_taxonomies($instance['posttype']) as $taxonomy){
+			if(array_key_exists($taxonomy, $convertTaxonomyToFormForCompatibility)){
+				$convertedTaxonomy = $convertTaxonomyToFormForCompatibility[$taxonomy];
+				if(isset($instance[$convertedTaxonomy[0]])){
+					$includeValues = $instance[$convertedTaxonomy[0]];
+					if(isset($instance[$convertedTaxonomy[1]])){
+						$includeValues = array();
+						foreach($instance[$convertedTaxonomy[0]] as $toInclude => $val){
+							if(is_array($instance[$convertedTaxonomy[1]]) && !in_array($toInclude, $instance[$convertedTaxonomy[1]])){
+								$includeValues[] = $val;
+							}
+						}
+					}
+					$taxQuery[] = array(
+						'taxonomy' => $taxonomy,
+						'field' => 'term_id',
+						'terms' => $includeValues
+					);
+				}
+				if(isset($instance[$convertedTaxonomy[1]])){
+					$excludeValues = array();
+					foreach($instance[$convertedTaxonomy[1]] as $toExclude => $val){
+						$excludeValues[] = $instance[$convertedTaxonomy[0]][$toExclude];
+						
+					}
+					$taxQuery[] = array(
+							'taxonomy' => $taxonomy,
+							'field' => 'term_id',
+							'terms' => $excludeValues,
+							'operator' => 'NOT IN'
+					);
+				}	
+			}else{
+				/** TODO HANDLE CUSTOM AND NEW TAXONOMIES */
+				if(isset($instance[$taxonomy][$taxonomy])){
+					$includeValues = $instance[$taxonomy][$taxonomy];
+					if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
+						$includeValues = array();
+						foreach($instance[$taxonomy][$taxonomy] as $toInclude => $val){
+							if(is_array($instance[$taxonomy]['exclude_' . $taxonomy]) && !in_array($toInclude, $instance[$taxonomy]['exclude_' . $taxonomy])){
+								$includeValues[] = $val;
+							}
+						}
+					}
+					$taxQuery[] = array(
+						'taxonomy' => $taxonomy,
+						'field' => 'term_id',
+						'terms' => $includeValues
+					);
+				}
+				if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
+					$excludeValues = array();
+					foreach($instance[$taxonomy]['exclude_' . $taxonomy] as $toExclude => $val){
+						$excludeValues[] = $instance[$taxonomy][$taxonomy][$toExclude];
+						
+					}
+					$taxQuery[] = array(
+							'taxonomy' => $taxonomy,
+							'field' => 'term_id',
+							'terms' => $excludeValues,
+							'operator' => 'NOT IN'
+					);
+				}
+			}
+		}
+		
+		if(empty($taxQuery)){
+			return array();
+		}
+		
+		if(count($taxQuery) == 1){
+			return $taxQuery;
+		}else if(count($taxQuery) == 2){
+			if(in_array('NOT IN', Hash::flatten($taxQuery))){
+				$taxQuery['relation'] = 'AND';
+			}else{
+				$taxQuery['relation'] = 'OR';
+			}
+		}else{
+			$toOr = array();
+			array_walk($taxQuery, function($el, $key) use (&$toOr, &$taxQuery){
+				if(is_array($el) && isset($el['operator']) && $el['operator'] === 'NOT IN'){
+					$toOr[] = $el;
+					unset($taxQuery[$key]);
+				}
+			});
+			array_walk($taxQuery, function($el, $key) use (&$toOr, &$taxQuery){
+				if(is_array($el) && !isset($el['operator']) && $el['taxonomy'] === $toOr[0]['taxonomy']){
+					$toOr[] = $el;
+					unset($taxQuery[$key]);
+				}
+			});
+			$toOr['relation'] = 'AND';
+			array_unshift($taxQuery, $toOr);
+			$taxQuery = array_values($taxQuery);
+			$taxQuery['relation'] = 'OR';
+		}
+		return $taxQuery;
 	}
 	
 	

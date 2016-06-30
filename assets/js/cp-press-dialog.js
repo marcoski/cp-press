@@ -108,7 +108,7 @@
 			$form.find('[name]').each(function(){
 				var $$ = $(this);
 				var name = /([A-Za-z0-9_]+)\[(.*)\]/.exec( $$.attr('name') );
-			if(name === undefined){
+					if(name === undefined){
         			return true;
         	}
 	        if(name === null){
@@ -214,6 +214,8 @@
 	            }
 	          }
 	        }
+	        
+	        
 				});
 
 			return data;

@@ -4,6 +4,7 @@ namespace CpPress\Application\FrontEnd;
 use \Commonhelp\WP\WPController;
 use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Theme\Media\Image;
+use CpPress\Application\FrontEnd\FrontPostController;
 use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
@@ -87,17 +88,6 @@ class FrontSliderController extends WPController{
 				'timeout' => 8000,
 				'navcolor' => '#ffffff'
 		));
-		$qargs = array(
-				'post_type'			=> isset($posts['post']['posttype']) ? $posts['post']['posttype'] : 'post',
-				'posts_per_page'	=> $posts['post']['limit'],
-				'category__in'		=> isset($posts['post']['categories']) ? $posts['post']['categories'] : array(),
-				'tag__in'			=> isset($posts['post']['tags']) ? $posts['post']['tags'] : array(),
-				'offset'			=> $posts['post']['offset'],
-				'order'				=> $posts['post']['order'],
-				'orderby'			=> $posts['post']['orderby'],
-				/* Set it to false to allow WPML modifying the query. */
-				'suppress_filters' => false
-		);
 		if($posts['post']['postspercolumn'] == 0){
 			$posts['post']['postspercolumn'] = 1;
 		}
@@ -108,7 +98,7 @@ class FrontSliderController extends WPController{
 		$templateName = $this->filter->apply('cppress_widget_slider_post_template_name',
 				'template-parts/' . $posts['post']['posttype'].'-slider', $options);
 		$this->assign('templateName', $templateName);
-		$this->wpQuery->setLoop($qargs);
+		$this->wpQuery->setLoop(FrontPostController::getQueryArgs($posts));
 		$this->assign('posts', $posts);
 		$this->assign('pColumn', $posts['post']['postspercolumn']);
 		$this->assign('col', $this->filter->apply('cppress_widget_slider_post_col', array(

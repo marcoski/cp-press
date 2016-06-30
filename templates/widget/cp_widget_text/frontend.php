@@ -39,8 +39,11 @@
 	echo $filter->apply('cppress_widget_text_after_the_content', '', $instance);
 	if(isset($instance['linkbutton'])){
 		$button = '<a class="btn btn-default" href="' . $instance['link'] . '">%s</a>';
-		$readMore = $filter->apply('cppress_widget_text_read_more', __('Read more', 'cppress'));
-		echo sprintf($button, $readMore);
+		$linkButtonText = $filter->apply('cppress_widget_text_read_more', __('Read more', 'cppress'));
+		if(isset($instance['linkbuttontext']) && $instance['linkbuttontext'] !== ''){
+			$linkButtonText = $instance['linkbuttontext'];
+		}
+		echo sprintf($button, $linkButtonText);
 	}
 	echo $filter->apply('cppress_widget_text_container_close', $textContainerClose, $instance['containerclass'], $instance);
 	echo $filter->apply('cppress_widget_text_maincontainer_close', '</div>', $instance['wtitle']);

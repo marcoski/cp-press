@@ -3,6 +3,7 @@ namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\FrontEndApplication;
+use CpPress\Application\BackEnd\PostController;
 class CpWidgetLoop extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -16,6 +17,12 @@ class CpWidgetLoop extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-update';
+		$this->adminScripts = array(
+				array(
+						'source' => 'cp-widget-loop',
+						'deps' => array('jquery')
+				)
+		);
 		$this->frontScripts = array(
 				array(
 						'source' => 'ajaxloop',
@@ -47,46 +54,12 @@ class CpWidgetLoop extends CpWidgetBase{
 	 * @param array $instance The widget options
 	 */
 	public function form($instance) {
-		$advInstance = array(
-			'id' => array(
-					'posttype' => $this->get_field_id('posttype'),
-					'limit' => $this->get_field_id( 'limit' ),
-					'offset' => $this->get_field_id( 'offset' ),
-					'order' => $this->get_field_id( 'order' ),
-					'orderby' => $this->get_field_id( 'orderby' ),
-					'categories' => $this->get_field_id( 'categories' ),
-					'excludecat' => $this->get_field_id('excludecat'),
-					'tags' => $this->get_field_id( 'tags' ),
-					'excludetags' => $this->get_field_id('excludetags'),
-					'linktitle' => $this->get_field_id('linktitle'),
-					'showinfo' => $this->get_field_id('showinfo'),
-					'showexcerpt' => $this->get_field_id('showexcerpt'),
-					'showthumbnail' => $this->get_field_id('showthumbnail'),
-					'hidecontent' => $this->get_field_id('hidecontent'),
-					'linkthumbnail' => $this->get_field_id('linkthumbnail'),
-					'postspercolumn' => $this->get_field_id('postspercolumn')
-			),
-			'name' => array(
-					'posttype' => $this->get_field_name('posttype'),
-					'limit' => $this->get_field_name( 'limit' ),
-					'offset' => $this->get_field_name( 'offset' ),
-					'order' => $this->get_field_name( 'order' ),
-					'orderby' => $this->get_field_name( 'orderby' ),
-					'categories' => $this->get_field_name( 'categories' ),
-					'excludecat' => $this->get_field_name('excludecat'),
-					'tags' => $this->get_field_name( 'tags' ),
-					'excludetags' => $this->get_field_name('excludetags'),
-					'linktitle' => $this->get_field_name('linktitle'),
-					'showinfo' => $this->get_field_name('showinfo'),
-					'showexcerpt' => $this->get_field_name('showexcerpt'),
-					'showthumbnail' => $this->get_field_name('showthumbnail'),
-					'hidecontent' => $this->get_field_name('hidecontent'),
-					'linkthumbnail' => $this->get_field_name('linkthumbnail'),
-					'postspercolumn' => $this->get_field_name('postspercolumn')
-			),
-			'value' => $instance
-		);
-		$advanced = BackEndApplication::part('PostController', 'advanced', $this->container, array($advInstance, false, true));
+		$instance = PostController::correctInstanceForCompatibility($instance);
+		$advanced = BackEndApplication::part(
+				'PostController', 
+				'advanced', 
+				$this->container, 
+				array($this, $instance,  array('single' => false, 'show_view_options' => true)));
 		$this->assign('advanced', $advanced);
 		return parent::form($instance);
 	}

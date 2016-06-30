@@ -6,6 +6,7 @@ use \Commonhelp\WP\WPApplication;
 use CpPress\Application\FrontEnd\FrontPageController;
 use CpPress\Application\FrontEnd\FrontSliderController;
 use CpPress\Application\FrontEnd\FrontPostController;
+use CpPress\Application\FrontEnd\FrontEventController;
 use CpPress\Application\WP\Hook\FrontEndHook;
 use CpPress\Application\WP\Hook\FrontEndFilter;
 use CpPress\CpPress;
@@ -113,6 +114,17 @@ class FrontEndApplication extends CpPressApplication{
 					),
 					$filter,
 					$c->query('ContactFormShortcodeManager')
+			);
+		});
+		$container->registerService('Event', function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontEventController(
+					'EventApp',
+					$c->query('Request'),
+					array(
+							$this->themeRoot
+					),
+					$filter
 			);
 		});
 		$container->registerService('FrontEndHook', function($c){

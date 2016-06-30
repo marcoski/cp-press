@@ -3,6 +3,7 @@ namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\BackEnd\FieldsController;
+use CpPress\Application\BackEnd\PostController;
 class CpWidgetSlider extends CpWidgetBase{
 
 	public function __construct(array $templateDirs=array()){
@@ -231,43 +232,12 @@ class CpWidgetSlider extends CpWidgetBase{
 	}
 	
 	private function getAdvPost($instance){
-		$adv = array(
-			'id' => array(
-					'posttype' => $this->get_field_id('posttype'),
-					'limit' => $this->get_field_id( 'limit' ),
-					'offset' => $this->get_field_id( 'offset' ),
-					'order' => $this->get_field_id( 'order' ),
-					'orderby' => $this->get_field_id( 'orderby' ),
-					'categories' => $this->get_field_id( 'categories' ),
-					'tags' => $this->get_field_id( 'tags' ),
-					'linktitle' => $this->get_field_id('linktitle'),
-					'showinfo' => $this->get_field_id('showinfo'),
-					'showexcerpt' => $this->get_field_id('showexcerpt'),
-					'showthumbnail' => $this->get_field_id('showthumbnail'),
-					'hidecontent' => $this->get_field_id('hidecontent'),
-					'linkthumbnail' => $this->get_field_id('linkthumbnail'),
-					'postspercolumn' => $this->get_field_id('postspercolumn')
-			),
-			'name' => array(
-					'posttype' => $this->get_field_name('post').'[posttype]',
-					'limit' => $this->get_field_name( 'post' ).'[limit]',
-					'offset' => $this->get_field_name( 'post' ).'[offset]',
-					'order' => $this->get_field_name( 'post' ).'[order]',
-					'orderby' => $this->get_field_name( 'post' ).'[orderby]',
-					'categories' => $this->get_field_name( 'post' ).'[categories]',
-					'tags' => $this->get_field_name( 'post' ).'[tags]',
-					'linktitle' => $this->get_field_name('post').'[linktitle]',
-					'showinfo' => $this->get_field_name('post').'[showinfo]',
-					'showexcerpt' => $this->get_field_name('post').'[showexcerpt]',
-					'showthumbnail' => $this->get_field_name('post').'[showthumbnail]',
-					'hidecontent' => $this->get_field_name('post').'[hidecontent]',
-					'linkthumbnail' => $this->get_field_name('post').'[linkthumbnail]',
-					'postspercolumn' => $this->get_field_name('post').'[postspercolumn]'
-					
-			),
-			'value' => $instance['post'],
-		);
-		return BackEndApplication::part('PostController', 'advanced', $this->container, array($adv, false, true));
+		$instance['post'] = PostController::correctInstanceForCompatibility($instance['post']);
+		return BackEndApplication::part(
+				'PostController', 
+				'advanced', 
+				$this->container, 
+				array($this, $instance['post'], array('single' => false, 'show_view_options' => true)));
 	}
 	
 	private function getRepeater($type, $instance, $actions, $labels){

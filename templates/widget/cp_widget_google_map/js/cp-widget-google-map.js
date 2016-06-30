@@ -1,8 +1,6 @@
 var CpGoogleMap = function($) {
   return {
     showMap: function(element, location, options) {
-      console.log(options);
-      console.log(location);
       var zoom = Number(options.zoom);
       if ( !zoom ) zoom = 14;
 
@@ -26,9 +24,13 @@ var CpGoogleMap = function($) {
       };
 
       var userMapStyles = options.map_styles;
-      console.log(userMapStyles);
       if ( userMapStyles ) {
         var userMapType = new google.maps.StyledMapType(userMapStyles, userMapOptions);
+
+        map.mapTypes.set(userMapTypeId, userMapType);
+        map.setMapTypeId(userMapTypeId);
+      }else{
+      	var userMapType = new google.maps.StyledMapType([], userMapOptions);
 
         map.mapTypes.set(userMapTypeId, userMapType);
         map.setMapTypeId(userMapTypeId);
@@ -141,6 +143,7 @@ var CpGoogleMap = function($) {
 
         var options = $$.data('options');
         var address = options.address;
+        var location = options.location;
         // If no address was specified, but we have markers, use the first marker as the map center.
         if(!address) {
           var markers = options.markers;
@@ -176,6 +179,11 @@ var CpGoogleMap = function($) {
               $$.append('<div><p><strong>There were no results for the place you entered. Please try another.</strong></p></div>');
             }
           }.bind(this));
+        }
+        
+        if(location){
+        	args = {'location': {lat: parseFloat(options.location.lat), lng: parseFloat(options.location.lng)}};
+        	this.showMap(element, args.location, options);
         }
 
       }.bind(this));

@@ -3,12 +3,12 @@
 		<p><?php _e('From', 'cppress'); ?> <input class="cpevent-date-input cpevent-date-start" type="text" name="cp-press-event[when][event_start_date]" value="<? !is_null($when) ? e(esc_attr($when['event_start_date'])) : e('') ?>" /></p>
 		<p><?php _e('To', 'cppress'); ?> <input class="cpevent-date-input cpevent-date-end" type="text" name="cp-press-event[when][event_end_date]" value="<? !is_null($when) ? e(esc_attr($when['event_end_date'])) : e(''); ?>" /></p>
 	</div>
-	<div class="cpevent-time-range" style="display: none">
+	<div class="cpevent-time-range">
 		<p>
 			<span class="cpevent-event-text"><?php _e('Event starts at', 'cppress'); ?></span>
-			<input id="start-time" class="cpevent-time-input cpevent-time-start" type="text" size="8" maxlength="8" name="cp-press-event[when][event_start_time]" value="<? !is_null($when) ? e(esc_attr($when['event_start_time'])) : e(''); ?>" />
 		</p>
 		<p>
+			<input id="start-time" class="cpevent-time-input cpevent-time-start" type="text" size="8" maxlength="8" name="cp-press-event[when][event_start_time]" value="<? !is_null($when) ? e(esc_attr($when['event_start_time'])) : e(''); ?>" />
 			<?php _e('To', 'cppress'); ?>
 			<input id="end-time" class="cpevent-time-input cpevent-time-end" type="text" size="8" maxlength="8" name="cp-press-event[when][event_end_time]" value="<? !is_null($when) ? e(esc_attr($when['event_end_time'])) : e(''); ?>" />
 		</p>
