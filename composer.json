@@ -27,6 +27,6 @@
     ],
     "require": {
      	"php": ">=5.4",
-        "commonhelp/libs": "dev-0.5"
+        "commonhelp/libs": "0.5.x-dev"
     }
 }
