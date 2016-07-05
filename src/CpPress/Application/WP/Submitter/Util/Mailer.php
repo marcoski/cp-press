@@ -50,7 +50,7 @@ class Mailer{
 		$to = $this->stripNewLine($to);
 		$additionalHeaders = trim($additionalHeaders);
 		
-		$headers = "From: $to\n";
+		$headers = "From: $from\n";
 		if($useHtml){
 			$headers .= "Content-type: text/html\n";
 		}
@@ -80,12 +80,12 @@ class Mailer{
 		}
 		
 		$content = explode("\n", $content);
+		
 		foreach($content as $num => $line){
-			$line = new MailerTagText($line, $this->submitter, $this->request, $args);
-			$replaced = $line->replaceTags();
-			
+			$l = new MailerTagText($line, $this->submitter, $this->request, $args);
+			$replaced = $l->replaceTags();
 			if($this->template['excludeblank']){
-				$replacedTags = $line->getReplacedTags();
+				$replacedTags = $l->getReplacedTags();
 				if(empty($replacedTags) || array_filter($replacedTags)){
 					$content[$num] = $replaced;
 				}else{
@@ -95,9 +95,7 @@ class Mailer{
 				$content[$num] = $replaced;
 			}
 		}
-		
 		$content = implode("\n", $content);
-		
 		return $content;
 	}
 	

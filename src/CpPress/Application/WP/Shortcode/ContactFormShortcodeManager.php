@@ -197,7 +197,6 @@ class ContactFormShortcodeManager extends Shortcode{
 		foreach($input as $value){
 			$ouput = array_merge($output, self::flatten($value));
 		}
-		
 		return $output;
 	}
 	

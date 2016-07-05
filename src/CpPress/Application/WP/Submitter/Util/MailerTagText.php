@@ -39,8 +39,8 @@ class MailerTagText{
 		}else{
 			$callback = array($this, 'replaceTagCallback');
 		}
-		
-		return preg_replace_callback($regex, $callback, $this->content);
+		$value = preg_replace_callback($regex, $callback, $this->content);
+		return $value;
 	}
 	
 	public function replaceTagCallbackHtml($matches){
@@ -74,25 +74,21 @@ class MailerTagText{
 		}
 		
 		$submitted = $this->postedData;
-		
 		if($submitted !== null){
 			if($doNotHeat){
 				$submitted = !is_null($this->request->getParam($tagname)) ?
 					$this->request->getParam($tagname) : '';
 			}
-			
-			$replaced = $submitted;
+			$replaced = $submitted[$tagname];
 			
 			if(!empty($format)){
 				$replaced = $this->format($replaced, $format);
 			}
-			
-			$replaced = ContactFormShortcodeManager::flatJoin($replaced);
+			//$replaced = ContactFormShortcodeManager::flatJoin($replaced);
 			if($html){
 				$replaced = esc_html($replaced);
 				$replaced = wptexturize($replaced);
 			}
-			
 			$replaced = wp_unslash(trim($replaced));
 			$this->replacedTags[$tag] = $replaced;
 			return $replaced;

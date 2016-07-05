@@ -15,6 +15,7 @@ class ContactFormSubmitter extends Submitter{
 	private $response;
 	private $invalidFields = array();
 	private $skipMail;
+	private $error = '';
 	
 	public function __construct(Request $request, Filter $filter, Hook $hook){
 		parent::__construct($request, $filter, $hook);
@@ -40,6 +41,10 @@ class ContactFormSubmitter extends Submitter{
 	
 	public function getStatus(){
 		return $this->status;
+	}
+	
+	public function getError(){
+		return $this->error;
 	}
 	
 	protected function submit($ajax=false){
@@ -70,6 +75,7 @@ class ContactFormSubmitter extends Submitter{
 		}else{
 			$this->status = 'mail_failed';
 			$this->response = __('Failed to send your message. Please try later or contact the administrator by another method.', 'cppress');
+			$this->error = $GLOBALS['phpmailer']->ErrorInfo;
 			$this->hook->create('cppress-cf-mailfailed', $this);
 		}
 		
@@ -79,6 +85,10 @@ class ContactFormSubmitter extends Submitter{
 			'status' => $this->status,
 			'message' => $this->response,	
 		);
+		
+		if($this->error !== ''){
+			$result['error'] = $this->error;
+		}
 		
 		if($this->is('validation_failed')){
 			$result['invalid_fields'] = $this->invalidFields;
@@ -175,14 +185,13 @@ class ContactFormSubmitter extends Submitter{
 				'subject' => $this->instance['subject'], 
 				'to' => $this->instance['to'], 
 				'from' => $this->instance['from'],
-				'body' => $this->instance['bory'], 
+				'body' => $this->instance['body'], 
 				'additionalheaders' => $this->instance['additionalheaders'],
 				'excludeblank' => isset($this->instance['excludeblank']) ?  true : false, 
 				'usehtml' => isset($this->instance['usehtml']) ? true : false
 		);
 		$mailer = new Mailer($template, $this, $this->request);
 		$result = $mailer->send();
-		
 		if($result){
 			return true;
 		}
@@ -232,6 +241,10 @@ class ContactFormSubmitter extends Submitter{
 			$items['onSentOk'] = $result['scripts_on_sent_ok'];
 		}
 		
+		if(isset($result['error']) && $result['error'] !== ''){
+			$items['error'] = $result['error'];
+		}
+		
 		if(!empty($result['script_on_submit'])){
 			$items['onSubmit'] = $result['script_on_submit'];
 		}
@@ -257,10 +270,10 @@ class ContactFormSubmitter extends Submitter{
 			
 			$name = $tag['name'];
 			$value = '';
-			if(isset($data['name'])){
-				$value = $data['name'];
-			}
 			
+			if(isset($data[$name])){
+				$value = $data[$name];
+			}
 			$data[$name] = $value;
 		}
 		

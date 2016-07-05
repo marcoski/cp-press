@@ -84,6 +84,8 @@ abstract class Submitter{
 			$value = wp_check_invalid_utf8($value);
 			$value = wp_kses_no_null($value);
 		}
+		
+		return $value;
 	}
 	
 	abstract function ajaxSubmit($instance, $args);
