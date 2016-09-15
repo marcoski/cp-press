@@ -2,9 +2,17 @@
     <label for="<?= $id; ?>_title">
     	<?php _e('Image Caption', 'cppress')?>
     </label>
-    <input type="text" class="widefat"
-		name="<?= $name; ?>[caption][]" 
-		value="<? !empty($values) ? e($values['caption']) : e('') ?>"/>
+    <?php 
+	$attrs = $filter->apply('cppress_widget_attrs', array(
+		'name' => $name.'[caption][]',
+		'value' => isset($values['caption']) ? $values['caption'] : ''
+	), $values, 'caption');
+	?>
+	<input class="widefat"
+    <?php foreach($attrs as $name => $value){
+		echo ' '.$name.'="'.$value.'"';
+   	}?>
+	/>
 </div>
 <?= $image ?>
 <?= $video ?>

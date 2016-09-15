@@ -1,10 +1,7 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
-  <input class="widefat"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <div class="cp-widget-field cp-widget-input">
 	<label for="<?= $widget->get_field_id( 'numberofposts' ); ?>"><?php _e( 'Number of posts:', 'cppress' ); ?></label>
@@ -96,10 +93,8 @@
 	<div class="cp-widget-section cp-widget-section-hide">
 		<div class="cp-widget-field cp-widget-input">
 			<label for="<?= $widget->get_field_id( 'linktext' ); ?>"><?php _e( 'Link text', 'cppress' ); ?></label>
-			<input type="text" class="widefat" placeholder="<?php _e( 'Find us on Facebook', 'cppress' ); ?>"
-				id="<?= $widget->get_field_id( 'linktext' ); ?>"
-				name="<?= $widget->get_field_name( 'linktext' ); ?>" 
-				value="<?= esc_attr($instance['linktext']) ?>"/>
+			<?php echo $template->inc('/templates/widget/widget-parts/linktext', 
+  				array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
 			<label for="<?= $widget->get_field_id( 'loadcss' ); ?>">

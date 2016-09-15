@@ -66,7 +66,8 @@ class CpWidgetText extends CpWidgetBase{
 				$instance['text'],
 				array(
 					'textarea_name' => $this->get_field_name('text'),
-				)
+				),
+				$instance
 			)
 		);
 		$icon = BackEndApplication::part(

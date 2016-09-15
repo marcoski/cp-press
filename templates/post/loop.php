@@ -76,6 +76,7 @@
 			echo		'data-url="' . admin_url('admin-ajax.php') . '"';
 			echo		 'data-options="' . htmlspecialchars(json_encode($options, JSON_HEX_TAG)) . '"';
 			echo		 'data-pageid="' . $pageId . '"';
+			echo		 'data-next="2"';
 			echo		 'data-wtitle="' . $options['wtitle'] . '"';
 			echo     'class="btn btn-primary">';
 			echo		$options['ajaxbutton'];

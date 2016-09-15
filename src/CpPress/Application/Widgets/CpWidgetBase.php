@@ -23,7 +23,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 	protected $frontStyles=array();
 	protected $frontLocalize;
 	protected $adminLocalize;
-	private $template;
+	protected $template;
 	protected $uri;
 	protected $scriptsPath;
 	protected $action;
@@ -188,6 +188,8 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 		$this->assign('widget', $this);
 		$this->assign('instance', $instance);
 		$this->assign('id_base', $this->id_base);
+		$this->assign('filter', $this->filter);
+		$this->assign('template', $this->template);
  		return $this->render();
  	}
 

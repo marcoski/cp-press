@@ -22,11 +22,8 @@
 		</div>
 		<div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget['subject']['id']; ?>"><?php _e('Default subject', 'cppress')?>:</label>
-		  <input class="widefat" type="text"
-		    id="<?= $widget['subject']['id']; ?>"
-		    name="<?= $widget['subject']['name']; ?>"
-		    value="<?= $instance['subject']; ?>"
-		  />
+		  <?php echo $template->inc('/templates/widget/widget-parts/contact_form/subject', 
+  				array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		  <div class="cp-widget-field-description">
 				<?php _e('Subject to use when there isn\'t one available.', 'cppress'); ?>
 			</div>
@@ -41,11 +38,8 @@
 		</div>
 		<div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget['body']['id']; ?>"><?php _e('Message Body', 'cppress')?>:</label>
-		 	<textarea class="large-text code" cols="100" rows="4"
-		    id="<?= $widget['body']['id']; ?>"
-		    name="<?= $widget['body']['name']; ?>">
-		  	<?= $instance['body']; ?>
-		  </textarea>
+		  <?php echo $template->inc('/templates/widget/widget-parts/contact_form/body', 
+  				array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 		<div class="cp-widget-field">
 	    <label for="<?= $widget['excludeblank']['id']; ?>">
@@ -70,11 +64,8 @@
 		<?php echo $link; ?>
 		<div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget['submit']['id']; ?>"><?php _e('Submit button text', 'cppress')?>:</label>
-		  <input class="widefat" type="text"
-		    id="<?= $widget['submit']['id']; ?>"
-		    name="<?= $widget['submit']['name']; ?>"
-		    value="<? echo $instance['submit'] != '' ? $instance['submit'] : __('Contact Us', 'cppress'); ?>"
-		  />
+		  <?php echo $template->inc('/templates/widget/widget-parts/contact_form/submit', 
+  				array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 	</div>
 </div>

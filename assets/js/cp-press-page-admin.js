@@ -1,13 +1,15 @@
 jQuery(document).ready(function(){
 
 	var $ = jQuery;
+	$.cpPageBuilder = null;
+	$.cpPageModel = null;
 	if($('#cp_press_select_content_type').length > 0){
-		var cpPageModel = new $.CpPage.Model.Page();
-		var cpPageBuilder = new $.CpPage.View.PageBuilder({
-    	el: $('#cp_press_select_content_type'),
-    	model: cpPageModel
-  	});
-  	cpPageBuilder.render().load();
+		$.cpPageModel = new $.CpPage.Model.Page();
+		$.cpPageBuilder = new $.CpPage.View.PageBuilder({
+	    	el: $('#cp_press_select_content_type'),
+	    	model: $.cpPageModel
+  		});
+  		$.cpPageBuilder.render().load();
 	}
 });
 
@@ -110,7 +112,7 @@ jQuery(document).ready(function(){
 		});
 
 		if(typeof data.widgets === "undefined") { return; }
-
+		
 		_.each(data.widgets, function(widgetData){
 			try{
 				var widget_info = widgetData.widget_info;
@@ -132,6 +134,8 @@ jQuery(document).ready(function(){
 				widget.cell = cell;
 				cell.widgets.add(widget);
 			}catch(err){
+				console.log(data.widgets);
+				console.log(err);
 			}
 		});
 
@@ -383,6 +387,7 @@ jQuery(document).ready(function(){
 		},
 
 		setData: function(data){
+				$(document).trigger('widget.presetdata', [data]);
 				var hasChanged = false;
 				if(JSON.stringify(data) !== JSON.stringify(this.get('data'))){
 					hasChanged = true;
@@ -396,7 +401,8 @@ jQuery(document).ready(function(){
 		},
 
 		getData: function(value){
-			var data = this.get('data');
+			var data = $.extend(true, {}, this.get('data')); //Cloning attributes object
+			$(document).trigger('widget.pregetdata', [data, value]);
 			if(data.hasOwnProperty(value)){
 					return data[value];
 			}else{
@@ -801,13 +807,9 @@ jQuery(document).ready(function(){
 			this.dialog.setView(this);
 			this.dialog.setModel(this.model);
 			this.dialog.render();
-      this.dialog.on('widget:edit', function(){
-        var widgetTitle = this.model.get('title');
-        if(this.model.getData('wtitle') !== null){
-          widgetTitle += " - - " + this.model.getData('wtitle');
-        }
-        this.$el.find('.title h4').html(widgetTitle);
-        this.pageBuilder.model.refreshLayoutData();
+      	this.dialog.on('widget:edit', function(){
+        	this.$el.find('.title h4').html(this.getTitle());
+        	this.pageBuilder.model.refreshLayoutData();
       }, this);
 			return false;
 		},
@@ -817,16 +819,22 @@ jQuery(document).ready(function(){
 		},
 
 		render: function(){
-		  var widgetTitle = this.model.get('title');
-		  if(this.model.getData('wtitle') !== null){
-		    widgetTitle += " - - " + this.model.getData('wtitle');
-		  }
+		  var widgetTitle = this.getTitle();
 			this.setElement(this.template({
 				title: widgetTitle,
 				description: this.model.get('description')
 			}));
 			this.$el.data('view', this);
 			return this;
+		},
+		
+		getTitle: function(){
+			var widgetTitle = this.model.get('title');
+        	if(this.model.getData('wtitle') !== null){
+         	 widgetTitle += " - - " + this.model.getData('wtitle');
+        	}
+        	
+        	return widgetTitle;
 		}
 	});
 
@@ -852,35 +860,45 @@ jQuery(document).ready(function(){
 
 		dropOptions: {},
 
-    events: {
-      "click #cp_add_section" : "addSection",
-      "click #cp_export_content": "export",
-      "click #cp_import_content": "import",
-      "change #cp_import_content .cp-importer": "importJsonFile"
-    },
-
-    initialize: function(){
-			_.bindAll(this, 'sort');
-      this.$input = $('#cp-press-layout-input');
-      this.$rowHead = $('#cp_press_rows_head');
-      this.elData = this.$el.data();
-      this.layout = JSON.parse(this.$input.val());
-      this.listenTo(this.model.sections, "add", this.onSectionAdd);
+	    events: {
+	      "click #cp_add_section" : "addSection",
+	      "click #cp_export_content": "export",
+	      "click #cp_import_content": "import",
+	      "change #cp_import_content .cp-importer": "importJsonFile"
+	    },
+	
+	    initialize: function(){
+				_.bindAll(this, 'sort');
+	      this.$input = $('#cp-press-layout-input');
+	      this.$rowHead = $('#cp_press_rows_head');
+	      this.elData = this.$el.data();
+	      this.layout = JSON.parse(this.$input.val());
+	      this.listenTo(this.model.sections, "add", this.onSectionAdd);
+				this.listenTo(this.model, "change:data", this.storeLayout);
+				this.initDragable();
+	    },
+	    
+	    render: function(){
+	      $p = $(this.template());
+	      $p.insertAfter(this.$rowHead);
+	      this.initSortable();
+	      this.initDropable();
+	      return this;
+	    },
+	
+	    load: function(){
+	      this.model.loadLayoutData(this.layout);
+	    },
+	    
+	    refresh: function(){
+	    	this.layout = JSON.parse(this.$input.val());
+	    	this.model = new $.CpPage.Model.Page();
+	    	this.listenTo(this.model.sections, "add", this.onSectionAdd);
 			this.listenTo(this.model, "change:data", this.storeLayout);
-			this.initDragable();
-    },
-    
-    render: function(){
-      $p = $(this.template());
-      $p.insertAfter(this.$rowHead);
-      this.initSortable();
-      this.initDropable();
-      return this;
-    },
-
-    load: function(){
-      this.model.loadLayoutData(this.layout);
-    },
+	    	this.$el.find('#cp_press_rows_container').remove();
+	    	this.render();
+	    	this.load();
+	    },
 
 		dropWidget: function(ev, ui){
 			var cellView = $(ev.target).parent().data('view');

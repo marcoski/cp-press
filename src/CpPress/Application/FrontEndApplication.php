@@ -187,7 +187,6 @@ class FrontEndApplication extends CpPressApplication{
 			return $widget['widget']->widget(array(), $widget['data']);
 		});
 		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
-			$request = $container->query('Request');
 			self::main('Post', 'loop_loadmore', $container);
 		});
 		$hookObj->execAll();

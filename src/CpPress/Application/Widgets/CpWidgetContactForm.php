@@ -136,7 +136,7 @@ class CpWidgetContactForm extends CpWidgetBase{
 			'ContactFormController', 
 			'mail_template_form', 
 			$this->container, 
-			array($instance, $fields, $link)
+			array($instance, $fields, $link, $this->template)
 		);
 		$dialog = BackEndApplication::part('ContactFormController', 'dialog_form', $this->container);
 		$this->assign('contact_form', $contactForm);

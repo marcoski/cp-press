@@ -1,19 +1,13 @@
 <?= $media ?>
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
-  <input class="widefat" type="text"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'alttext' ); ?>"><?php _e('Alt Text', 'cppress')?>:</label>
-  <input class="widefat" type="text"
-    id="<?= $widget->get_field_id( 'alttext' ); ?>"
-    name="<?= $widget->get_field_name( 'alttext' ); ?>"
-    value="<?= $instance['alttext']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/alttext', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <?= $link ?>
 <div class="cp-widget-field cp-widget-type-section ">

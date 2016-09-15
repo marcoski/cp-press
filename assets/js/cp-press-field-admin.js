@@ -488,13 +488,15 @@
       this.$counter.val(this.countItem);
       this.$items.append($item);
       $item.addClass('loading');
+      var args = {id: this.data.itemId, name: this.data.elementName, values: values, count: this.countItem};
+      $(document).trigger('repeater.preadd', [args]);
       this.cpAjax.call(this.data.action.add, function(html){
-        $item.find('.cp-widget-field-repeater-item-form').append(html.data);
-        $.CpField.fn.enable($item, {exclude: ['repeater']});
-        $item.removeClass('loading');
-        _that.sortObj.refresh();
-        $item.trigger('repeater.add');
-      }, {id: this.data.itemId, name: this.data.elementName, values: values, count: this.countItem});
+        	$item.find('.cp-widget-field-repeater-item-form').append(html.data);
+        	$.CpField.fn.enable($item, {exclude: ['repeater']});
+        	$item.removeClass('loading');
+        	_that.sortObj.refresh();
+        	$item.trigger('repeater.add');
+      }, args);
     },
     
     change: function(e){

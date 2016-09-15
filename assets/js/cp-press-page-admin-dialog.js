@@ -29,6 +29,7 @@
 		render: function(args){
 			args || (args={});
 			args = _.extend({action: 'page_widget_form'}, args);
+			$(document).trigger('widget.premodalopen', [args]);
 			var _that = this;
 			this.cpAjax.call(args.action, function(response){
 				_that.$el.html(response.data);

@@ -80,6 +80,7 @@ class PageController extends WPController{
 	*/
 	public function xhr_page_widget_form(){
 		$args = json_decode(stripslashes($this->getParam('args')), true);
+		
 		$widget = null;
 		foreach($this->widgets as $wdg){
 			if($wdg->id_base != $args['widget_id']){

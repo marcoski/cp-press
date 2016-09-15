@@ -55,6 +55,7 @@ class BackEndHook extends Hook{
 					$w = new $widget();
 					$w->setContainer($c);
 					$w->setUri($this->app->getThemeUri());
+					$w->setFilter($c->query('BackEndFilter'));
 					$w->setScriptsObj($this->app->getScripts());
 					$w->setStylesObj($this->app->getStyles());
 					return $w;

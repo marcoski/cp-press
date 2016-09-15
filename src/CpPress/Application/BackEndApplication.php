@@ -25,7 +25,6 @@ use CpPress\Application\WP\Query\Query;
 use CpPress\Application\WP\MetaType\PostType;
 use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\BackEnd\FieldsController;
-use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
 use CpPress\Application\BackEnd\MultiLanguageController;
@@ -185,7 +184,8 @@ class BackEndApplication extends CpPressApplication{
 									'teeny' => false,
 									'media_buttons' => false,
 									'editor_height' => 230
-							)
+							),
+							$request->getParam('widget', null)
 					)
 			);
 			self::main('FieldsController', 'xhr_marker', $container, array($editor));
@@ -275,13 +275,11 @@ class BackEndApplication extends CpPressApplication{
 						'teeny' => false,
 						'media_buttons' => false,
 						'editor_height' => 230
-					)
+					),
+					$request->getParam('widget', null)
 				)	
 			);
 			self::main('SliderController', 'xhr_add', $this->getContainer(), array($media, $linker, $editor));
-		});
-		$hookObj->register('widget_slider_add_sentences', function(){
-			self::main('SliderController', 'xhr_add_parallax', $this->getContainer());
 		});
 		$hookObj->register('widget_slider_add_singlepost', function(){
 			$container = $this->getContainer();
@@ -359,7 +357,7 @@ class BackEndApplication extends CpPressApplication{
 	private function registerControllers(){
 		$container = $this->getContainer();
 		$container->registerService('FieldsController', function($c){
-			return new FieldsController('FieldApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
+			return new FieldsController('FieldApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('SocialmediaController', function($c){
 			return new SocialmediaController('SocialmediaApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
@@ -393,7 +391,7 @@ class BackEndApplication extends CpPressApplication{
 			return new EventController('EventApp', $c->query('Request'), array($this->themeRoot));
 		});
 		$container->registerService('GalleryController', function($c){
-			return new GalleryController('GalleryApp', $c->query('Request'), array($this->themeRoot));
+			return new GalleryController('GalleryApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('PortfolioController', function($c){
 			return new PortfolioController(
@@ -404,13 +402,13 @@ class BackEndApplication extends CpPressApplication{
 			);
 		});
 		$container->registerService('SliderController', function($c){
-			return new SliderController('SliderApp', $c->query('Request'), array($this->themeRoot));
+			return new SliderController('SliderApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('DialogController', function($c){
 			return new DialogController('DialogApp', $c->query('Request'), array($this->themeRoot));
 		});
 		$container->registerService('ContactFormController', function($c){
-			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot));
+			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('MultiLanguageController', function($c){
 			return new MultiLanguageController('LanguageApp', $c->query('Request'), array($this->themeRoot));
