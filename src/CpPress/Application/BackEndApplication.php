@@ -29,6 +29,7 @@ use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
 use CpPress\Application\BackEnd\MultiLanguageController;
 use Commonhelp\Util\Inflector;
+use CpPress\Application\WP\Admin\SettingsInterface;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -68,7 +69,7 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('CpPressSettings', function($c) use($container){
 			$menu = $container->query('WpOptionMenu');
-			return new Settings('cppress_settings', 'cppress', $menu, $c);
+			return new Settings('cppress_settings', $menu);
 		});
 		$container->registerService('WpEditor', function($c){
 			return new Editor();
@@ -94,10 +95,7 @@ class BackEndApplication extends CpPressApplication{
 		$menu->add(function(){
 			self::main('SettingsController', 'main', $this->getContainer());
 		});
-		$settings = $this->getSettings();
-		$settings->addSections();
-		$settings->addFields();
-		$settings->registerAll();
+		$this->getSettings()->createSettingsSection();
 	}
 
 	public function registerBackEndAjax(){
@@ -338,6 +336,9 @@ class BackEndApplication extends CpPressApplication{
 		$filter->execAll();
 	}
 
+	/**
+	 * @param SettingsInterface $settings
+	 */
 	public function getSettings($settings=''){
 		return $this->getContainer()->query('CpPress'.$settings.'Settings');
 	}

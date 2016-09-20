@@ -4,6 +4,7 @@ namespace CpPress;
 use \Commonhelp\WP\WPApplication;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\FrontEndApplication;
+use CpPress\Application\LoginApplication;
 
 class CpPress{
 	
@@ -24,6 +25,10 @@ class CpPress{
 				load_plugin_textdomain('cppress', false, dirname(dirname(dirname(CpPress::$FILE))).'/languages');
 			});
 			self::$App->execHooks();
+		}else if(!is_admin() && in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'))){
+			self::$App = new LoginApplication();
+			self::$App->registerHooks();
+			self::$App->registerFilters();
 		}else{
 			add_filter('show_admin_bar', '__return_false');
 			add_action('get_header', function() {

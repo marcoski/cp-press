@@ -1,125 +1,82 @@
 <?php
 namespace CpPress\Application\WP\Admin;
 
-use Closure;
-use CpPress\Application\WP\Admin\Menu\OptionsMenu;
 use CpPress\Exception\SettingsException;
-use Commonhelp\WP\WPContainer;
-use CpPress\Application\BackEndApplication;
+use CpPress\Application\WP\Admin\SettingsSection\SettingsSectionFactoryInterface;
+use CpPress\Application\WP\Admin\SettingsSection\SettingsSectionFactory;
+use CpPress\Application\WP\Admin\Menu\Menu;
+use CpPress\Application\WP\Admin\SettingsSection\SettingsSectionInterface;
 
-class Settings{
+class Settings implements SettingsInterface{
 	
 	private $name;
-	private $group;
-	
 	private $errorSlug;
 	
 	private $menu;
 	
-	private $sections;
-	private $fields;
+	/**
+	 * @var SettingsSectionFactoryInterface
+	 */
+	private $settingsSectionFactory;
 	
-	private $options;
-	
-	private $container;
-	
-	
-	public function __construct($name, $group, OptionsMenu $menu, WPContainer $container){
+	public function __construct($name, Menu $menu, SettingsSectionFactoryInterface $settingsSectionFactory = null){
 		$this->name = $name;
-		$this->group = $group;
 		$this->errorSlug = $name.'-error';
 		$this->menu = $menu;
-		$this->sections = array();
-		
-		$this->container = $container;
+		$this->settingsSectionFactory = null !== $settingsSectionFactory ?: new SettingsSectionFactory();
 	}
 	
-	
-	public function addFields(){
-		$this->addField(
-				'attachment-valid-mime',
-				__('Valid Attachment', 'cppress'),
-				'cppress-options-attachment',
-				function($args){
-					BackEndApplication::main('SettingsController', 'attachment_fields', $this->container, array($args));
-				},
-				array(
-					'id' => 'attachment-valid-mime', 
-					'name' => 'validmime', 
-					'tag' => 'selectmultiple', 
-					'options' => array(__('Mime Types', 'cppress') => array_flip(get_allowed_mime_types()))
-				)
-		);
+	public function getSettingsSectionFactory(){
+		return $this->settingsSectionFactory;
 	}
 	
-	public function addField($id, $title, $section, Closure $renderize, $args=array()){
-		if(isset($this->sections[$section]) && $this->sections[$section]){
-			$this->fields[$id] = true;
-			add_settings_field($id, $title, $renderize, $section, $section, $args);
-		}else{
-			throw new SettingsException('No section '.$section.' registered');
+	public function createSettingsSection(){
+		$this->settingsSectionFactory->create();
+		foreach($this->settingsSectionFactory->all() as $section){
+			$section->getSettingsFieldFactory()->create($section);
+			if(count($section) > 0){
+				$this->createSubSections($section);
+			}
 		}
+		$this->registerAll();
+	}
+	
+	public function getMenu(){
+		return $this->menu;
 	}
 	
 	public function registerAll(){
-		register_setting('cppress-options-general', 'cppress-options-general');
-		register_setting('cppress-options-attachment', 'cppress-options-attachment');
-		register_setting('cppress-options-widget', 'cppress-options-widget');
-		register_setting('cppress-options-event', 'cppress-options-event');
-	}
-	
-	public function addSections(){
-		$this->addSection('cppress-options-general', __('General Settings', 'cppress'), function(){
-			BackEndApplication::main('SettingsController', 'general', $this->container);
-		});
-		$this->addSection('cppress-options-widget', __('Widget Settings', 'cppress'), function(){
-			BackEndApplication::main('SettingsController', 'widget', $this->container);
-		});
-		$this->addSection('cppress-options-event', __('Event Settings', 'cppress'), function(){
-			BackEndApplication::main('SettingsController', 'event', $this->container);
-		});
-		$this->addSection('cppress-options-attachment', __('Attachment Settings', 'cppress'), function(){
-			BackEndApplication::main('SettingsController', 'attachment', $this->container);
-		});
-	}
-	
-	public function addSection($id, $title, Closure $renderize){
-		$this->sections[$id] = true;
-		add_settings_section($id, $title, $renderize, $id);		
-	}
-	
-	public function fields($tab = ''){
-		if($tab == ''){
-			$tab = $this->group;
+		foreach($this->settingsSectionFactory->all() as $section){
+			register_setting(
+				$section->getPage(),
+				$section->getId(),
+				array($section, 'sanitize')
+			);
+			if(count($section) > 0){
+				$this->registerChildren($section);
+			}
 		}
+	}
+	
+	public function fields($tab){
 		settings_fields($tab);
 	}
 	
-	public function doSections($tab = ''){
-		if($tab == ''){
-			$tab = $this->menu->getSlug();
+	private function createSubSections(SettingsSectionInterface $section){
+		foreach($section as $child){
+			$child->getSettingsFieldFactory()->create($child);
+			$this->createSubSections($child);
 		}
-		do_settings_sections($tab);
 	}
 	
-	public function doFields($section){
-		if(array_key_exists($section, $this->sections)){
-			do_settings_fields($this->menu->getSlug(), $section);
+	private function registerChildren(SettingsSectionInterface $section){
+		foreach($section as $child){
+			register_setting(
+				$child->getPage(),
+				$child->getId()
+			);
+			$this->registerChildren($child);
 		}
-		
-		throw new SettingsException('No section '.$section.' registered');
-	}
-	
-	public function addError($field, $message, $type='error'){
-		if(array_key_exists($field, $this->fields)){
-			add_settings_error($field, $this->errorSlug, $message, $type);
-		}
-		
-		throw new SettingsException('No field '.$field.' registered');
-	}
-	
-	public function doError($sanitize=false, $hideOnUpdate=false){
-		settings_errors($this->errorSlug, $sanitize, $hideOnUpdate);
 	}
 	
 }

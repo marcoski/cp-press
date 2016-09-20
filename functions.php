@@ -35,6 +35,10 @@ function dump($obj, $limit=10, $die = 1){
 	if ($die) exit;
 }
 
+function vardump($obj, $limit=10){
+	echo Dumper::dump($obj, $limit, true);
+}
+
 
 
 if(false === function_exists('lcfirst')){
