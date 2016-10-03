@@ -1,9 +1,9 @@
 <?php
 namespace CpPress\Application\WP\Admin;
 
-use Closure;
 use CpPress\Exception\MetaBoxException;
 use CpPress\Application\WP\MetaType\PostType;
+
 class MetaBox{
 	
 	private $id;
@@ -20,11 +20,21 @@ class MetaBox{
 	
 	private $callback;
 	
-	public function __construct($id, $title){
+	public function __construct($id = '', $title = ''){
 		$this->id = $id;
 		$this->title = $title;
 		$this->context = 'advanced';
 		$this->priority = 'default';
+	}
+
+	public function setId($id){
+		$this->id = $id;
+		return $this;
+	}
+
+	public function setTitle($title){
+		$this->title = $title;
+		return $this;
 	}
 	
 	public function setPostType($postType){
@@ -35,6 +45,8 @@ class MetaBox{
 		}else{
 			throw new MetaBoxException('Invalid screen '.$postType);
 		}
+
+		return $this;
 	}
 	
 	public function setContext($context){
@@ -43,6 +55,8 @@ class MetaBox{
 		}else{
 			throw new MetaBoxException('Invalid screen '.$context);
 		}
+
+		return $this;
 	}
 	
 	public function setPriority($priority){
@@ -51,10 +65,13 @@ class MetaBox{
 		}else{
 			throw new MetaBoxException('Invalid screen '.$priority);
 		}
+
+		return $this;
 	}
 	
-	public function setCallback(Closure $callback){
+	public function setCallback(callable $callback){
 		$this->callback = $callback;
+		return $this;
 	}
 	
 	public function add($args=null){

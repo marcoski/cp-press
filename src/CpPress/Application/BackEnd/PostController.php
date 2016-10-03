@@ -28,9 +28,6 @@ class PostController extends WPController{
 		$this->query = $query;
 	}
 	
-	public function singlebox(){
-	}
-	
 	public function advanced(CpWidgetBase $widget, $instance, array $options){
 		$options = wp_parse_args($options, array('single' => false, 'show_view_options' => false));
 		$instance = $this->getTaxonomyInstanceCompatibility($instance);

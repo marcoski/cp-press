@@ -1,15 +1,14 @@
 <?php
 namespace CpPress\Application\BackEnd;
 
-use \Commonhelp\WP\WPController;
-use \Commonhelp\App\Http\RequestInterface;
+use Commonhelp\App\Http\RequestInterface;
+use Commonhelp\WP\WPController;
 use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\CpPress;
 use CpPress\Application\WP\Theme\Editor;
-use CpPress\Application\WP\Theme\CpPress\Application\WP\Theme;
 use CpPress\Application\WP\Hook\Filter;
 
-class FieldsController extends WPController{
+class FieldsController extends WPController {
 
 	private $boundle;
 	
@@ -99,7 +98,7 @@ class FieldsController extends WPController{
 		
 	}
 	
-	public function icon_button($id, $name, $value, $color, $class, $visible=true){
+	public function icon_button($id, $name, $value, $color, $class, $iconPosition, $visible=true){
 		$icons = array();
 		foreach($this->boundle as $family => $fname){
 			$icons[$family] = array(
@@ -114,6 +113,7 @@ class FieldsController extends WPController{
 		$this->assign('value', $value);
 		$this->assign('color', $color);
 		$this->assign('class', $class);
+        $this->assign('icon_position', $iconPosition);
 		$this->assign('visible', $visible);
 	}
 	
@@ -264,10 +264,18 @@ class FieldsController extends WPController{
 			return array();
 		}
 	}
+
+	public static function isLinkArgs($val){
+	    return preg_match("/([a-zA-Z]*):\s([0-9]+)/", $val);
+    }
 	
 	public static function getLinkPermalink($val){
-		$args = self::getLinkArgs($val);
-		return get_permalink($args['p']);
+	    if(self::isLinkArgs($val)){
+            $args = self::getLinkArgs($val);
+            return get_permalink($args['p']);
+        }
+
+        return $val;
 	}
 	
 	public static function isGoogleWebFont($fontValue){

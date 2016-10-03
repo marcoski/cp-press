@@ -40,11 +40,8 @@
 	      name="<?= $widget->get_field_name( 'linkbutton' ); ?>"
 	      type="checkbox"
 	      value="1" <?php checked( '1', $instance['linkbutton'] ); ?> />&nbsp;
-	      <input
-	      	placeholder="<?php _e('Insert link button text...', 'cppress'); ?>"
-		      id="<?= $widget->get_field_id( 'linkbuttontext' ); ?>"
-		      name="<?= $widget->get_field_name( 'linkbuttontext' ); ?>"
-		      value="<? isset($instance['linkbuttontext']) ? e($instance['linkbuttontext']) : e(''); ?>"/>
+		  <?php echo $template->inc('/templates/widget/widget-parts/text/linkbuttontext',
+			  array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 	  </div>
 	  <div class="cp-widget-field">
 	    <label for="<?= $widget->get_field_id( 'linktitle' ); ?>">

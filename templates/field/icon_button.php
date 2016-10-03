@@ -27,6 +27,19 @@
       <label for="<?= $id['class'] ?>"><?php _e('Container class', 'cppress')?>:</label>
       <input class="widefat" id="<?= $id['class'] ?>" name="<?= $name['class'] ?>" value="<?= $class ?>">
     </div>
+    <div class="cp-widget-field">
+        <label for="<?= $id['class'] ?>"><?php _e('Position', 'cppress')?>:</label>
+        <select
+            id="<?php echo $id['iconposition'] ?>"
+            name="<?php echo $name['iconposition'] ?>">
+            <option value="top" <?php selected($icon_position, 'top'); ?>><?php _e('Top', 'cppress') ?></option>
+            <option value="before-title" <?php selected($icon_position, 'before-title'); ?>><?php _e('Before Title', 'cppress') ?></option>
+            <option value="after-title" <?php selected($icon_position, 'after-title'); ?>><?php _e('After Title', 'cppress') ?></option>
+            <option value="before-content" <?php selected($icon_position, 'before-content'); ?>><?php _e('Before Content', 'cppress') ?></option>
+            <option value="after-content" <?php selected($icon_position, 'after-content'); ?>><?php _e('After Content', 'cppress') ?></option>
+            <option value="bottom" <?php selected($icon_position, 'top'); ?>><?php _e('Bottom', 'cppress') ?></option>
+        </select>
+    </div>
   </div>
 </div>
   

@@ -176,6 +176,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController{
 		$this->assign('args', $args);
 		$this->assign('instance', $instance);
 		$this->assign('filter', $this->filter);
+        $this->assign('template', $this->template);
 		return $this->render();
 	}
 

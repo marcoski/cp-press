@@ -1,17 +1,15 @@
 <?php
 namespace CpPress\Application\WP\Hook;
 
-use Closure;
+use Commonhelp\WP\WPContainer;
 use CpPress\Application\CpPressApplication;
-use CpPress\CpPress;
+use CpPress\Application\WP\Theme\Feature\FeatureFactory;
 use CpPress\Application\WP\Admin\MetaBox;
 use CpPress\Application\BackEndApplication;
-use CpPress\Application\WP\Admin\PostMeta;
-use CpPress\Application\BackEnd\GalleryController;
-use CpPress\Application\WP\Theme\Media\Image;
-use CpPress\Application\WP\Theme\Media\Video;
-use CpPress\Application\BackEnd\PortfolioController;
 use CpPress\Application\Widgets\CpWidgetBase;
+use CpPress\Application\WP\Theme\Feature\PageContentFeature;
+use CpPress\Application\WP\Theme\Feature\PageWidgetsFeature;
+use CpPress\Application\WP\Theme\Feature\SubtitleFeature;
 
 class BackEndHook extends Hook{
 
@@ -61,6 +59,7 @@ class BackEndHook extends Hook{
 					return $w;
 				});
 			}
+			$this->featureFactory();
 			$this->create('cppress_admin_init');
 		});
 		$this->register('admin_menu', function(){
@@ -69,81 +68,6 @@ class BackEndHook extends Hook{
 		});
 		$this->register('add_meta_boxes', function(){
 			$container = $this->app->getContainer();
-			$container->registerService('CpAttachment', function($c){
-				$metaBox = new MetaBox('cp-press-attachment', __('Featured Attachment', 'cppress'));
-				$metaBox->setContext('side');
-				$metaBox->setCallback(function($post, $box) use($c){
-					BackEndApplication::main('AttachmentController', 'featured', $c, array($post));
-				});
-				
-				return $metaBox;
-			});
-			$container->registerService('CpLanguage', function($c){
-				$metaBox = new MetaBox('cp-press-language', __('Language', 'cppress'));
-				$metaBox->setContext('side');
-				$metaBox->setCallback(function($post, $box) use($c){
-					BackEndApplication::main('MultiLanguageController', 'language', $c, array($post));
-				});
-			
-				return $metaBox;
-			});
-			$container->registerService('CpLink', function($c){
-				$metaBox = new MetaBox('cp-press-link', __('Link', 'cppress'));
-				$metaBox->setCallback(function($post, $box) use ($c){
-					BackEndApplication::main('LinkerController', 'create', $c, array($post, $box));
-				});
-				return $metaBox;
-			});
-			$container->registerService('CpPageWidgets', function($c){
-				$metaBox = new MetaBox('cp-press-page-widgets', __('Widgets', 'cppress'));
-				$metaBox->setCallback(function($post, $box) use ($c){
-					BackEndApplication::main('PageController', 'widgets', $c, array($post, $c));
-				});
-				return $metaBox;
-			});
-			
-			$pageWidgets = $container->query('CpPageWidgets');
-			$pageWidgets->setPostType($container->query('PagePostType'));
-			$pageWidgets->add();
-			
-			$container->registerService('CpPageContent', function($c){
-				$metaBox = new MetaBox('cp-press-page-content', __('Content', 'cppress'));
-				$metaBox->setCallback(function($post, $box) use ($c){
-					$dialog = BackEndApplication::part('DialogController', 'content_dialog', $c);
-					$template = BackEndApplication::part('PageController', 'page_template', $c);
-					$fields = BackEndApplication::part('FieldsController', 'template', $c);
-					$pdTemplate = BackEndApplication::part('PageController', 'dialog_template', $c);
-					BackEndApplication::main('PageController', 'content', $c, array($post, $dialog, $template, $fields, $pdTemplate));
-				});
-				return $metaBox;
-			});
-			$pageContent = $container->query('CpPageContent');
-			$pageContent->setPostType($container->query('PagePostType'));
-			$pageContent->add();
-			
-			$container->registerService('CpPageSubtitle', function($c){
-				$metaBox = new MetaBox('cp-press-page-subtitle', __('Sub Title', 'cppress'));
-				$metaBox->setCallback(function($post, $box) use ($c){
-					BackEndApplication::main('PageController', 'subtitle', $c, array($post->ID));
-				});
-				$metaBox->setPriority('high');
-				return $metaBox;
-			});
-			$subTitle = $container->query('CpPageSubtitle');
-			$subTitle->setPostType($container->query('PagePostType'));
-			$subTitle->add();
-			
-			$container->registerService('CpPostSettings', function($c){
-				$metaBox = new MetaBox('cp-press-post-settings', __('View options', 'cppress'));
-				$metaBox->setContext('side');
-				$metaBox->setPostType('post');
-				$metaBox->setCallback(function($post, $box) use ($c){
-					BackEndApplication::main('PostController', 'singlebox', $c, array($post, $box));
-				});
-				$metaBox->add();
-				return $metaBox;
-			});
-			$container->query('CpPostSettings');
 			$container->registerService('CpEventWhere', function($c){
 				$metaBox = new MetaBox('cp-press-event-where', __('Where', 'cppress'));
 				$metaBox->setContext('normal');
@@ -170,8 +94,8 @@ class BackEndHook extends Hook{
 			$container->query('CpEventWhen');
 			$this->create('cppress_add_meta_boxes');
 		});
-		$this->register('save_post', function($post_id, $post, $update){
-			$this->app->save($post_id);
+		$this->register('save_post', function($postId){
+			$this->app->save($postId);
 		}, 10, 3);
 		
 		
@@ -192,35 +116,33 @@ class BackEndHook extends Hook{
 				$scripts->enqueue('utils');
 				$scripts->enqueue('wp-color-picker');
 				$styles->enqueue('wp-color-picker');
-				$scripts->enqueue('cp-press-dialog', array('backbone', 'underscore', 'wp-util'));
-				$scripts->enqueue('cp-press-dragbg');
-				$scripts->enqueue('cp-press-admin');
-				$scripts->enqueue('cp-press-page-admin-dialog', array('backbone', 'underscore', 'wp-util'));
-				$scripts->enqueue('cp-press-page-admin', array('backbone', 'underscore'));
-				$scripts->enqueue('cp-press-field-admin', array('backbone', 'underscore'));
-				$scripts->enqueue('cp-press-attachment-admin', array('backbone', 'underscore'));
-				$scripts->enqueue('cp-press-field-tinymce');
 				$scripts->enqueue('cp-press-event-admin');
 				$scripts->enqueue('media-upload');
 				$styles->enqueue('cp-press-flag-icon');
 				$styles->enqueue('cp-press-dialog');
 				$styles->enqueue('cp-press-event-admin');
 				$styles->enqueue('cp-press-admin');
-				
-				foreach(CpWidgetBase::getWidgets() as $widget){
-					$container = $this->app->getContainer();
-					$wObj = $container->query($widget);
-					$wObj->enqueueAdminScripts();
-					$wObj->localizeAdminScripts();
-					$wObj->enqueueAdminStyles();
-				}
+
 				$this->create('cppress_admin_enqueue_scripts');
 			}
 		});
-		$this->register('plugins_loaded', function(){
-			
-		});
-		$this->register('manage_section_posts_custom_column' , function($col, $post){
-		}, 10, 2 );
+	}
+
+	private function featureFactory(){
+		/** @var WPContainer $container */
+		$container = $this->app->getContainer();
+		$container->register(new FeatureFactory());
+
+		/** @var PageWidgetsFeature $pageWidgets */
+		$pageWidgets = $container->query('CpPageWidgets');
+		$pageWidgets->set('post_type', $container->query('PagePostType'))->hooks();
+
+		/** @var PageContentFeature $pageContent */
+		$pageContent = $container->query('CpPageContent');
+		$pageContent->set('post_type', $container->query('PagePostType'))->hooks();
+
+		/** @var SubtitleFeature $subTitle */
+		$subTitle = $container->query('CpPageSubtitle');
+		$subTitle->set('post_type', $container->query('PagePostType'))->hooks();
 	}
 }

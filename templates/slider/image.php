@@ -16,10 +16,10 @@
 			</div>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
-			<label for="<?= $fields['id']; ?>_displaycontent">
+			<label for="<?php echo $fields['id']; ?>_displaycontent">
 		    <input class="widefat"
-		      id="<?= $fields['id']; ?>_displaycontent"
-		      name="<?= $fields['name']; ?>[displaycontent]"
+		      id="<?php echo $fields['id']; ?>_displaycontent"
+		      name="<?php echo $fields['name']; ?>[displaycontent]"
 		      type="checkbox"
 		      value="1" <?php checked( '1', $values['slides']['displaycontent'] ); ?> />&nbsp;
 		      <?php _e('Display content', 'cppress')?>

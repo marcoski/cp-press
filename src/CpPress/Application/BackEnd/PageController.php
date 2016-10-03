@@ -19,11 +19,8 @@ class PageController extends WPController{
 		$this->widgets = $widgets;
 	}
 
-	public function content($post, $dialog, $template, $fields, $pdTemplate){
-		$layout = PostMeta::find($post->ID, 'cp-press-page-layout');
-		if($layout == ''){
-			$layout = array();
-		}
+	public function content($layout, $dialog, $template, $fields, $pdTemplate){
+
 		$fakeEditor = new Editor();
 		$fakeEditor->init(
 				'cp-widget-fake-editor',
@@ -46,19 +43,8 @@ class PageController extends WPController{
 		$this->assign('post_name', $post->post_name);
 	}
 
-	public function widgets($post){
+	public function widgets(){
 		$this->assign('widgets', $this->widgets);
-	}
-
-	public function order(){
-
-	}
-
-	public function subtitle($id){
-		$this->assign(
-			'sub_title_value',
-			PostMeta::find($id, 'cp-press-page-subtitle')
-		);
 	}
 
 	public function page_template(){
@@ -106,12 +92,8 @@ class PageController extends WPController{
 		if(is_null($this->getParam('_cppress_nonce')) || !wp_verify_nonce($this->getParam('_cppress_nonce'), 'save')){
 			return;
 		}
-		if(!current_user_can( 'edit_post', $post_id )){
+		if(!current_user_can( 'edit_post', $id )){
 			return;
-		}
-		
-		if($this->getParam('cp-press-page-order', null) !== null){
-			update_post_meta($id, 'cp-press-page-order', $this->getParam('cp-press-page-order', null));
 		}
 		
 		if($this->getParam('cp-press-page-layout', null) !== null){

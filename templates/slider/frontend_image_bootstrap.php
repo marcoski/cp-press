@@ -35,7 +35,7 @@
 				 */
 				if($options['link'] == 'slide' && !empty($slide['link']) ){
 					$new = $slide['link']['isext'] ? 'target="_new"' : '';
-					echo '<a href="' . $slide['link']['url'] . '" ' . $new . '>';
+					echo $filter->apply('cppress_widget_slider_linkwrapper_open', '<a href="' . $slide['link']['url'] . '" ' . $new . '>', $slide['link']['isext'], $slide);
 				}
 				if(is_object($slide['img'])){
 					$itemClassArray = array('cp-embed-responsive');
@@ -70,14 +70,14 @@
 					echo ' />';
 					if($slide['displaytitle'] || $slide['displaycontent']){
 						echo $filter->apply('cppress_widget_slider_before_caption', '', $slide, $sliderId);
-						$captionClasses = $filter->apply('cppress_widget_slider_caption_classes', array('caption'), $slide);
+						$captionClasses = $filter->apply('cppress_widget_slider_caption_classes', array('caption', 'caption-align-'.$slide['captionalign']), $slide);
 						echo '<div class="' . implode(' ', $captionClasses) . '">';
 					}
 					if($slide['displaytitle']){
-						echo '<span class="main">' . $slide['title'] . '</span>';
+						echo $filter->apply('cppress_widget_slider_title', '<span class="main">' . $slide['title'] . '</span>', $slide);
 					}
 					if($slide['displaycontent']){
-						echo '<span class="secondary clearfix">' . $slide['content'] . '</span>';
+						echo $filter->apply('cppress_widget_slider_content', '<span class="secondary clearfix">' . $slide['content'] . '</span>', $slide);
 					}
 					if($slide['displaytitle'] || $slide['displaycontent']){
 						echo '</div>';
@@ -85,7 +85,7 @@
 					}
 				}
 				if($options['link'] == 'slide' && !empty($slide['link']) ){
-					echo '</a>';
+					echo $filter->apply('cp_widget_slider_linkwrapper_close', '</a>', $slide);
 				}
 				/**
 				 * SLIDE CONTENT MARKUP END

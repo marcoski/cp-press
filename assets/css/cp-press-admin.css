@@ -1869,3 +1869,8 @@ table.cp-link tr.cp-link textarea {
 	color: red;
 	text-decoration: underline;
 }
+
+img.cp-multithumbnail {
+    max-width: 100%;
+    height: auto;
+}

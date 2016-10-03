@@ -100,12 +100,6 @@ class BackEndApplication extends CpPressApplication{
 
 	public function registerBackEndAjax(){
 		$hookObj = $this->getContainer()->query('AjaxHook');
-		$hookObj->register('page_sidebar_grid', function(){
-			self::main('PageController', 'xhr_page_sidebar', $this->getContainer(), array('grid'));
-		});
-		$hookObj->register('page_widget_form', function(){
-			self::main('PageController', 'xhr_page_widget_form', $this->getContainer());
-		});
 		$hookObj->register('icon_family', function(){
 			self::main('FieldsController', 'xhr_icon_family', $this->getContainer());
 		});
@@ -345,14 +339,8 @@ class BackEndApplication extends CpPressApplication{
 
 	public function save($id){
 		$container = $this->getContainer();
-		$page = $container->query('PageController');
-		$page->save($id);
 		$event = $container->query('EventController');
 		$event->save($id);
-		$attachment = $container->query('AttachmentController');
-		$attachment->save($id);
-		$multiLanguage = $container->query('MultiLanguageController');
-		$multiLanguage->save($id);
 	}
 
 	private function registerControllers(){

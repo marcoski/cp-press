@@ -1,13 +1,14 @@
 <?php
 namespace CpPress\Application\WP\Hook;
 
-use Closure;
-use CpPress\Application\CpPressApplication;
+use CpPress\Application\FrontEndApplication;
 use CpPress\Application\Widgets\CpWidgetBase;
+use CpPress\Application\WP\Asset\Scripts;
+use CpPress\Application\WP\Asset\Styles;
 
 class FrontEndHook extends Hook{
 	
-	public function __construct(CpPressApplication $app){
+	public function __construct(FrontEndApplication $app){
 		parent::__construct($app);
 	}
 
@@ -23,6 +24,7 @@ class FrontEndHook extends Hook{
 			$container = $this->app->getContainer();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container->registerService($widget, function($c) use ($widget){
+                    /** @var CpWidgetBase $w */
 					$w = new $widget();
 					$w->setContainer($c);
 					$w->setFilter($c->query('FrontEndFilter'));
@@ -39,7 +41,9 @@ class FrontEndHook extends Hook{
 		});
 		
 		$this->register('wp_enqueue_scripts', function(){
+		    /** @var Scripts $scripts */
 			$scripts = $this->app->getScripts();
+            /** @var Styles $styles */
 			$styles = $this->app->getStyles();
 			$styles->enqueue('cp-press-lightbox');
 			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
@@ -47,6 +51,7 @@ class FrontEndHook extends Hook{
 			$this->app->loadCpPressFont();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container = $this->app->getContainer();
+                /** @var CpWidgetBase $wObj */
 				$wObj = $container->query($widget);
 				$wObj->enqueueFrontScripts();
 				$wObj->localizeFrontScripts();
