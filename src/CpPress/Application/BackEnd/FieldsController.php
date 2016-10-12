@@ -149,6 +149,13 @@ class FieldsController extends WPController {
 		$this->assign('value', $value);
 		$this->assign('valid_types', esc_attr(json_encode($validTypes)));
 	}
+
+	public function taxonomy_button($id, $name, $value, $excludedTaxonomies=array()){
+		$this->assign('id', $id);
+		$this->assign('name', $name);
+		$this->assign('value', $value);
+		$this->assign('exluded_taxonomyes', esc_attr(json_encode($excludedTaxonomies)));
+	}
 	
 	public function repeater($id, $name, $values, $actions, $title, $itemTitle, $events=null){
 		$this->assign('id', $id);
@@ -266,7 +273,7 @@ class FieldsController extends WPController {
 	}
 
 	public static function isLinkArgs($val){
-	    return preg_match("/([a-zA-Z]*):\s([0-9]+)/", $val);
+	    return preg_match("/([a-zA-Z]*):\s([0-9a-zA-Z-_]+)/", $val);
     }
 	
 	public static function getLinkPermalink($val){
@@ -276,6 +283,27 @@ class FieldsController extends WPController {
         }
 
         return $val;
+	}
+
+	public static function getTaxonomyPermalink($val){
+		if(self::isLinkArgs($val)){
+			$args = self::getTaxonomyArgs($val);
+			$terms = get_terms($args);
+			return get_term_link($terms[0]);
+		}
+
+		return $val;
+	}
+
+	public static function getTaxonomyArgs($val){
+		if(preg_match("/([a-zA-Z]*):\s([A-Za-z0-9-_]+)/", $val, $match)){
+			return array(
+				'taxonomy' => $match[1],
+				'name' => $match[2]
+			);
+		}else{
+			return array();
+		}
 	}
 	
 	public static function isGoogleWebFont($fontValue){

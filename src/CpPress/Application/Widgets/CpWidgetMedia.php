@@ -105,7 +105,16 @@ class CpWidgetMedia extends CpWidgetBase{
 					$instance['desturi']
 				)
 		);
+		$taxonomy = BackEndApplication::part(
+			'FieldsController', 'taxonomy_button', $this->container,
+			array(
+				$this->get_field_id( 'desttaxonomy' ),
+				$this->get_field_name( 'desttaxonomy' ),
+				$instance['desttaxonomy']
+			)
+		);
 		$this->assign('link', $link);
+		$this->assign('taxonomy', $taxonomy);
 		$this->assign('media', $media);
 		return parent::form($instance);
 	}

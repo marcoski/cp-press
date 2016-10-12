@@ -15,7 +15,8 @@
 			echo '<img src="' . $instance['link'] . '" class="' . implode(' ', $imgClasses) . '" />';
 		if(isset($instance['showcaption']) && $instance['showcaption']){
 			$figCapClasses = $filter->apply('cppress_widget_media_figurecaption_classes', array('figure-caption'), $instance['wtitle'], $instance);
-			echo '<figcaption class="' . implode(' ', $figCapClasses) . '">'.$instance['alttext'].'</figcaption>';
+			$figCapText = $filter->apply('cppress_widget_media_figurecaption_text', $instance['alttext'], $instance['wtitle'], $instance);
+			echo '<figcaption class="' . implode(' ', $figCapClasses) . '">'.$figCapText.'</figcaption>';
 		}
 		echo '</figure>';
 		if($instance['desturi'] !== ''){

@@ -89,6 +89,18 @@ class CpWidgetSlider extends CpWidgetBase{
                     }
                 }
 			}
+			if($slides[$i]['taxonomy'] !== ""){
+				$slider[$i]['link']['url'] = $slides['taxonomy'][$i];
+				if(!FieldsController::isLinkArgs($slider[$i]['link']['url']) && filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
+					$slider[$i]['link']['isext'] = true;
+				}else{
+					$slider[$i]['link']['isext'] = false;
+					$slider[$i]['link']['url'] = FieldsController::getTaxonomyPermalink($slider[$i]['link']['url']);
+					if(!$slider[$i]['link']['url']){
+						$slider[$i]['link'] = array();
+					}
+				}
+			}
 			$slider[$i]['captionalign'] = $slides['captionalign'][$i];
 			$slider[$i]['displaytitle'] = $slides['displaytitle'] == 1 ? true : false;
 			$slider[$i]['displaycontent'] = $slides['displaycontent'] == 1 ? true : false;

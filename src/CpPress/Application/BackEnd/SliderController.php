@@ -34,13 +34,14 @@ class SliderController extends WPController{
 	/**
 	 * @responder wpjson
 	 */
-	public function xhr_add($media, $linker, $editor){
+	public function xhr_add($media, $linker, $taxonomier, $editor){
 		$id = $this->getParam( 'id' );
 		$name = $this->getParam('name');
 		$count = $this->getParam('count', 0);
 		$values = array_merge($this->getParam('values', array()), $this->getParam('widget', array()));
 		$this->assign('values', $values);
 		$this->assign('linker', $linker);
+		$this->assign('taxonomier', $taxonomier);
 		$this->assign('media', $media);
 		$this->assign('editor', $editor);
 		$this->assign('id', $id);

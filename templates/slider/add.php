@@ -16,6 +16,7 @@
 	/>
 </div>
 <?php echo $linker ?>
+<?php echo $taxonomier ?>
 <?php echo $editor ?>
 <div class="cp-widget-field cp-widget-input">
 	<label for="<?php echo $id ?>_captionalign"><?php _e('Caption Align', 'cppress')?>:</label>

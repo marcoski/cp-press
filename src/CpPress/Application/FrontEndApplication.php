@@ -189,6 +189,12 @@ class FrontEndApplication extends CpPressApplication{
 		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
 			self::main('Post', 'loop_loadmore', $container);
 		});
+		$hookObj->registerFrontEnd('cppress_search', function() use ($container){
+			self::main('Post', 'xhr_search', $container);
+		});
+		$hookObj->registerFrontEnd('cppress_paginate', function() use ($container){
+			self::main('Post', 'xhr_paginate', $container);
+		});
 		$hookObj->execAll();
 	}
 	

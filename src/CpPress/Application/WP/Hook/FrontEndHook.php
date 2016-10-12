@@ -46,8 +46,11 @@ class FrontEndHook extends Hook{
             /** @var Styles $styles */
 			$styles = $this->app->getStyles();
 			$styles->enqueue('cp-press-lightbox');
+			$scripts->enqueue('cp-press-jquery', array('jquery'), false, true);
 			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
 			$scripts->enqueue('cp-social-share-kit', array(), false, true);
+			$scripts->enqueue('cp-press-search', array('jquery', 'backbone'), false, true);
+			$scripts->enqueue('cp-press-paginator', array('jquery', 'backbone'), false, true);
 			$this->app->loadCpPressFont();
 			foreach(CpWidgetBase::getWidgets() as $widget){
 				$container = $this->app->getContainer();
@@ -57,6 +60,10 @@ class FrontEndHook extends Hook{
 				$wObj->localizeFrontScripts();
 				$wObj->enqueueFrontStyles();
 			}
+		});
+
+		$this->register('wp_head', function(){
+			echo '<script type="text/javascript">var ajaxurl="'.admin_url('admin-ajax.php').'";</script>';
 		});
 	}
 	

@@ -46,7 +46,7 @@ class CpWidgetContent extends CpWidgetBase{
 				'PostController', 
 				'advanced', 
 				$this->container, 
-				array($this, $instanced, array('single' => true, 'show_view_options' => true)
+				array($this, $instance, array('single' => true, 'show_view_options' => true)
 			)
 		);
 		$posts = BackEndApplication::part(

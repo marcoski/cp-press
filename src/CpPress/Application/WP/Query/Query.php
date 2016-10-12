@@ -3,7 +3,7 @@ namespace CpPress\Application\WP\Query;
 
 use WP_Query;
 
-class Query extends WP_Query{
+class Query extends WP_Query implements \ArrayAccess, \IteratorAggregate, \Countable {
 
 	public function __construct($query=''){
 		parent::__construct($query);
@@ -78,5 +78,56 @@ class Query extends WP_Query{
 		$this->query = $query;
 		$this->query($query);
 	}
-	
+
+	public function get($var){
+		if($this->has($var)){
+			return $this->query[$var];
+		}
+
+		return null;
+	}
+
+	public function offsetGet($var){
+		return $this->get($var);
+	}
+
+	public function has($var){
+		return isset($this->query[$var]);
+	}
+
+	public function offsetExists($var){
+		return $this->has($var);
+	}
+
+	public function set($var, $value){
+		$this->query[$var] = $value;
+		return $this;
+	}
+
+	public function offsetSet($var, $value) {
+		$this->set($var, $value);
+	}
+
+	public function all(){
+		return $this->query;
+	}
+
+	public function remove($var){
+		if($this->has($var)){
+			unset($this->query[$var]);
+		}
+	}
+
+	public function offsetUnset($var){
+		$this->remove($var);
+	}
+
+	public function getIterator(){
+		return new \ArrayIterator($this->query);
+	}
+
+	public function count(){
+		return $this->found_posts;
+	}
+
 }

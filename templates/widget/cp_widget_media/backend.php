@@ -9,7 +9,8 @@
   <?php echo $template->inc('/templates/widget/widget-parts/alttext', 
   		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
-<?= $link ?>
+<?php echo $link; ?>
+<?php echo $taxonomy; ?>
 <div class="cp-widget-field cp-widget-type-section ">
 	<label class="section"><?php _e('Options', 'cppress')?></label>
 	<div class="cp-widget-section cp-widget-section-hide">

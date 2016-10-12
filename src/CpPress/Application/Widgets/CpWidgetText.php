@@ -2,7 +2,6 @@
 namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
-use Commonhelp\Util\Commonhelp\Util;
 use CpPress\Application\BackEnd\FieldsController;
 
 class CpWidgetText extends CpWidgetBase{
@@ -37,6 +36,11 @@ class CpWidgetText extends CpWidgetBase{
 		if(!filter_var($instance['link'], FILTER_VALIDATE_URL)){
 			$instance['link'] = FieldsController::getLinkPermalink($instance['link']);
 		}
+
+		if(!filter_var($instance['taxonomy'], FILTER_VALIDATE_URL)){
+			$instance['link'] = FieldsController::getTaxonomyPermalink($instance['taxonomy']);
+		}
+
 		$content = $instance['text'];
 		if(isset($instance['removep']) && $instance['removep']){
 			$content = wpautop($content);
@@ -100,6 +104,15 @@ class CpWidgetText extends CpWidgetBase{
 					$instance['link'],
 			)
 		);
+		$taxonomy = BackEndApplication::part(
+			'FieldsController', 'taxonomy_button', $this->container,
+			array(
+				$this->get_field_id( 'taxonomy' ),
+				$this->get_field_name( 'taxonomy' ),
+				$instance['taxonomy'],
+			)
+		);
+		$this->assign('taxonomy', $taxonomy);
 		$this->assign('link', $link);
 		$this->assign('icon', $icon);
 		$this->assign('editor', $editor);

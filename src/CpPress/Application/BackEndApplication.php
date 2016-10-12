@@ -106,6 +106,9 @@ class BackEndApplication extends CpPressApplication{
 		$hookObj->register('widget_search_post', function(){
 			self::main('PostController', 'xhr_widget_search_post', $this->getContainer());
 		});
+		$hookObj->register('widget_search_taxonomy', function(){
+			self::main('PostController', 'xhr_widget_search_taxonomy', $this->getContainer());
+		});
 		$hookObj->register('contact_form_tag', function(){
 			self::main('ContactFormController', 'xhr_taggenerator', $this->getContainer());
 		});
@@ -229,9 +232,9 @@ class BackEndApplication extends CpPressApplication{
 			$request = $container->query('Request');
 			$val = $request->getParam('values', array());
 			if(!empty($val)){
-				$link = $val['link']; $img = $val['img']; $imgExt = $val['img_ext']; $content = $val['content'];
+				$link = $val['link']; $img = $val['img']; $imgExt = $val['img_ext']; $content = $val['content']; $taxonomy = $val['taxonomy'];
 			}else{
-				$link = ''; $img = ''; $imgExt = ''; $content = '';
+				$link = ''; $img = ''; $imgExt = ''; $content = ''; $taxonomy = '';
 			}
 			$media = BackEndApplication::part(
 				'FieldsController', 'media_button', $this->container,
@@ -254,7 +257,14 @@ class BackEndApplication extends CpPressApplication{
 					$request->getParam('id').'_link',
 					$request->getParam('name').'[link][]',
 					$link,
-					$validPostTypes
+				)
+			);
+			$taxonomier = self::part(
+				'FieldsController', 'taxonomy_button', $container,
+				array(
+					$request->getParam('id').'_taxonomy',
+					$request->getParam('name').'[taxonomy][]',
+					$taxonomy,
 				)
 			);
 			$editor = self::part(
@@ -271,7 +281,7 @@ class BackEndApplication extends CpPressApplication{
 					$request->getParam('widget', null)
 				)	
 			);
-			self::main('SliderController', 'xhr_add', $this->getContainer(), array($media, $linker, $editor));
+			self::main('SliderController', 'xhr_add', $this->getContainer(), array($media, $linker, $taxonomier, $editor));
 		});
 		$hookObj->register('widget_slider_add_singlepost', function(){
 			$container = $this->getContainer();

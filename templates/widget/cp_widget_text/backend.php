@@ -3,8 +3,9 @@
   <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
   		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
-<?= $editor ?>
-<?= $link ?>
+<?php echo $editor; ?>
+<?php echo $link; ?>
+<?php echo $taxonomy; ?>
 <div class="cp-widget-field">
     <label for="<?= $widget->get_field_id( 'removep' ); ?>">
     	<input class="widefat"
