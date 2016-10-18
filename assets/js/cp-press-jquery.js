@@ -21,4 +21,20 @@
         }
         $(html).hide().prependTo($(this)).fadeIn(speed);
     };
+
+    $.inArrayComparer = function(array, comparer){
+        for(var i=0; i < array.length; i++){
+            if(comparer(array[i])){
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    $.pushIfNotExists = function(array, element, comparer){
+        if(!$.inArrayComparer(array, comparer)){
+            array.push(element);
+        }
+    }
 })(jQuery);

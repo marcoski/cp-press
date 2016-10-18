@@ -3,6 +3,7 @@ namespace CpPress\Application;
 
 use Closure;
 use \Commonhelp\WP\WPApplication;
+use CpPress\Application\FrontEnd\FrontFilterController;
 use CpPress\Application\FrontEnd\FrontPageController;
 use CpPress\Application\FrontEnd\FrontSliderController;
 use CpPress\Application\FrontEnd\FrontPostController;
@@ -80,6 +81,18 @@ class FrontEndApplication extends CpPressApplication{
 					),
 					$filter,
 					$c->query('Query')
+			);
+		});
+		$container->registerService(FrontFilterController::class, function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontFilterController(
+				'FilterApp',
+				$c->query('Request'),
+				array(
+					$this->themeRoot
+				),
+				$filter,
+				$c->query('Query')
 			);
 		});
 		$container->registerService('Breadcrumb', function($c){
@@ -229,7 +242,7 @@ class FrontEndApplication extends CpPressApplication{
 	
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){
 		$filterObj = $this->getContainer()->query('FrontEndFilter');
-		$filterkObj->register($filter, $closure, $priority, $acceptedArgs);
+		$filterObj->register($filter, $closure, $priority, $acceptedArgs);
 	}
 	
 	public function execFilters(){

@@ -43,7 +43,7 @@ class Paginator implements PaginateInterface {
 	public function __construct(Query $query, Filter $filter){
 		$this->query = $query;
 		$this->filter = $filter;
-		$this->pagination = '<ul class="%s" data-pagination-query="%s">%s</ul>';
+		$this->pagination = '<ul class="%s" data-query="%s">%s</ul>';
 		$this->initialize();
 		$this->createElements();
 

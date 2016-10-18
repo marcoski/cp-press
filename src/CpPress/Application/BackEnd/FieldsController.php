@@ -296,10 +296,11 @@ class FieldsController extends WPController {
 	}
 
 	public static function getTaxonomyArgs($val){
-		if(preg_match("/([a-zA-Z]*):\s([A-Za-z0-9-_]+)/", $val, $match)){
+		if(preg_match("/([a-zA-Z]*):\s([\sA-Za-z0-9-_]+)/", $val, $match)){
 			return array(
 				'taxonomy' => $match[1],
-				'name' => $match[2]
+				'slug' => $match[2],
+				'hide_empty' => false
 			);
 		}else{
 			return array();

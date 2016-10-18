@@ -29,7 +29,7 @@ class CpWidgetButton extends CpWidgetBase{
 			$instance['link'] = FieldsController::getLinkPermalink($instance['link']);
 		}
 		if(!filter_var($instance['taxonomy'], FILTER_VALIDATE_URL)){
-			$instance['link'] = FieldsController::getLinkPermalink($instance['taxonomy']);
+			$instance['link'] = FieldsController::getTaxonomyPermalink($instance['taxonomy']);
 		}
 		$styles = array(
 			'background-color' => $instance['bcolor'] != '' ? $instance['bcolor'] : null,

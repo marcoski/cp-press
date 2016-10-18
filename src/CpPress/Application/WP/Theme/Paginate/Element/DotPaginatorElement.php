@@ -13,7 +13,7 @@ class DotPaginatorElement extends PaginatorElement {
 
 
 	public function render() {
-		return '<li><span class="paginator-element-dot">...</span></li>';
+		return '<li class="paginator-element-dot"><span>...</span></li>';
 	}
 
 }

@@ -157,13 +157,11 @@ class MultiThumbnailFeature extends BaseFeature {
 	    }
 
 	    $thumbId = intval($_POST['thumbnail_id']);
-
 	    if($thumbId < 0){
 	    	delete_post_meta($post_ID, $this->getMetaKey());
 		    echo $this->renderPostThumbnail();
 		    exit;
 	    }
-
 	    if($thumbId && get_post($thumbId)){
 	    	$thumbHtml = wp_get_attachment_image($thumbId, 'thumbnail');
 		    if(!empty($thumbHtml)){

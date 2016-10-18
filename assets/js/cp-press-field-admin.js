@@ -377,7 +377,7 @@
               if(this.$wtitle.length > 0){
                   this.$wtitle.val($$.data('name'));
               }
-              this.$input.val($$.data('taxonomy') + ': ' + $$.data('name'));
+              this.$input.val($$.data('taxonomy') + ': ' + $$.data('slug'));
           }else{
               if(this.$wtitle.length > 0){
                   this.$wtitle.val($$.data('post_title'));

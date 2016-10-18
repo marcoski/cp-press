@@ -19,7 +19,10 @@ abstract class AbstractApplication implements ApplicationInterface{
 		
 		self::main($controllerName, $methodName, $this->container);
 	}
-	
+
+	/**
+	 * @return SimpleContainer;
+	 */
 	public function getContainer(){
 		return $this->container;
 	}

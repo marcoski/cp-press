@@ -11,19 +11,36 @@
         clicked: null,
         page: null,
 
+        $queryData: null,
+
         initialize: function(options){
             this.itemsView = options.itemsView;
             this.collection = options.collection;
-            this.listenTo(this.collection, 'sync', this.render);
-            this.query = this.$el.data('pagination-query');
+            this.listenTo(this.collection, 'sync:paginate', this.render);
+            this.on('paginator.refresh', this.refresh, this);
+            this.$queryData = this.$el;
+            if(options.hasOwnProperty('queryData') && null !== options.queryData){
+                this.$queryData = options.queryData;
+            }
+            this.page = 1;
+            this.query = this.$queryData.data('query');
+        },
+
+        refresh: function(){
+            this.query = this.$queryData.data('query');
+            return this.render();
         },
 
         paginate: function(event){
             event.preventDefault();
             var $$ = $(event.target).parents('li');
+            if($$.hasClass('paginator-element-dot')){
+                return;
+            }
             this.clicked = $$;
             this.page = $$.data('pagination-page');
             $(window).trigger('paginator.onpaginate');
+            this.trigger('paginator:onpaginate');
             this.collection.paginate(this.page, this.query);
         },
 
@@ -42,7 +59,7 @@
                 success: function(result){
                     _that.$el.html('');
                     _that.$el.append(result.html);
-                    _that.$el.data('pagination-query', result.query);
+                    _that.$queryData.data('query', result.query);
                     _that.itemsView.render();
                     $(window).trigger('paginator.onsuccess');
                 }
