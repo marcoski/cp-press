@@ -77,19 +77,19 @@ class CpWidgetSlider extends CpWidgetBase{
 			$slider[$i]['title'] = $slides['title'][$i];
 			$slider[$i]['content'] = $slides['content'][$i];
 			$slider[$i]['link'] = array();
-			if($slides['link'][$i] != ""){
+			if($slides['link'][$i] !== ""){
 				$slider[$i]['link']['url'] = $slides['link'][$i];
                 if(!FieldsController::isLinkArgs($slider[$i]['link']['url']) && filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
                     $slider[$i]['link']['isext'] = true;
                 }else{
                     $slider[$i]['link']['isext'] = false;
                     $slider[$i]['link']['url'] = FieldsController::getLinkPermalink($slider[$i]['link']['url']);
-                    if(!$slider[$i]['link']['url']){
+                    if('' === $slider[$i]['link']['url'] || false === $slider[$i]['link']['url'] || null === $slider[$i]['link']['url']){
                         $slider[$i]['link'] = array();
                     }
                 }
 			}
-			if($slides[$i]['taxonomy'] !== ""){
+			if(null !== $slides[$i]['taxonomy'] && $slides[$i]['taxonomy'] !== ""){
 				$slider[$i]['link']['url'] = $slides['taxonomy'][$i];
 				if(!FieldsController::isLinkArgs($slider[$i]['link']['url']) && filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
 					$slider[$i]['link']['isext'] = true;
