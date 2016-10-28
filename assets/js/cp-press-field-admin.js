@@ -176,7 +176,6 @@
           .attr('href', this.iconsCache[family].style)
           .appendTo('head');
 	     }
-	     
 	     for(var i in this.iconsCache[family].icons){
 	       var icon = $('<div data-cp-icon="' + this.iconsCache[family].icons[i] +  '"/>')
 	         .attr('data-value', family + '-' + i)

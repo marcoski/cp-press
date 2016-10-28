@@ -3,11 +3,15 @@ namespace CpPress;
 
 use \Commonhelp\WP\WPApplication;
 use CpPress\Application\BackEndApplication;
+use CpPress\Application\CpPressApplication;
 use CpPress\Application\FrontEndApplication;
 use CpPress\Application\LoginApplication;
 
 class CpPress{
-	
+
+	/**
+	 * @var CpPressApplication
+	 */
 	public static $App;
 	public static $FILE = __FILE__;
 	public static $WEBROOT = ABSPATH;

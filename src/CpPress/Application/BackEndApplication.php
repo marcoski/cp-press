@@ -332,7 +332,7 @@ class BackEndApplication extends CpPressApplication{
 
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){
 		$filterObj = $this->getContainer()->query('BackEndFilter');
-		$filterkObj->register($filter, $closure, $priority, $acceptedArgs);
+		$filterObj->register($filter, $closure, $priority, $acceptedArgs);
 	}
 
 	public function execFilters(){
