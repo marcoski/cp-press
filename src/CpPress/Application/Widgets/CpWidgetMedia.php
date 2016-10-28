@@ -1,6 +1,7 @@
 <?php
 namespace CpPress\Application\Widgets;
 
+use CpPress\Application\BackEnd\FieldsController;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\WP\Theme\Media\Image;
 
@@ -70,6 +71,18 @@ class CpWidgetMedia extends CpWidgetBase{
 			$imageSrc = $image->getImage($instance['media']);
 			$instance['link'] = $imageSrc[0];
 			$instance['oembed'] = null;
+		}
+		if($instance['desturi'] !== ""){
+			if(!FieldsController::isLinkArgs($instance['desturi']) && filter_var($instance['desturi'], FILTER_SANITIZE_URL)){
+			}else{
+				$instance['desturi'] = FieldsController::getLinkPermalink($instance['desturi']);
+			}
+		}
+		if(null !== $instance['desttaxonomy'] && $instance['desttaxonomy'] !== ""){
+			if(!FieldsController::isLinkArgs($instance['desttaxonomy']) && filter_var($instance['desttaxonomy'], FILTER_SANITIZE_URL)){
+			}else{
+				$instance['desturi'] = FieldsController::getTaxonomyPermalink($instance['desttaxonomy']);
+			}
 		}
 		unset($instance['external']);
 		unset($instance['media']);
