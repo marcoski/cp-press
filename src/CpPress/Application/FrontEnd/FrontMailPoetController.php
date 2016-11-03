@@ -42,10 +42,13 @@ class FrontMailPoetController extends WPController{
 		if(!isset($atts['type'])){
 			$atts['type'] = 'default';
 		}
+		if(!isset($atts['submit'])){
+			$atts['submit'] = 'default';
+		}
 		$formModel = \WYSIJA::get('forms', 'model');
 		$form = $formModel->getOne(array('form_id' => $atts['id']));
 		if(!empty($form)){
-			$this->hiddenFields($atts['id'], $atts['type']);
+			$this->hiddenFields($atts['id'], $atts['type'], $atts['submit']);
 			$this->assign('mailpoetConfig', \WYSIJA::get('config', 'model'));
 			$this->assign('id', $atts['id']);
 			$this->assign('formResult', FrontEndApplication::getFormResult('cppress-mailpoet'));
@@ -65,13 +68,17 @@ class FrontMailPoetController extends WPController{
 		return '';
 	}
 	
-	private function hiddenFields($id, $type){
+	private function hiddenFields($id, $type, $submit){
 		$hiddenFields = array(
 				'_cppress-mailpoet' => 1,
 				'_wpnonce' => wp_create_nonce('cppress-mailpoet'),
 				'_cppress-mailpoet-id' => $id,
 				'_cppress-mailpoet_type' => $type
 		);
+		if('ajax' === $submit){
+			$hiddenFields['_cppress_front_ajax'] = 1;
+			$hiddenFields['_cppress-mailpoet-isajaxcall'] = 1;
+		}
 		$this->assign('hiddenFields', $hiddenFields);
 	}
 	

@@ -199,6 +199,9 @@ class FrontEndApplication extends CpPressApplication{
 			$widget = $this->getWidget($layout, 'cp_widget_contact_form', $container);
 			return $widget['widget']->widget(array(), $widget['data']);
 		});
+		$hookObj->registerFrontEnd('cppress_mailpoet_ajax', function() use ($container){
+			self::main('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter')));
+		});
 		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
 			self::main('Post', 'loop_loadmore', $container);
 		});
