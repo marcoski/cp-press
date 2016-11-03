@@ -28,7 +28,7 @@ class CpWidgetButton extends CpWidgetBase{
 		if(!filter_var($instance['link'], FILTER_VALIDATE_URL)){
 			$instance['link'] = FieldsController::getLinkPermalink($instance['link']);
 		}
-		if(!filter_var($instance['taxonomy'], FILTER_VALIDATE_URL)){
+		if(isset($instance['taxonomy']) && $instance['taxonomy'] !== ''){
 			$instance['link'] = FieldsController::getTaxonomyPermalink($instance['taxonomy']);
 		}
 		$styles = array(
