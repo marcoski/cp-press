@@ -14,7 +14,7 @@ class MailPoetSubmitter extends Submitter{
 	protected function submit(){
 		$type = Inflector::camelize($this->request->getParam('_cppress-mailpoet_type'));
 		$id = $this->request->getParam('_cppress-mailpoet-id');
-		$list = intval($this->request->getParam('_cppress-mailpoet-list', 1));
+		$list = intval($this->request->getParam('_cppress_mailpoet-list', 1));
 		$submit = 'submit' . $type;
 
 		return $this->$submit($id, $list);
