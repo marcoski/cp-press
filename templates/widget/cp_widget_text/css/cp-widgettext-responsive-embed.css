@@ -1,0 +1,15 @@
+.cp-video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px;
+    height: 0;
+}
+.cp-video-container iframe,
+.cp-video-container object,
+.cp-video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100%;
+}

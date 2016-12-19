@@ -49,6 +49,13 @@ class FrontEndFilter extends Filter{
 			}
 			return $template;
 		});
+
+		$this->register('cppress_embed_oembed_html', function($html){
+			if(false !== strpos($html, 'iframe')){
+				return '<div class="cp-video-container">'.$html.'</div>';
+			}
+			return $html;
+		});
 	}
 	
 }

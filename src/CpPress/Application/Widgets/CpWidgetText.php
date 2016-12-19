@@ -3,8 +3,11 @@ namespace CpPress\Application\Widgets;
 
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\BackEnd\FieldsController;
+use CpPress\Application\WP\Theme\Embed;
 
 class CpWidgetText extends CpWidgetBase{
+
+	private $linkifunknown = true;
 
 	public function __construct(array $templateDirs=array()){
 		parent::__construct(
@@ -17,6 +20,11 @@ class CpWidgetText extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-text';
+		$this->frontStyles = array(
+			array(
+				'source' => 'cp-widgettext-responsive-embed'
+			)
+		);
 	}
 	
 	public function unwpautop($string) {
@@ -46,6 +54,7 @@ class CpWidgetText extends CpWidgetBase{
 		}else{
 			$content = wpautop($content, false);
 		}
+		$content = $this->autoembed($content);
 		if(strpos($content, '[')){
 			$content = do_shortcode($content);
 		}
@@ -125,9 +134,50 @@ class CpWidgetText extends CpWidgetBase{
 	 *
 	 * @param array $new The new options
 	 * @param array $old The previous options
+	 * @return
 	 */
 	public function update($new, $old) {
 		return parent::update($new, $old);
+	}
+
+	/**
+	 * Passes any unlinked URLs that are on their own line to WP_Embed::shortcode() for potential embedding.
+	 *
+	 * @see WP_Embed::autoembed_callback()
+	 *
+	 * @param string $content The content to be searched.
+	 * @return string Potentially modified $content.
+	 */
+	private function autoembed( $content ) {
+		// Replace line breaks from all HTML elements with placeholders.
+		$content = wp_replace_in_html_tags( $content, array( "\n" => '<!-- wp-line-break -->' ) );
+
+		if ( preg_match( '#(^|\s|>)https?://#i', $content ) ) {
+			// Find URLs on their own line.
+			$content = preg_replace_callback( '|^(\s*)(https?://[^\s<>"]+)(\s*)$|im', array( $this, 'autoembed_callback' ), $content );
+			// Find URLs in their own paragraph.
+			$content = preg_replace_callback( '|(<p(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/p>)|i', array( $this, 'autoembed_callback' ), $content );
+		}
+
+		// Put the line breaks back.
+		return str_replace( '<!-- wp-line-break -->', "\n", $content );
+	}
+
+	/**
+	 * Callback function for WP_Embed::autoembed().
+	 *
+	 * @param array $match A regex match array.
+	 * @return string The embed HTML on success, otherwise the original URL.
+	 */
+	private function autoembed_callback( $match ) {
+		/** @var Embed $embed */
+		$embed = $this->container->query('Embed');
+		$oldval = $this->linkifunknown;
+		$this->linkifunknown = false;
+		$return = $embed->shortcode( array(), $match[2] );
+		$this->linkifunknown = $oldval;
+
+		return $match[1] . $return . $match[3];
 	}
 
 }
