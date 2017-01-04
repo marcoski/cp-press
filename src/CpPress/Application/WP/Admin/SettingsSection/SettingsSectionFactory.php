@@ -65,7 +65,7 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 	private function add(){
 		foreach($this->sections as $section){
 			$section->addSection();
-			if(count($section > 0)){
+			if(count($section) > 0){
 				$this->addSubSections($section);
 			}
 		}

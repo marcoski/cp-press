@@ -21,7 +21,7 @@ class OrderedHashMapIterator implements \Iterator{
 		$this->elements = &$elements;
 		$this->orderedKeys = &$orderedKeys;
 		$this->managedCursor = &$managedCursors;
-		$this->cursorId = count($managedCursor);
+		$this->cursorId = count($this->managedCursor);
 		
 		$this->managedCursor[$this->cursorId] = &$this->cursor;
 	}

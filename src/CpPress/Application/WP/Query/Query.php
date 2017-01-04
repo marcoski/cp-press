@@ -79,9 +79,9 @@ class Query extends WP_Query implements \ArrayAccess, \IteratorAggregate, \Count
 		$this->query($query);
 	}
 
-	public function get($var){
-		if($this->has($var)){
-			return $this->query[$var];
+	public function get($query_var, $default = ''){
+		if($this->has($query_var)){
+			return $this->query[$query_var];
 		}
 
 		return null;

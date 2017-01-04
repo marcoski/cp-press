@@ -133,16 +133,9 @@ class BackEndHook extends Hook{
 		$container = $this->app->getContainer();
 		$container->register(new FeatureFactory());
 
-		/** @var PageWidgetsFeature $pageWidgets */
-		$pageWidgets = $container->query('CpPageWidgets');
-		$pageWidgets->set('post_type', $container->query('PagePostType'))->hooks();
+		$container->query('CpPageWidgets');
+		$container->query('CpPageContent');
 
-		/** @var PageContentFeature $pageContent */
-		$pageContent = $container->query('CpPageContent');
-		$pageContent->set('post_type', $container->query('PagePostType'))->hooks();
-
-		/** @var SubtitleFeature $subTitle */
-		$subTitle = $container->query('CpPageSubtitle');
-		$subTitle->set('post_type', $container->query('PagePostType'))->hooks();
+		$container->query('CpPageSubtitle');
 	}
 }

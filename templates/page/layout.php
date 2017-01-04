@@ -25,7 +25,7 @@ if(!function_exists('render_widget')){
 				$classes[] = 'cpwidget-last-child';
 			}
 			$id = 'cpwidget-' . $postId . '-' . $section . '-' . $grid . '-' . $cell . '-' . $panel;
-			$classes = apply_filters( 'cppress_layout_widget_classes', $classes, $widget, $instance, $widget_info );
+			$classes = apply_filters( 'cppress_layout_widget_classes', $classes, $widget, $instance);
 			$classes = explode( ' ', implode( ' ', $classes ) );
 			$classes = array_filter( $classes );
 			$classes = array_unique( $classes );

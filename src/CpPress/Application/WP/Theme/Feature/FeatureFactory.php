@@ -54,7 +54,7 @@ class FeatureFactory implements ServiceProviderInterface {
 	public static function subtitle(ContainerInterface $container){
 		$subtitle = new SubtitleFeature( $container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container);
 		$subtitle->hooks();
-		return $sbutitle;
+		return $subtitle;
 	}
 
 	public static function multithumb(ContainerInterface $container, array $options = array()){

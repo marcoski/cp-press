@@ -27,6 +27,7 @@ class ContactFormController extends WPController{
 		$this->assign('fields', $this->fields);
 		$this->assign('fields_json', htmlspecialchars(json_encode($this->fields, JSON_HEX_TAG)));
 		$this->assign('instance', $instance);
+		$this->assign('filter', $this->backEndFilter);
 		$this->assign('widget', $widget);
 	}
 	

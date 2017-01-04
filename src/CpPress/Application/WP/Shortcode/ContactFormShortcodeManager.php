@@ -66,7 +66,7 @@ class ContactFormShortcodeManager extends Shortcode{
 		}, $content );
 	}
 	
-	public function getRegex(){
+	public function getRegex(array $tagNames = array()){
 		$tagNames = array_keys($this->toArray());
 		$tagregexp = join('|', array_map( 'preg_quote', $tagNames));
 		return '(\[?)'

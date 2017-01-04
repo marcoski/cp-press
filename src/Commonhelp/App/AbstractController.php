@@ -98,26 +98,6 @@ abstract class AbstractController implements ContainerInterfaceTraitInterface{
 		return array_key_exists($responder, $this->responders);
 	}
 	
-	public function render($name, array $parameters=array(), array $headers=array()){
-		if($this->container === null){
-			return null;
-		}
-		$parameters = array_replace($this->vars, $parameters);
-		if($this->has('Engine')){
-			$engine = $this->get('Engine');
-		}else{
-			$engine = $this->get(TemplateInterface::class);
-		}
-		$engine->setApplication($this->appName);
-		$engine->setTemplate($name);
-		$response = new TemplateResponse($engine, array_replace($this->vars, $parameters));
-		foreach($headers as $name => $value){
-			$response->addHeader($name, $value);
-		}
-		
-		return $response;
-	}
-	
 	public function redirect($url){
 		return new RedirectResponse($url);
 	}

@@ -160,7 +160,6 @@ abstract class BaseFeature implements FeatureInterface {
 			->setPriority($this->get('priority'))
 			->setContext($this->get('context'))
 			->add();
-
 	}
 
 	abstract public function getMetaKey();
