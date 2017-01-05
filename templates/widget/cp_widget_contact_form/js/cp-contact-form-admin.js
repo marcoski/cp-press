@@ -4,6 +4,8 @@
       var tagGenerator = new $.CpContactForm.View.TagGenerator({
         el: $('.cp-widget-tag-generator')
       });
+
+      $('.code-editor').ace({ theme: 'chrome', lang: 'html' });
     }
   });
   
@@ -186,7 +188,6 @@
 
     render: function(args){
       args || (args={});
-      console.log(args);
       args = _.extend({action: 'contact_form_tag'}, args);
       var _that = this;
       this.cpAjax.call(args.action, function(response){
@@ -246,6 +247,8 @@
 
     save: function(e){
       var content = $('#cp-shortcode-tag-input').val();
+      var textAreaEditor = $('.cp-widget-tag-generator textarea.code-editor').data('ace').getEditor();
+      textAreaEditor.insert(content);
       $('.cp-widget-tag-generator textarea').each(function(){
         this.focus();
 

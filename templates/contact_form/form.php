@@ -13,7 +13,7 @@
 	$attrs = $filter->apply('cppress_widget_attrs', array(
 		'id' => $widget['form']['id'],
 		'name' => $widget['form']['name'],
-		'class' => "large-text code",
+		'class' => "large-text code code-editor",
 		'cols' => "100",
 		'rows' => "14"
 	), $instance, 'form');

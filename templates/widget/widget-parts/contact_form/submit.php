@@ -3,7 +3,7 @@
 		'id' => $widget['submit']['id'],
 		'name' => $widget['submit']['name'],
 		'value' => $instance['submit'] != '' ? $instance['submit'] : __('Contact Us', 'cppress')
-	), $instance, 'subject');
+	), $instance, 'submit');
 ?>
 <input class="widefat"
     <?php foreach($attrs as $name => $value){
