@@ -429,7 +429,7 @@ class FrontContactFormController extends WPController{
 			
 			$itemAtts = array(
 				'type' => $this->tag->baseType,
-				'name' => $this->name . ( $multiple ? '[]' : '' ),
+				'name' => $this->tag->name . ( $multiple ? '[]' : '' ),
 				'value' => $value,
 				'checked' => $checked ? 'checked' : '',
 				'tabindex' => $tabindex ? $tabindex : '' 
