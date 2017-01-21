@@ -47,6 +47,7 @@ class OEmbed{
 			'#https?://(www\.)?reverbnation\.com/.*#i' => array('https://www.reverbnation.com/oembed', true),
 			'#https?://(www\.)?reddit\.com/r/[^/]+/comments/.*#i' => array('https://www.reddit.com/oembed', true),
 			'#https?://(www\.)?speakerdeck\.com/.*#i' => array('https://speakerdeck.com/oembed.{format}', true),
+			'#http://(www\.)?ustream.tv/*#i' => array('http://www.ustream.tv/oembed', true)
 		);
 	
 	private $linkTypes =array(
