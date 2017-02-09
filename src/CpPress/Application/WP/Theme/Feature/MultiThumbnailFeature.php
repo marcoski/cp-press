@@ -5,6 +5,7 @@ namespace CpPress\Application\WP\Theme\Feature;
 
 use CpPress\Application\WP\Admin\PostMeta;
 use CpPress\Application\WP\Asset\Scripts;
+use CpPress\Application\WP\Asset\Styles;
 use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Hook\Hook;
 
@@ -14,8 +15,8 @@ class MultiThumbnailFeature extends BaseFeature {
     private static $enqueued = false;
 
 
-	public function __construct(Hook $hook, Filter $filter, Scripts $scripts, array $options) {
-		parent::__construct($hook, $filter, $scripts, $options);
+	public function __construct(Hook $hook, Filter $filter, Scripts $scripts, Styles $styles, array $options) {
+		parent::__construct($hook, $filter, $scripts, $styles, $options);
 		if(!current_theme_supports('post-thumbnails')){
 			add_theme_support('post-thumbnails');
 		}

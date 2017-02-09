@@ -48,7 +48,7 @@
     var SearchItem = Backbone.View.extend({
         model: null,
         tagName: 'div',
-        template: _.template($('#search-item-template').html()),
+        template: null,
         col: 'col-md-12',
         classes: [],
 
@@ -59,6 +59,9 @@
             }
             if(options.hasOwnProperty('classes')){
                 this.classes = options.classes;
+            }
+            if($('#search-item-template').length > 0){
+                this.template = _.template($('#search-item-template').html());
             }
         },
 

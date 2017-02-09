@@ -67,6 +67,8 @@ class CpWidgetText extends CpWidgetBase{
 			}
 		}
 		$instance['text'] = $content;
+		$this->assignTemplate($instance, 'text_widget');
+
 		return parent::widget($args, $instance);
 	}
 

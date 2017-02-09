@@ -36,8 +36,8 @@ class Styles implements Asset{
 		if($this->isDefault($asset)){
 			return wp_enqueue_style($asset, false, $deps, $ver, $media);
 		}
+
 		$src = $this->getAssetSrc($asset, 'css');
-		
 		if(is_null($src)){
 			return null;
 		}

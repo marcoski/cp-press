@@ -12,6 +12,7 @@ namespace CpPress\Application\WP\Theme\Feature;
 use Commonhelp\WP\WPContainer;
 use CpPress\Application\WP\Admin\MetaBox;
 use CpPress\Application\WP\Asset\Scripts;
+use CpPress\Application\WP\Asset\Styles;
 use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Hook\Hook;
 use CpPress\Application\WP\MetaType\PostType;
@@ -29,6 +30,11 @@ abstract class BaseFeature implements FeatureInterface {
 	 * @var Scripts
 	 */
 	protected $scripts;
+
+	/**
+	 * @var Styles
+	 */
+	protected $styles;
 
 	/**
 	 * @var Filter
@@ -57,14 +63,24 @@ abstract class BaseFeature implements FeatureInterface {
 	 * @param Hook $hook
 	 * @param Filter $filter
 	 * @param Scripts $scripts
+	 * @param Styles $styles
 	 * @param array $options
 	 * @param WPContainer $container
 	 */
-	public function __construct(Hook $hook, Filter $filter, Scripts $scripts, $options = array(), WPContainer $container = null){
+	public function __construct(
+		Hook $hook,
+		Filter $filter,
+		Scripts $scripts,
+		Styles $styles,
+		$options = array(),
+		WPContainer $container = null
+	){
 		$this->scripts = $scripts;
+		$this->styles = $styles;
 		$this->filter = $filter;
 		$this->hook = $hook;
 		$this->container = $container;
+
 
 		$this->defaults = array(
 			'label' => null,
@@ -144,6 +160,9 @@ abstract class BaseFeature implements FeatureInterface {
 	}
 
 	public function adminEnqueueScripts($hook){
+	}
+
+	public function adminEnqueueStyles($hook){
 	}
 
 	public function hooks(){

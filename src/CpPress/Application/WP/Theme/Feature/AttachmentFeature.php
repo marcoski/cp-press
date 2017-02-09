@@ -14,6 +14,7 @@ use Commonhelp\WP\WPContainer;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\WP\Admin\PostMeta;
 use CpPress\Application\WP\Asset\Scripts;
+use CpPress\Application\WP\Asset\Styles;
 use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Hook\Hook;
 
@@ -21,8 +22,8 @@ class AttachmentFeature extends BaseFeature {
 
 	private $attachmentOptions;
 
-	public function __construct( Hook $hook, Filter $filter, Scripts $scripts, WPContainer $container ) {
-		parent::__construct( $hook, $filter, $scripts, array(), $container );
+	public function __construct( Hook $hook, Filter $filter, Scripts $scripts, Styles $styles, WPContainer $container ) {
+		parent::__construct( $hook, $filter, $scripts, $styles, [], $container );
 		$this->options = array(
 			'id' => 'cp-press-attachment',
 			'label' => __('Featured Attachment', 'cppress'),
