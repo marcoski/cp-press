@@ -49,7 +49,7 @@ class PostMeta{
 			
 		}
 		
-		return self::$instances[$id]->_findAll();
+		return self::$instances[$id]->_findAll($id);
 	}
 	
 }

@@ -178,7 +178,7 @@ class PostController extends WPController{
 	}
 	
 	private function getTaxonomy($id){
-		preg_match("/\[[0-9]+\]\[([A-Za-z0-9_]+)\]/", $id, $matches);
+		preg_match("/\\[[0-9]+\\]\\[([A-Za-z0-9_-]+)\\]/", $id, $matches);
 		$taxForm = $matches[1];
 		foreach(PostController::$convertTaxonomyToFormForCompatibility as $taxonomy => $taxCompatibility){
 			if($taxForm === $taxonomy){

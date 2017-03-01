@@ -58,14 +58,18 @@ class CpWidgetMedia extends CpWidgetBase{
 	 */
 	public function widget($args, $instance) {
 		$embed = $this->container->query('Embed');
-		if($instance['external'] != '' && filter_var($instance['external'], FILTER_VALIDATE_URL)){
+		if($instance['video'] != '' && filter_var($instance['video'], FILTER_VALIDATE_URL)){
+			$this->assign('isVideo', true);
+			$this->assign('isImage', false);
 			try{
-				$instance['oembed'] = $embed->getEmbedObj($instance['external']);
+				$instance['oembed'] = $embed->getEmbedObj($instance['video']);
 			}catch(Exception $e){
-				$instance['link'] = $instance['extrenal'];
+				$instance['link'] = $instance['video'];
 				$instance['oembed'] = null;
 			}
 		}else if($instance['media'] != ''){
+			$this->assign('isVideo', false);
+			$this->assign('isImage', true);
 			$image = new Image();
 			$image->set($instance['media']);
 			$imageSrc = $image->getImage($instance['media']);
@@ -86,6 +90,7 @@ class CpWidgetMedia extends CpWidgetBase{
 		}
 		unset($instance['external']);
 		unset($instance['media']);
+		$this->assignTemplate($instance, 'media_widget');
 		return parent::widget($args, $instance);
 	}
 

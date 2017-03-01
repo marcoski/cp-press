@@ -47,6 +47,7 @@ class AttachmentFeature extends BaseFeature {
 	public function render(){
 		global $post;
 		$files = PostMeta::find($post->ID, $this->getMetaKey());
+
 		$validMime = isset($this->attachmentOptions['validmime']) ?
 			json_encode($this->attachmentOptions['validmime']) : json_encode(array());
 		BackEndApplication::main('AttachmentController', 'featured', $this->container, array($files, $validMime));
