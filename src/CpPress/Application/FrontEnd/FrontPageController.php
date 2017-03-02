@@ -50,7 +50,6 @@ class FrontPageController extends WPController{
 			[ intval($widget['widget_info']['grid']) ]
 			[ intval($widget['widget_info']['cell']) ][] = $widget;
 		}
-		
 		$this->assign('sections', $sections);
 		$this->assign('layout_data', $layout_data);
 		$this->assign('filter', $this->filter);

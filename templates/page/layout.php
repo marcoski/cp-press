@@ -53,6 +53,20 @@ if(!function_exists('render_widget')){
 	}
 }
 
+if(!function_exists('get_style_attr')){
+	function get_style_attr($styleArray){
+		if(empty($styleArray)){
+			return "";
+		}
+		$css = "";
+		foreach($styleArray as $property => $value){
+			$css .= $property.': '.$value.';';
+		}
+
+		return $css;
+	}
+}
+
 
 echo $filter->apply('cppress_layout_before_content', "", $sections, $post->ID);
 
@@ -81,6 +95,10 @@ foreach($sections as $skey => $grids){
 		$gridAttrs = $filter->apply('cppress_layout_grid_attrs', array(
 				'class' => implode(' ', $gridClasses)
 		), $grid, $section['slug']);
+		$gridStyle = get_style_attr($filter->apply('cppress_layout_grid_style', $grid['style'], $grid, $section['slug']));
+		if($gridStyle !==  ''){
+			$gridAttrs['style'] = $gridStyle;
+		}
 		echo $filter->apply('cppress_layout_before_grid', '', $grid, $gridAttrs, $section['slug']);
 		if($filter->apply('cppress_layout_print_grid_open', true, $grid, $section['slug'])) {
 			echo '<div';
@@ -99,6 +117,10 @@ foreach($sections as $skey => $grids){
 			$cellAttrs = $filter->apply('cppress_layout_cell_attrs', array(
 					'class' => implode(' ', $cellClasses)
 			), $cell, $section['slug']);
+			$cellStyle = get_style_attr($filter->apply('cppress_layout_cell_style', $cell['style'], $cell, $section['slug']));
+			if($cellStyle !==  ''){
+				$cellAttrs['style'] = $cellStyle;
+			}
 			if($filter->apply('cppress_layout_print_cell_open', true, $cell, $section['slug'])) {
 				echo $filter->apply( 'cppress_layout_before_cell', "", $cell, $cellAttrs, $section['slug'] );
 				echo '<div';
