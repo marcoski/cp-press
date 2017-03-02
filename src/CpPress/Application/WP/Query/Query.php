@@ -130,4 +130,8 @@ class Query extends WP_Query implements \ArrayAccess, \IteratorAggregate, \Count
 		return $this->found_posts;
 	}
 
+	public function order(callable $order){
+		$this->posts = $order($this->posts, $this);
+	}
+
 }
