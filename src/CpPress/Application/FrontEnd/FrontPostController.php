@@ -248,7 +248,19 @@ class FrontPostController extends WPController{
 		foreach(get_object_taxonomies($instance['posttype']) as $taxonomy){
 			if(array_key_exists($taxonomy, $convertTaxonomyToFormForCompatibility)){
 				$convertedTaxonomy = $convertTaxonomyToFormForCompatibility[$taxonomy];
-				if(isset($instance[$convertedTaxonomy[0]])){
+                if(isset($instance[$convertedTaxonomy[1]])){
+                    $excludeValues = array();
+                    foreach($instance[$convertedTaxonomy[1]] as $toExclude => $val){
+                        $excludeValues[] = $instance[$convertedTaxonomy[0]][$toExclude];
+
+                    }
+                    $taxQuery[] = array(
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => $excludeValues,
+                        'operator' => 'NOT IN'
+                    );
+                }else if(isset($instance[$convertedTaxonomy[0]])){
 					$includeValues = $instance[$convertedTaxonomy[0]];
 					if(isset($instance[$convertedTaxonomy[1]])){
 						$includeValues = array();
@@ -264,22 +276,21 @@ class FrontPostController extends WPController{
 						'terms' => $includeValues
 					);
 				}
-				if(isset($instance[$convertedTaxonomy[1]])){
-					$excludeValues = array();
-					foreach($instance[$convertedTaxonomy[1]] as $toExclude => $val){
-						$excludeValues[] = $instance[$convertedTaxonomy[0]][$toExclude];
-						
-					}
-					$taxQuery[] = array(
-							'taxonomy' => $taxonomy,
-							'field' => 'term_id',
-							'terms' => $excludeValues,
-							'operator' => 'NOT IN'
-					);
-				}	
 			}else{
 				/** TODO HANDLE CUSTOM AND NEW TAXONOMIES */
-				if(isset($instance[$taxonomy][$taxonomy])){
+                if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
+                    $excludeValues = array();
+                    foreach($instance[$taxonomy]['exclude_' . $taxonomy] as $toExclude => $val){
+                        $excludeValues[] = $instance[$taxonomy][$taxonomy][$toExclude];
+
+                    }
+                    $taxQuery[] = array(
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => $excludeValues,
+                        'operator' => 'NOT IN'
+                    );
+                }else if(isset($instance[$taxonomy][$taxonomy])){
 					$includeValues = $instance[$taxonomy][$taxonomy];
 					if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
 						$includeValues = array();
@@ -295,19 +306,7 @@ class FrontPostController extends WPController{
 						'terms' => $includeValues
 					);
 				}
-				if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
-					$excludeValues = array();
-					foreach($instance[$taxonomy]['exclude_' . $taxonomy] as $toExclude => $val){
-						$excludeValues[] = $instance[$taxonomy][$taxonomy][$toExclude];
-						
-					}
-					$taxQuery[] = array(
-							'taxonomy' => $taxonomy,
-							'field' => 'term_id',
-							'terms' => $excludeValues,
-							'operator' => 'NOT IN'
-					);
-				}
+
 			}
 		}
 		
@@ -342,6 +341,7 @@ class FrontPostController extends WPController{
 			$taxQuery = array_values($taxQuery);
 			$taxQuery['relation'] = 'OR';
 		}
+
 		return $taxQuery;
 	}
 	

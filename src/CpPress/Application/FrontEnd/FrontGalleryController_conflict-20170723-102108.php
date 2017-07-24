@@ -33,7 +33,9 @@ class FrontGalleryController extends WPController{
             $itemPerRowBootstrap = 1;
         }
         $rows = ceil(count($gallery['items'])/$options['tperrow']);
-
+        //vardump($rows);
+        //vardump($gallery);
+        //vardump($options);
 		$this->assign('items', $gallery['items']);
 		$this->assign('options', $options);
 		$this->assign('filter', $this->filter);

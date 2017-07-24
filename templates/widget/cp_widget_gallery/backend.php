@@ -11,7 +11,7 @@
 			<label><?php _e('Template', 'cppress'); ?></label>
 			<select name="<?= $widget->get_field_name( 'template' ); ?>" >
 				<option value="carousel" <? selected( $instance['template'], 'carousel' ); ?>><?php _e('Carousel', 'cppress'); ?></option>
-				<option value="list" <? selected( $instance['template'], 'glist' ); ?>><?php _e('List', 'cppress') ?></option>
+				<option value="glist" <? selected( $instance['template'], 'glist' ); ?>><?php _e('List', 'cppress') ?></option>
 			</select>
 			<div class="cp-widget-field-description">
 				<?php _e('Gallery frontend template. Default is bootstrap carousel', 'cppress')?>.
