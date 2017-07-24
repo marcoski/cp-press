@@ -24,7 +24,7 @@
 								$lightboxNavLeftClasses = $filter->apply('cppress-lightbox-navleft-classes', [
 									'glyphicon', 'glyphicon-chevron-left', 'lightbox-nav-left'
 								], $item);
-								$lightboxNavRightClasses = $filter->apply('cppress-lightbox-navleft-classes', [
+								$lightboxNavRightClasses = $filter->apply('cppress-lightbox-navright-classes', [
 									'glyphicon', 'glyphicon-chevron-right', 'lightbox-nav-right'
 								], $item);
 							?>
