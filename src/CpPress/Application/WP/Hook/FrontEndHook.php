@@ -45,9 +45,8 @@ class FrontEndHook extends Hook{
 			$scripts = $this->app->getScripts();
             /** @var Styles $styles */
 			$styles = $this->app->getStyles();
-			$styles->enqueue('cp-press-lightbox');
+            $scripts->enqueue('bootstrap', array('jquery'), false, true);
 			$scripts->enqueue('cp-press-jquery', array('jquery'), false, true);
-			$scripts->enqueue('cp-press-lightbox', array('jquery', 'bootstrap'), false, true);
 			$scripts->enqueue('cp-social-share-kit', array(), false, true);
 			$scripts->enqueue('cp-press-search', array('jquery', 'backbone'), false, true);
 			$scripts->enqueue('cp-press-paginator', array('jquery', 'backbone'), false, true);

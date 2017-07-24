@@ -8,7 +8,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="lightbox" aria-hidden="true">×</button>
-					<h4 class="modal-title"><?= $title ?></h4>
+					<h4 class="modal-title"><? echo $filter->apply('cppress-lightbox-title', $title, $item); ?></h4>
 				</div>
 				<div class="modal-body">
 					<div class="lightbox-content container-fluid cp-lightbox-container">
@@ -20,8 +20,16 @@
 						<?php endif; ?>
 						</div>
 						<div class="cp-lightbox-nav-overlay" style="display: block;">
-							<a href="#" class="glyphicon glyphicon-chevron-left lightbox-nav-left" style="line-height: 612px;"></a>
-							<a href="#" class="glyphicon glyphicon-chevron-right lightbox-nav-right" style="line-height: 612px;"></a>
+							<?php
+								$lightboxNavLeftClasses = $filter->apply('cppress-lightbox-navleft-classes', [
+									'glyphicon', 'glyphicon-chevron-left', 'lightbox-nav-left'
+								], $item);
+								$lightboxNavRightClasses = $filter->apply('cppress-lightbox-navleft-classes', [
+									'glyphicon', 'glyphicon-chevron-right', 'lightbox-nav-right'
+								], $item);
+							?>
+							<a href="#" class="<?php echo implode(' ', $lightboxNavLeftClasses); ?>"></a>
+							<a href="#" class="<?php echo implode(' ', $lightboxNavRightClasses); ?>"></a>
 						</div>
 					</div>
 				</div>

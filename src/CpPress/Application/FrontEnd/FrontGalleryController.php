@@ -49,6 +49,7 @@ class FrontGalleryController extends WPController{
 		$this->assign('galleryId', $id);
 		$this->assign('title', $options['wtitle']);
 		$this->assign('item', $item);
+        $this->assign('filter', $this->filter);
 	}
 	
 	

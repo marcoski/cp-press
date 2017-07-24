@@ -552,20 +552,9 @@
 				preloader.width = originalWidth / originalHeight * preloader.height;
 			}
 			that.$element.css({
-				'z-index': 4000
+				'z-index': 20000
 			});
-			that.$element.find('.lightbox-modal').css({
-				'width': preloader.width + padLeft + padRight,
-				'height': preloader.height + padTop + padBottom,
-			});
-			that.$element.find('.lightbox-content').css({
-				'width': preloader.width + padLeft + padRight,
-				'height': preloader.height + padTop + padBottom
-			});
-			$image.css({
-				'width': preloader.width + padLeft + padRight,
-				'height': preloader.height + padTop + padBottom
-			});
+
 
 			// We have everything sized!
 			callbacks.fire();

@@ -19,6 +19,18 @@ class CpWidgetGallery extends CpWidgetBase{
 				array(),
 				$templateDirs
 		);
+
+        $this->frontScripts = array(
+            array(
+                'source' => 'cp-lightbox',
+                'deps' => array('bootstrap')
+            ),
+        );
+        $this->frontStyles = array(
+            array(
+                'source' => 'cp-lightbox'
+            )
+        );
 		$this->icon = 'dashicons-format-gallery';
 	}
 
