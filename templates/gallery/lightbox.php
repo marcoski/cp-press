@@ -1,4 +1,4 @@
-<div id="<?php echo $lightboxId ?>" 
+<div id="<?php echo $lightboxId ?>"
 			class="cp-lightbox lightbox hide fade"  
 			tabindex="-1" role="dialog" 
 			aria-hidden="true" 
@@ -8,7 +8,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="lightbox" aria-hidden="true">×</button>
-					<h4 class="modal-title"><? echo $filter->apply('cppress-lightbox-title', $title, $item); ?></h4>
+					<h4 class="modal-title"><?php echo $gallery_title; ?></h4>
 				</div>
 				<div class="modal-body">
 					<div class="lightbox-content container-fluid cp-lightbox-container">

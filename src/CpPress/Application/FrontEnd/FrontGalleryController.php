@@ -44,10 +44,10 @@ class FrontGalleryController extends WPController{
 	}
 	
 	public function lightbox($id, $lid, $item, $options){
-		$salt = md5(serialize($item).$options['wtitle']);
+		$salt = md5(serialize($item).$options['title']);
 		$this->assign('lightboxId', $lid);
 		$this->assign('galleryId', $id);
-		$this->assign('title', $options['wtitle']);
+		$this->assign('gallery_title', $options['title']);
 		$this->assign('item', $item);
         $this->assign('filter', $this->filter);
 	}

@@ -220,15 +220,19 @@ body.lightbox-open,
   opacity: 1;
 }
 
-.cp-lightbox .glyphicon-chevron-left {
-  left: 0;
+.cp-lightbox .lightbox-nav-left {
+    position: absolute;
+  left: -5px;
+    top: 50%;
   float: left;
   padding-left: 15px;
   text-align: left;
 }
 
-.cp-lightbox .glyphicon-chevron-right {
-  right: 0;
+.cp-lightbox .lightbox-nav-right {
+    position: absolute;
+  right: -5px;
+    top: 50%;
   float: right;
   padding-right: 15px;
   text-align: right;
