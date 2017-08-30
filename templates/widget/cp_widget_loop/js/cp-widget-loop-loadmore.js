@@ -4,7 +4,7 @@
 		var data = $(this).data();
 		var $_that = $(this);
 		data = $.extend({'action': 'cppress_loop_loadmore', '_cppress_front_ajax': 1}, data);
-		data.options.offset = data.options.limit*data.next;
+		data.options.offset = data.options.limit * (data.next-1);
 		$(this).insertAndFadeIn('<i class="fa fa-refresh fa-spin fa-fw"></i>');
 		$.post(data.url, data, function(response){
 			$('#cppress_more_posts_news').insertAndFadeIn(response.data);
