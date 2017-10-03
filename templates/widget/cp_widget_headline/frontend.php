@@ -21,8 +21,7 @@
 	if($headContainerClasses !== ''){
 		echo '<div class="'.$headContainerClasses.'">';
 	}
-
-	$headClasses = $filter->apply('cppress_widget_heading_classes', $instance['titleclass'] === '' ? array() : array($instance['titleclass']), $instance);
+	$headClasses = $filter->apply('cppress_widget_heading_classes', $instance['titleclass'], $instance);
 	$haedStyles = $filter->apply('cppress_widget_heading_styles', $styles, $instance);
 	echo '<' . $instance['htag'];
 	echo !empty($headClasses) ? ' class="'. implode(' ', $headClasses) . '"' : '';
