@@ -7,24 +7,22 @@ use CpPress\Application\WP\Admin\PostMeta;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\WP\Theme\Editor;
 use CpPress\Application\WP\Theme\Media\Image;
+use CpPress\Application\WP\Hook\Filter;
+use Commonhelp\WP\WPTemplate;
 
 class SliderController extends WPController{
 	
-	public function __construct($appName, RequestInterface $request, $templateDirs = array()){
+	private $backEndFilter;
+	
+	public function __construct($appName, RequestInterface $request, $templateDirs = array(), Filter $filter){
 		parent::__construct($appName, $request, $templateDirs);
+		$this->backEndFilter = $filter;
 	}
 	
 	public function image($fields, $values, $imagesRepeater){
 		$this->assign('fields', $fields);
 		$this->assign('values', $values);
 		$this->assign('images', $imagesRepeater);
-	}
-	
-	public function parallax($fields, $values, $sentencesRepeater, $media){
-		$this->assign('fields', $fields);
-		$this->assign('values', $values);
-		$this->assign('sentences', $sentencesRepeater);
-		$this->assign('media', $media);
 	}
 	
 	public function single_post($fields, $values, $postRepeater){
@@ -36,25 +34,19 @@ class SliderController extends WPController{
 	/**
 	 * @responder wpjson
 	 */
-	public function xhr_add($media, $linker, $editor){
+	public function xhr_add($media, $linker, $taxonomier, $editor){
 		$id = $this->getParam( 'id' );
 		$name = $this->getParam('name');
 		$count = $this->getParam('count', 0);
-		$this->assign('values', $this->getParam('values', array()));
+		$values = array_merge($this->getParam('values', array()), $this->getParam('widget', array()));
+		$this->assign('values', $values);
 		$this->assign('linker', $linker);
+		$this->assign('taxonomier', $taxonomier);
 		$this->assign('media', $media);
 		$this->assign('editor', $editor);
 		$this->assign('id', $id);
 		$this->assign('name', $name);
-	}
-	
-	/**
-	 * @responder wpjson
-	 */
-	public function xhr_add_parallax(){
-		$this->assign('id', $this->getParam( 'id' ));
-		$this->assign('name', $this->getParam('name'));
-		$this->assign('values', $this->getParam('values', array()));
+		$this->assign('filter', $this->backEndFilter);
 	}
 	
 	/**

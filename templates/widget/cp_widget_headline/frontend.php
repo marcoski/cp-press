@@ -1,6 +1,5 @@
 <?php
 	echo $args['before_widget'];
-	
 	if(isset($instance['font']['css_import'])){
 		echo '<style type="text/css">' . $instance['font']['css_import'] . '</style>';
 	}
@@ -18,8 +17,12 @@
 	if($instance['color'] != ''){
 		$styles['color'] = $instance['color'];
 	}
-	
-	$headClasses = $filter->apply('cppress_widget_heading_classes', array('test'), $instance);
+	$headContainerClasses = $filter->apply('cppress_widget_heading_container_classes', $instance['containerclass'], $instance);
+	if($headContainerClasses !== ''){
+		echo '<div class="'.$headContainerClasses.'">';
+	}
+
+	$headClasses = $filter->apply('cppress_widget_heading_classes', $instance['titleclass'] === '' ? array() : array($instance['titleclass']), $instance);
 	$haedStyles = $filter->apply('cppress_widget_heading_styles', $styles, $instance);
 	echo '<' . $instance['htag'];
 	echo !empty($headClasses) ? ' class="'. implode(' ', $headClasses) . '"' : '';
@@ -31,6 +34,11 @@
 		echo '"';
 	}
 	echo '>';
+	echo $filter->apply('cppress_widget_heading_before_title', '', $instance['wtitle'], $instance['htag']);
 	echo $instance['wtitle'];
+	echo $filter->apply('cppress_widget_heading_after_title', '', $instance['wtitle'], $instance['htag']);
 	echo '</' . $instance['htag'] . '>';
+	if($headContainerClasses !== ''){
+		echo '</div>';
+	}
 	echo $args['after_widget'];

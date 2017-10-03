@@ -1,9 +1,9 @@
 <?php
 namespace CpPress\Application\FrontEnd;
 
+use Commonhelp\App\Http\JsonResponse;
 use \Commonhelp\WP\WPController;
 use CpPress\Application\WP\Hook\Filter;
-use CpPress\Application\WP\Theme\Media\Image;
 use Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Query\Query;
 use Commonhelp\WP\WPTemplate;
@@ -11,6 +11,7 @@ use Commonhelp\Util\Inflector;
 use CpPress\Application\BackEnd\FieldsController;
 use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\PostController;
+use CpPress\Application\WP\Theme\Paginate\AjaxPaginator;
 
 class FrontPostController extends WPController{
 	
@@ -28,8 +29,8 @@ class FrontPostController extends WPController{
 		if($posts['postspercolumn'] != '' && $posts['postspercolumn'] > 0){
 			$this->assign('postWidth', floor(12/$posts['postspercolumn']));
 		}else{
-			if($this->wpQuery->found_posts > 0){
-				$this->assign('postWidth', floor(12/$this->wpQuery->found_posts));
+			if($this->wpQuery->post_count > 0){
+				$this->assign('postWidth', floor(12/$this->wpQuery->post_count));
 			}else{
 				$this->assign('postWidth', 12);
 			}
@@ -60,6 +61,41 @@ class FrontPostController extends WPController{
 		$this->assign('wpQuery', $this->wpQuery);
 		$this->setWpAjaxData('data', $data);
 	}
+
+
+	public function xhr_search(){
+		$posts = array();
+		$queryArgs = $this->request->getParam('query');
+		$this->wpQuery->setLoop($queryArgs);
+		$i=0;
+		while($this->wpQuery->have_posts()){
+			$this->wpQuery->the_post();
+			$posts[$i]['id'] = get_the_ID();
+			$posts[$i]['title'] = get_the_title();
+			$posts[$i]['permalink'] = get_the_permalink();
+			$posts[$i]['excerpt'] = get_the_excerpt();
+			$posts[$i]['date'] = get_the_date('');
+			$posts[$i]['author'] = get_the_author();
+			$posts[$i]['thumbnail'] = get_the_post_thumbnail(null, 'post-thumbnail', array('class' => 'img-responsive'));
+			$posts[$i]['terms'] = wp_get_post_terms(get_the_ID());
+			$posts[$i]['categories'] = wp_get_post_categories(get_the_ID(), array('fields' => 'all_with_object_id'));
+			$posts[$i] = $this->filter->apply('cppress_search_post', $posts[$i]);
+			$i++;
+		}
+		$this->wpQuery->reset_postdata();
+		return new JsonResponse($this->filter->apply('cppress_search_posts', $posts));
+	}
+
+	public function xhr_paginate(){
+		$queryArgs = $this->request->getParam('query', array());
+		$queryArgs['paged'] = $this->request->getParam('paged', 1);
+		$this->wpQuery->query($queryArgs);
+		$paginator = new AjaxPaginator($this->wpQuery, $this->filter);
+		return new JsonResponse(array(
+			'html' => $paginator->renderAllElements(),
+			'query' => $paginator->getQueryVar()
+		));
+	}
 	
 	public function single($instance){
 		if(isset($instance['postid']) && $instance['postid'] != ''){
@@ -67,7 +103,6 @@ class FrontPostController extends WPController{
 		}else{
 			$this->wpQuery->setLoop(FrontPostController::getQueryArgs($instance));
 		}
-		
 		$this->assignTemplate($instance, 'single');
 		$this->assign('filter', $this->filter);
 		$this->assign('instance', $instance);
@@ -151,7 +186,7 @@ class FrontPostController extends WPController{
 			$nextLinkText = $this->filter->apply('cppress-pagination-naexlink-text', __('Next', 'cppress') . ' &raquo;');
 			$els[] = sprintf('<li><a href="%s">%s</a></li>', get_pagenum_link($paged+1), $nextLinkText);
 		}
-		
+
 		return sprintf($pagination, implode("\n", $els));
 	}
 	
@@ -213,7 +248,19 @@ class FrontPostController extends WPController{
 		foreach(get_object_taxonomies($instance['posttype']) as $taxonomy){
 			if(array_key_exists($taxonomy, $convertTaxonomyToFormForCompatibility)){
 				$convertedTaxonomy = $convertTaxonomyToFormForCompatibility[$taxonomy];
-				if(isset($instance[$convertedTaxonomy[0]])){
+                if(isset($instance[$convertedTaxonomy[1]])){
+                    $excludeValues = array();
+                    foreach($instance[$convertedTaxonomy[1]] as $toExclude => $val){
+                        $excludeValues[] = $instance[$convertedTaxonomy[0]][$toExclude];
+
+                    }
+                    $taxQuery[] = array(
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => $excludeValues,
+                        'operator' => 'NOT IN'
+                    );
+                }else if(isset($instance[$convertedTaxonomy[0]])){
 					$includeValues = $instance[$convertedTaxonomy[0]];
 					if(isset($instance[$convertedTaxonomy[1]])){
 						$includeValues = array();
@@ -229,22 +276,21 @@ class FrontPostController extends WPController{
 						'terms' => $includeValues
 					);
 				}
-				if(isset($instance[$convertedTaxonomy[1]])){
-					$excludeValues = array();
-					foreach($instance[$convertedTaxonomy[1]] as $toExclude => $val){
-						$excludeValues[] = $instance[$convertedTaxonomy[0]][$toExclude];
-						
-					}
-					$taxQuery[] = array(
-							'taxonomy' => $taxonomy,
-							'field' => 'term_id',
-							'terms' => $excludeValues,
-							'operator' => 'NOT IN'
-					);
-				}	
 			}else{
 				/** TODO HANDLE CUSTOM AND NEW TAXONOMIES */
-				if(isset($instance[$taxonomy][$taxonomy])){
+                if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
+                    $excludeValues = array();
+                    foreach($instance[$taxonomy]['exclude_' . $taxonomy] as $toExclude => $val){
+                        $excludeValues[] = $instance[$taxonomy][$taxonomy][$toExclude];
+
+                    }
+                    $taxQuery[] = array(
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => $excludeValues,
+                        'operator' => 'NOT IN'
+                    );
+                }else if(isset($instance[$taxonomy][$taxonomy])){
 					$includeValues = $instance[$taxonomy][$taxonomy];
 					if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
 						$includeValues = array();
@@ -260,19 +306,7 @@ class FrontPostController extends WPController{
 						'terms' => $includeValues
 					);
 				}
-				if(isset($instance[$taxonomy]['exclude_' . $taxonomy])){
-					$excludeValues = array();
-					foreach($instance[$taxonomy]['exclude_' . $taxonomy] as $toExclude => $val){
-						$excludeValues[] = $instance[$taxonomy][$taxonomy][$toExclude];
-						
-					}
-					$taxQuery[] = array(
-							'taxonomy' => $taxonomy,
-							'field' => 'term_id',
-							'terms' => $excludeValues,
-							'operator' => 'NOT IN'
-					);
-				}
+
 			}
 		}
 		
@@ -307,6 +341,7 @@ class FrontPostController extends WPController{
 			$taxQuery = array_values($taxQuery);
 			$taxQuery['relation'] = 'OR';
 		}
+
 		return $taxQuery;
 	}
 	

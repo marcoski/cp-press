@@ -3,6 +3,7 @@ namespace CpPress\Application;
 
 use Closure;
 use \Commonhelp\WP\WPApplication;
+use CpPress\Application\FrontEnd\FrontFilterController;
 use CpPress\Application\FrontEnd\FrontPageController;
 use CpPress\Application\FrontEnd\FrontSliderController;
 use CpPress\Application\FrontEnd\FrontPostController;
@@ -80,6 +81,18 @@ class FrontEndApplication extends CpPressApplication{
 					),
 					$filter,
 					$c->query('Query')
+			);
+		});
+		$container->registerService(FrontFilterController::class, function($c){
+			$filter = $c->query('FrontEndFilter');
+			return new FrontFilterController(
+				'FilterApp',
+				$c->query('Request'),
+				array(
+					$this->themeRoot
+				),
+				$filter,
+				$c->query('Query')
 			);
 		});
 		$container->registerService('Breadcrumb', function($c){
@@ -186,9 +199,17 @@ class FrontEndApplication extends CpPressApplication{
 			$widget = $this->getWidget($layout, 'cp_widget_contact_form', $container);
 			return $widget['widget']->widget(array(), $widget['data']);
 		});
+		$hookObj->registerFrontEnd('cppress_mailpoet_ajax', function() use ($container){
+			self::main('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter')));
+		});
 		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
-			$request = $container->query('Request');
 			self::main('Post', 'loop_loadmore', $container);
+		});
+		$hookObj->registerFrontEnd('cppress_search', function() use ($container){
+			self::main('Post', 'xhr_search', $container);
+		});
+		$hookObj->registerFrontEnd('cppress_paginate', function() use ($container){
+			self::main('Post', 'xhr_paginate', $container);
 		});
 		$hookObj->execAll();
 	}
@@ -224,7 +245,7 @@ class FrontEndApplication extends CpPressApplication{
 	
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){
 		$filterObj = $this->getContainer()->query('FrontEndFilter');
-		$filterkObj->register($filter, $closure, $priority, $acceptedArgs);
+		$filterObj->register($filter, $closure, $priority, $acceptedArgs);
 	}
 	
 	public function execFilters(){

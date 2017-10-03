@@ -14,8 +14,9 @@
 			$submitClasses = array('btn', 'btn-default');
 			echo $filter->apply('cppress-cf-submit', 
 				'<div class="cppress-cf-submit"><button type="submit" value="' . $submit . '" class="' . implode(' ', $submitClasses) . '">' . $submit . '</button></div>',
-				$submitClasses,
-				$title	
+                $submitClasses,
+				$title,
+                $submit
 			); 
 		?>
 		<?php echo $responseOutput; ?>

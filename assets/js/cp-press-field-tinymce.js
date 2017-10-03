@@ -22,7 +22,9 @@
 						$textarea.trigger('change');
 						$textarea.val(window.switchEditors.pre_wpautop(editor.getContent()));
 					});
-					
+					editor.on('init', function(args){
+						$textarea.trigger('editor.init');
+					});
 					$textarea.on('keyup', function(){
 						editor.setContent(window.switchEditors.wpautop($textarea.val()));
 					});

@@ -6,13 +6,13 @@ use CpPress\Application\FrontEndApplication;
 use Commonhelp\WP\WPContainer;
 
 class ContactFormShortcodeManager extends Shortcode{
-	
+
 	public static $fields;
-	
+
 	private $exec = true;
-	
+
 	private $scannedTags = null;
-	
+
 	public static function init(){
 		self::$fields['text'] = array('title' => __('Text Tag', 'cppress'), 'label' => __('Text', 'cppress'));
 		self::$fields['email'] = array('title' => __('Email Tag', 'cppress'), 'label' => __('Email', 'cppress'));
@@ -27,13 +27,13 @@ class ContactFormShortcodeManager extends Shortcode{
 		self::$fields['acceptance'] = array('title' => __('Acceptance Tag', 'cppress'), 'label' => __('Acceptance', 'cppress'));
 		self::$fields['file'] = array('title' => __('File', 'cppress'), 'label' => __('File', 'cppress'));
 	}
-	
+
 	public function __construct(WPContainer $container){
 		$this->container = $container;
 		parent::__construct();
 		$this->enctype = null;
 	}
-	
+
 	public function register(){
 		foreach(self::$fields as $k => $f){
 			$this->addShortcode($k, function($tag) use($k){
@@ -44,16 +44,16 @@ class ContactFormShortcodeManager extends Shortcode{
 			});
 		}
 	}
-	
+
 	public function getScannedTags(){
 		return $this->scannedTags;
 	}
-	
+
 	public function scanShortcode($content){
 		$this->doShortcode($content, false);
 		return $this->getScannedTags();
 	}
-	
+
 	public function doShortcode($content, $exec=true){
 		$this->exec = (bool) $exec;
 		$this->scannedTags = array();
@@ -65,22 +65,22 @@ class ContactFormShortcodeManager extends Shortcode{
 			return $this->doShortCodeTag($m);
 		}, $content );
 	}
-	
-	public function getRegex(){
+
+	public function getRegex(array $tagNames = array()){
 		$tagNames = array_keys($this->toArray());
 		$tagregexp = join('|', array_map( 'preg_quote', $tagNames));
 		return '(\[?)'
-				. '\[(' . $tagregexp . ')(?:[\r\n\t ](.*?))?(?:[\r\n\t ](\/))?\]'
-				. '(?:([^[]*?)\[\/\2\])?'
-				. '(\]?)';
+		       . '\[(' . $tagregexp . ')(?:[\r\n\t ](.*?))?(?:[\r\n\t ](\/))?\]'
+		       . '(?:([^[]*?)\[\/\2\])?'
+		       . '(\]?)';
 	}
-	
+
 	protected function doShortCodeTag($m){
 		// allow [[foo]] syntax for escaping a tag
 		if($m[1] == '[' && $m[6] == ']'){
 			return substr( $m[0], 1, -1 );
 		}
-		
+
 		$tag = $m[2];
 		$attr = $this->parseAtts($m[3]);
 		$scannedTag = array(
@@ -103,36 +103,37 @@ class ContactFormShortcodeManager extends Shortcode{
 						return $m[0]; // Invalid name is used. Ignore this tag.
 					}
 				}
-				
+
 				$scannedTag['options'] = (array) $attr['options'];
 			}
-			
+
 			$scannedTag['raw_values'] = (array) $attr['values'];
 			$scannedTag['values'] = $scannedTag['raw_values'];
 			$scannedTag['labels'] = $scannedTag['values'];
-			
+
 		}else{
 			$scannedTag['attr'] = $attr;
 		}
-		
+
 		$scannedTag['values'] = array_map('trim', $scannedTag['values']);
 		$scannedTag['labels'] = array_map('trim', $scannedTag['labels']);
-		
+
 		$content = trim($m[5]);
 		$content = preg_replace("/<br[\r\n\t ]*\/?>$/m", '', $content);
 		$scannedTag['content'] = $content;
-		
+
 		//$scannedTag = apply_filters( 'wpcf7_form_tag', $scannedTag, $this->exec );
-		
+
 		$this->scannedTags[] = $scannedTag;
 		if ($this->exec){
 			$func = $this[$tag];
+
 			return $m[1] . call_user_func($func, $scannedTag) . $m[6];
 		}else{
 			return $m[0];
 		}
 	}
-	
+
 	public function parseAtts($text){
 		$atts = array('options' => array(), 'values' => array());
 		$text = preg_replace("/[\x{00a0}\x{200b}]+/u", " ", $text );
@@ -149,10 +150,10 @@ class ContactFormShortcodeManager extends Shortcode{
 		}else{
 			$atts = $text;
 		}
-		
+
 		return $atts;
 	}
-	
+
 	public static function stripQuoteDepp($arr){
 		if(is_string($arr)){
 			return self::stripQuote($arr);
@@ -165,58 +166,58 @@ class ContactFormShortcodeManager extends Shortcode{
 			return $result;
 		}
 	}
-	
+
 	public static function stripQuote($text){
 		$text = trim( $text );
-		
+
 		if (preg_match('/^"(.*)"$/', $text, $matches)){
 			$text = $matches[1];
 		}else if(preg_match("/^'(.*)'$/", $text, $matches)){
 			$text = $matches[1];
 		}
-		
+
 		return $text;
 	}
-	
+
 	public static function flatJoin($input){
 		$input = self::flatten($input);
 		$output = array();
 		foreach((array) $input as $value){
-			$output[] = trim((string) $value); 
+			$output[] = trim((string) $value);
 		}
-		
+
 		return implode(', ', $output);
 	}
-	
+
 	public static function flatten($input){
 		if(!is_array($input)){
 			return array($input);
 		}
-		
+
 		$output = array();
 		foreach($input as $value){
-			$ouput = array_merge($output, self::flatten($value));
+			$output = array_merge($output, self::flatten($value));
 		}
-		
+
 		return $output;
 	}
-	
+
 	public function isMultiPartForm(){
 		foreach($this->scannedTags as $tag){
 			if($tag['baseType'] == 'file'){
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public function getEnctype(){
 		return $this->enctype;
 	}
-	
+
 	protected function isName($string){
 		return preg_match('/^[A-Za-z][-A-Za-z0-9_:.]*$/', $string);
 	}
-	
+
 }

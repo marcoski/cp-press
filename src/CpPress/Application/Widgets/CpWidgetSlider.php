@@ -77,36 +77,34 @@ class CpWidgetSlider extends CpWidgetBase{
 			$slider[$i]['title'] = $slides['title'][$i];
 			$slider[$i]['content'] = $slides['content'][$i];
 			$slider[$i]['link'] = array();
-			if($slides['link'][$i] != ""){
+			if($slides['link'][$i] !== ""){
 				$slider[$i]['link']['url'] = $slides['link'][$i];
-				if(filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
+                if(!FieldsController::isLinkArgs($slider[$i]['link']['url']) && filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
+                    $slider[$i]['link']['isext'] = true;
+                }else{
+                    $slider[$i]['link']['isext'] = false;
+                    $slider[$i]['link']['url'] = FieldsController::getLinkPermalink($slider[$i]['link']['url']);
+                    if('' === $slider[$i]['link']['url'] || false === $slider[$i]['link']['url'] || null === $slider[$i]['link']['url']){
+                        $slider[$i]['link'] = array();
+                    }
+                }
+			}
+			if(null !== $slides[$i]['taxonomy'] && $slides[$i]['taxonomy'] !== ""){
+				$slider[$i]['link']['url'] = $slides['taxonomy'][$i];
+				if(!FieldsController::isLinkArgs($slider[$i]['link']['url']) && filter_var($slider[$i]['link']['url'], FILTER_SANITIZE_URL)){
 					$slider[$i]['link']['isext'] = true;
-				}
-				if(is_numeric($slider[$i]['link']['url'])){
+				}else{
 					$slider[$i]['link']['isext'] = false;
-					$slider[$i]['link']['url'] = get_permalink($slider[$i]['link']['url']);
+					$slider[$i]['link']['url'] = FieldsController::getTaxonomyPermalink($slider[$i]['link']['url']);
 					if(!$slider[$i]['link']['url']){
 						$slider[$i]['link'] = array();
 					}
 				}
 			}
+			$slider[$i]['captionalign'] = $slides['captionalign'][$i];
 			$slider[$i]['displaytitle'] = $slides['displaytitle'] == 1 ? true : false;
 			$slider[$i]['displaycontent'] = $slides['displaycontent'] == 1 ? true : false;
 		}
-		return $slider;
-	}
-	
-	private function widgetParallax($instance){
-		$slides = $instance['parallax']; $count = $instance['parallax']['countitem'];
-		$slider = array();
-		for($i=0; $i<$count; $i++){
-			$slider['slide'][$i] = $slide['slides'][$i];
-		}
-		$slider['subtitle'] = $slides['subtitle'];
-		$slider['displaytitle'] = $slides['displaytitle'] == 1 ? true : false;
-		$slider['displayoverlay'] = $slides['displayoverlay'] == 1 ? true : false;
-		$slider['nextlink'] = $slides['nextlink'];
-		$slider['bg'] = $slides['img'];
 		return $slider;
 	}
 	
@@ -155,20 +153,6 @@ class CpWidgetSlider extends CpWidgetBase{
 				)
 			),	
 		);
-		$parallaxParams = array(
-			array('id' => $this->get_field_id('parallax'), 'name' => $this->get_field_name('parallax')),
-			$instance['parallax'],
-			$this->getRepeater(
-				'parallax',
-				$instance['parallax'],
-				array('add' => 'widget_slider_add_sentences'),
-				array(
-					'title' => __('Slides', 'cppress'),
-					'item' => __('Slide', 'cppress')
-				)
-			),
-			$this->getMedia($instance['parallax'], 'parallax')	
-		);
 		$singlePostParams = array(
 				array('id' => $this->get_field_id('singlepost'), 'name' => $this->get_field_name('singlepost')),
 				$instance,
@@ -183,16 +167,15 @@ class CpWidgetSlider extends CpWidgetBase{
 				),
 		);
 		$image = BackEndApplication::part('SliderController', 'image', $this->container, $imageParams);
-		$parallax = BackEndApplication::part('SliderController', 'parallax', $this->container, $parallaxParams);
 		$advanced = $this->getAdvPost($instance);
 		$singlePost = BackEndApplication::part('SliderController', 'single_post', $this->container, $singlePostParams);
 		$accordion = BackEndApplication::part(
 			'FieldsController', 'accordion', $this->container,
 			array(
 				__('Sliders', 'cppress'),
-				array(__('Image slider', 'cppress'), __('Parallax slider', 'cppress'), __('Posts slider', 'cppress'), __('Single post slider', 'cppress')),
-				array('image', 'parallax', 'post', 'singlepost'),
-				array($image, $parallax, $advanced, $singlePost),
+				array(__('Image slider', 'cppress'), __('Posts slider', 'cppress'), __('Single post slider', 'cppress')),
+				array('image', 'post', 'singlepost'),
+				array($image, $advanced, $singlePost),
 				array(
 					'name' => $this->get_field_name('type'),
 					'value' => $instance['type'] != '' ? $instance['type'] : array()

@@ -1,0 +1,21 @@
+{
+    "name": "commonhelp/client",
+    "description": "Http Client interface request: CURL or Stream",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco 'Marcoski' Trognoni",
+            "email": "mtrognon@commonhelp.it",
+            "homepage": "http://www.commonhelp.it",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+    	"php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": { "Commonhelp\\Client": "" }
+    },
+}

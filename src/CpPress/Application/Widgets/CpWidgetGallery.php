@@ -19,6 +19,18 @@ class CpWidgetGallery extends CpWidgetBase{
 				array(),
 				$templateDirs
 		);
+
+        $this->frontScripts = array(
+            array(
+                'source' => 'cp-lightbox',
+                'deps' => array('bootstrap')
+            ),
+        );
+        $this->frontStyles = array(
+            array(
+                'source' => 'cp-lightbox'
+            )
+        );
 		$this->icon = 'dashicons-format-gallery';
 	}
 
@@ -67,7 +79,7 @@ class CpWidgetGallery extends CpWidgetBase{
 		if($instance['template']){
 			$salt = md5(serialize($gallery).$options['wtitle']);
 			$gid = $this->filter->apply(
-				'cppress_widget_gallery_id', 'cppress-carousel-'. $salt , $gallery['items'], $options
+				'cppress_widget_gallery_id', 'cppress-'.$instance['template'].'-'. $salt , $gallery['items'], $options
 			);
 			$lid = $this->filter->apply(
 					'cppress_widget_gallery_lightbox_id', 'cppress-carousel-lightbox-'.$salt, $gallery['items'], $options
@@ -76,6 +88,7 @@ class CpWidgetGallery extends CpWidgetBase{
 			if($options['enablelightbox']){
 				$lightbox = FrontEndApplication::part('Gallery', 'lightbox', $this->container, array($gid, $lid, $gallery['items'][0], $options));
 			}
+
 			$galleryHtml = FrontEndApplication::part('Gallery', $instance['template'], $this->container, array($gid, $lid, $gallery, $options));
 			$this->assign('galleryHtml', $galleryHtml);
 			$this->assign('lightbox', $lightbox);

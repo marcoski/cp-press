@@ -1,6 +1,6 @@
 <?php
 	$options = $filter->apply('cppress_widget_gallery_options', $options, $items);
-	$galleryClasses = $filter->apply('cppress_widget_gallery_classes', array('carousel', 'slide', $options['galleryclass']), $items, $options);
+	$galleryClasses = $filter->apply('cppress_widget_gallery_classes', array('carousel', 'slide', 'cp-gallery', $options['galleryclass']), $items, $options);
 	$galleryAttrs = $filter->apply('cppress_widget_gallery_attrs', array(
 			'id' => $galleryId,
 			'class' => implode(' ', $galleryClasses),

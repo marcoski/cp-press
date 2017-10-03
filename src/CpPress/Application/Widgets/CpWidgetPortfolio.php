@@ -52,7 +52,17 @@ class CpWidgetPortfolio extends CpWidgetBase{
 				}
 			}
 		}
+
 		$this->wpQuery->setLoop($queryArgs);
+		$this->wpQuery->order(function($posts, Query $query){
+			$orderPosts = [];
+			$orderMap = $query->query['post__in'];
+			foreach($posts as $k => $p){
+				$orderPosts[array_search($p->ID, $orderMap)] = $p;
+			}
+			ksort($orderPosts);
+			return $orderPosts;
+		});
 		$this->assign('wpQuery', $this->wpQuery);
 		if(isset($instance['itemperrow']) && $instance['itemperrow'] !== ''){
 			$instance['rowclass'] = floor(12/$instance['itemperrow']);

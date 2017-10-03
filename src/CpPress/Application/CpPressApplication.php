@@ -111,7 +111,7 @@ abstract class CpPressApplication extends WPApplication{
 		$hookObj->register($hook, $closure, $priority, $acceptedArgs);
 	}
 	
-	protected function setup(){
+	public function setup(){
 	/*	global $wp_scripts, $wp_styles;
 		//init styles and scripts global
 		$wp_styles = $this->getStyles();

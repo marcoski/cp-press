@@ -1,0 +1,22 @@
+{
+    "name": "commonhelp/config",
+    "description": "Configuration library",
+    "type": "library",
+    "require": {
+        "php": ">=5.4",
+        "commonhelp/util": ""
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco 'Marcoski' Trognoni",
+            "email": "mtrognon@commonhelp.it",
+            "homepage": "http://www.commonhelp.it",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": { "Commonhelp\\Config": "" }
+    },
+}

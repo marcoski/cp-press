@@ -25,7 +25,7 @@ if(!function_exists('render_widget')){
 				$classes[] = 'cpwidget-last-child';
 			}
 			$id = 'cpwidget-' . $postId . '-' . $section . '-' . $grid . '-' . $cell . '-' . $panel;
-			$classes = apply_filters( 'cppress_layout_widget_classes', $classes, $widget, $instance, $widget_info );
+			$classes = apply_filters( 'cppress_layout_widget_classes', $classes, $widget, $instance);
 			$classes = explode( ' ', implode( ' ', $classes ) );
 			$classes = array_filter( $classes );
 			$classes = array_unique( $classes );
@@ -50,6 +50,20 @@ if(!function_exists('render_widget')){
 			}
 			
 		}
+	}
+}
+
+if(!function_exists('get_style_attr')){
+	function get_style_attr($styleArray){
+		if(empty($styleArray)){
+			return "";
+		}
+		$css = "";
+		foreach($styleArray as $property => $value){
+			$css .= $property.': '.$value.';';
+		}
+
+		return $css;
 	}
 }
 
@@ -81,13 +95,19 @@ foreach($sections as $skey => $grids){
 		$gridAttrs = $filter->apply('cppress_layout_grid_attrs', array(
 				'class' => implode(' ', $gridClasses)
 		), $grid, $section['slug']);
-		echo $filter->apply('cppress_layout_before_grid', '', $grid, $gridAttrs, $section['slug']);
-		echo '<div';
-		foreach($gridAttrs as $name => $value){
-			echo ' ' . $name . '="' . $value . '"';
+		$gridStyle = get_style_attr($filter->apply('cppress_layout_grid_style', $grid['style'], $grid, $section['slug']));
+		if($gridStyle !==  ''){
+			$gridAttrs['style'] = $gridStyle;
 		}
-		echo '>';
-		echo $filter->apply('cppress_layout_before_grid_container', "", $grid, $gridAttrs, $section['slug']);
+		echo $filter->apply('cppress_layout_before_grid', '', $grid, $gridAttrs, $section['slug']);
+		if($filter->apply('cppress_layout_print_grid_open', true, $grid, $section['slug'])) {
+			echo '<div';
+			foreach ( $gridAttrs as $name => $value ) {
+				echo ' ' . $name . '="' . $value . '"';
+			}
+			echo '>';
+			echo $filter->apply('cppress_layout_before_grid_container', "", $grid, $gridAttrs, $section['slug']);
+		}
 		unset($cells['data']);
 		foreach($cells as $ckey => $widgets){
 			$cell = $widgets['data'];
@@ -96,13 +116,19 @@ foreach($sections as $skey => $grids){
 			$cellClasses = $filter->apply('cppress_layout_cell_classes', $cClasses, $post->ID, $cell, $section['slug']);
 			$cellAttrs = $filter->apply('cppress_layout_cell_attrs', array(
 					'class' => implode(' ', $cellClasses)
-			), $cell);
-			echo $filter->apply('cppress_layout_before_cell', "", $cell, $cellAttrs, $section['slug']);
-			echo '<div';
-			foreach($cellAttrs as $name => $value){
-				echo ' ' . $name . '="' . $value . '"';
+			), $cell, $section['slug']);
+			$cellStyle = get_style_attr($filter->apply('cppress_layout_cell_style', $cell['style'], $cell, $section['slug']));
+			if($cellStyle !==  ''){
+				$cellAttrs['style'] = $cellStyle;
 			}
-			echo '>';
+			if($filter->apply('cppress_layout_print_cell_open', true, $cell, $section['slug'])) {
+				echo $filter->apply( 'cppress_layout_before_cell', "", $cell, $cellAttrs, $section['slug'] );
+				echo '<div';
+				foreach ( $cellAttrs as $name => $value ) {
+					echo ' ' . $name . '="' . $value . '"';
+				}
+				echo '>';
+			}
 			
 			unset($widgets['data']);
 			echo $filter->apply('cppress_layout_widget_before', '', $cell, $section['slug']);
@@ -110,12 +136,16 @@ foreach($sections as $skey => $grids){
 				render_widget($widgetsFactory, $widget, $widget['widget_info'], $skey, $gkey, $ckey, $wkey, $wkey == 0, $wkey == count( $widgets ) - 1, $post->ID);
 			}
 			echo $filter->apply('cppress_layout_widget_after', '', $cell, $section['slug']);
-			echo '</div>';
-			echo $filter->apply('cppress_layout_after_cell', "", $cell, $cellAttrs, $section['slug']);
+			if($filter->apply('cppress_layout_print_grid_close', true, $cell, $section['slug'])) {
+				echo '</div>';
+				echo $filter->apply( 'cppress_layout_after_cell', "", $cell, $cellAttrs, $section['slug'] );
+			}
 		}
 		echo $filter->apply('cppress_layout_after_grid_container', "", $grid, $gridAttrs, $section['slug']);
-		echo '</div>';
-		echo $filter->apply('cppress_layout_after_grid', "", $grid, $gridAttrs, $section['slug']);
+		if($filter->apply('cppress_layout_print_grid_close', true, $grid, $section['slug'])) {
+			echo '</div>';
+			echo $filter->apply( 'cppress_layout_after_grid', "", $grid, $gridAttrs, $section['slug'] );
+		}
 	}
 	echo $filter->apply('cppress_layout_grid_container_close', '</div>', $section['slug']);
 	

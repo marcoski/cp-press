@@ -84,7 +84,7 @@
         this.$form.addClass('spam');
       }else if(1 == data.mailSent){
         $responseOutput.addClass('cppress-cf-mail-sent-ok');
-        $this.$form.addClass('sent');
+        this.$form.addClass('sent');
         if(data.onSentOk){
           _.each(data.onSentOk, function(el, i){ eval(el); });
         }
@@ -103,7 +103,7 @@
       
       $(data.into).trigger('cppress-cf:submit');
       if(1 == data.mailSent){
-        this.resetForm();
+        this.$form.resetForm();
       }
       
       this.$form.find('[placeholder].placeheld').each(function(i, n){

@@ -1,12 +1,10 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Button Title', 'cppress')?>:</label>
-  <input class="widefat"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
-<?= $link ?>
+<?php echo $link; ?>
+<?php echo $taxonomy; ?>
 <div class="cp-widget-field">
     <label for="<?= $widget->get_field_id( 'opennew' ); ?>">
     	<input class="widefat"
@@ -95,8 +93,8 @@
 		  	name="<?= $widget->get_field_name( 'align' ); ?>">
 					<option value="left" <?php selected($instance['align'], 'left'); ?>><?php _e('Left', 'cppress') ?></option>
 					<option value="right" <?php selected($instance['align'], 'right'); ?>><?php _e('Right', 'cppress') ?></option>
-					<option value="center" <?php selected($instance['align'], '1.4'); ?>><?php _e('Center', 'cppress') ?></option>
-					<option value="justify" <?php selected($instance['align'], '1.8'); ?>><?php _e('Justify', 'cppress') ?></option>
+					<option value="center" <?php selected($instance['align'], 'center'); ?>><?php _e('Center', 'cppress') ?></option>
+					<option value="justify" <?php selected($instance['align'], 'justify'); ?>><?php _e('Justify', 'cppress') ?></option>
 			</select>
 		</div>
 	</div>

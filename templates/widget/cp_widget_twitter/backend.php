@@ -1,10 +1,7 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
-  <input class="widefat"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <div class="cp-widget-field cp-widget-input">
 	<label for="<?php echo $widget->get_field_id( 'twitter_screen_name' ); ?>"><?php _e( 'Twitter Screen Name:', 'cppress' ); ?></label>

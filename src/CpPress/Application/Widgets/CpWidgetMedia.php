@@ -1,6 +1,7 @@
 <?php
 namespace CpPress\Application\Widgets;
 
+use CpPress\Application\BackEnd\FieldsController;
 use CpPress\Application\BackEndApplication;
 use CpPress\Application\WP\Theme\Media\Image;
 
@@ -57,22 +58,39 @@ class CpWidgetMedia extends CpWidgetBase{
 	 */
 	public function widget($args, $instance) {
 		$embed = $this->container->query('Embed');
-		if($instance['external'] != '' && filter_var($instance['external'], FILTER_VALIDATE_URL)){
+		if($instance['video'] != '' && filter_var($instance['video'], FILTER_VALIDATE_URL)){
+			$this->assign('isVideo', true);
+			$this->assign('isImage', false);
 			try{
-				$instance['oembed'] = $embed->getEmbedObj($instance['external']);
+				$instance['oembed'] = $embed->getEmbedObj($instance['video']);
 			}catch(Exception $e){
-				$instance['link'] = $instance['extrenal'];
+				$instance['link'] = $instance['video'];
 				$instance['oembed'] = null;
 			}
 		}else if($instance['media'] != ''){
+			$this->assign('isVideo', false);
+			$this->assign('isImage', true);
 			$image = new Image();
 			$image->set($instance['media']);
 			$imageSrc = $image->getImage($instance['media']);
 			$instance['link'] = $imageSrc[0];
 			$instance['oembed'] = null;
 		}
+		if($instance['desturi'] !== ""){
+			if(!FieldsController::isLinkArgs($instance['desturi']) && filter_var($instance['desturi'], FILTER_SANITIZE_URL)){
+			}else{
+				$instance['desturi'] = FieldsController::getLinkPermalink($instance['desturi']);
+			}
+		}
+		if(null !== $instance['desttaxonomy'] && $instance['desttaxonomy'] !== ""){
+			if(!FieldsController::isLinkArgs($instance['desttaxonomy']) && filter_var($instance['desttaxonomy'], FILTER_SANITIZE_URL)){
+			}else{
+				$instance['desturi'] = FieldsController::getTaxonomyPermalink($instance['desttaxonomy']);
+			}
+		}
 		unset($instance['external']);
 		unset($instance['media']);
+		$this->assignTemplate($instance, 'media_widget');
 		return parent::widget($args, $instance);
 	}
 
@@ -105,7 +123,16 @@ class CpWidgetMedia extends CpWidgetBase{
 					$instance['desturi']
 				)
 		);
+		$taxonomy = BackEndApplication::part(
+			'FieldsController', 'taxonomy_button', $this->container,
+			array(
+				$this->get_field_id( 'desttaxonomy' ),
+				$this->get_field_name( 'desttaxonomy' ),
+				$instance['desttaxonomy']
+			)
+		);
 		$this->assign('link', $link);
+		$this->assign('taxonomy', $taxonomy);
 		$this->assign('media', $media);
 		return parent::form($instance);
 	}

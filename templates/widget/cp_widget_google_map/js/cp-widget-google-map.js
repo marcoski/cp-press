@@ -6,6 +6,10 @@ var CpGoogleMap = function($) {
 
       var userMapTypeId = 'user_map_style';
 
+      if(null === options.scroll_zoom){
+        options.scroll_zoom = false;
+      }
+
       var mapOptions = {
         zoom: zoom,
         scrollwheel: options.scroll_zoom,

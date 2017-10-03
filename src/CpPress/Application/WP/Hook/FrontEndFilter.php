@@ -20,10 +20,9 @@ class FrontEndFilter extends Filter{
 			if($post->post_type == 'page'){
 				$layout = PostMeta::find($post->ID, 'cp-press-page-layout');
 				if(!empty($layout)){
-						$pageContent = $this->app->main(Inflector::camelize($post->post_type), 'layout', $container, array($post, $layout, $content));
+						$content = $this->app->part(Inflector::camelize($post->post_type), 'layout', $container, array($post, $layout, $content));
 				}
 			}
-			
 			return $content;
 		});
 		
@@ -49,6 +48,13 @@ class FrontEndFilter extends Filter{
 				}
 			}
 			return $template;
+		});
+
+		$this->register('cppress_embed_oembed_html', function($html){
+			if(false !== strpos($html, 'iframe')){
+				return '<div class="cp-video-container">'.$html.'</div>';
+			}
+			return $html;
 		});
 	}
 	

@@ -25,7 +25,7 @@ class CpWidgetLoop extends CpWidgetBase{
 		);
 		$this->frontScripts = array(
 				array(
-						'source' => 'ajaxloop',
+						'source' => 'cp-widget-loop-loadmore',
 						'deps' => array('jquery')
 				),
 		);

@@ -28,7 +28,7 @@ class NewsTaxonomy extends Taxonomy{
 		$this->setLabel(__('News Categories', 'cppress'));
 		$this->setSingularLabel(__('News Category', 'cppress'));
 		$this->setRewrite(array(
-			'slug' => $slug,
+			'slug' => 'news-category',
 			'with_front' => false,
 			'hierarchical' => false
 		));

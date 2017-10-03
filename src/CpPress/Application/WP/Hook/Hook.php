@@ -1,7 +1,6 @@
 <?php
 namespace CpPress\Application\WP\Hook;
 
-use Closure;
 use CpPress\Application\CpPressApplication;
 
 abstract class Hook{
@@ -14,7 +13,7 @@ abstract class Hook{
 		$this->registered = array();
 	}
 	
-	public function register($hook, Closure $closure, $priority=10, $acceptedArgs = 1){
+	public function register($hook, callable $closure, $priority=10, $acceptedArgs = 1){
 		$this->registered[$hook][] = array(
 			$closure,
 			$priority,

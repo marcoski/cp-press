@@ -25,11 +25,11 @@ use CpPress\Application\WP\Query\Query;
 use CpPress\Application\WP\MetaType\PostType;
 use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\BackEnd\FieldsController;
-use Commonhelp\Util\Hash;
 use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
 use CpPress\Application\BackEnd\MultiLanguageController;
 use Commonhelp\Util\Inflector;
+use CpPress\Application\WP\Admin\SettingsInterface;
 
 class BackEndApplication extends CpPressApplication{
 
@@ -69,7 +69,7 @@ class BackEndApplication extends CpPressApplication{
 		});
 		$container->registerService('CpPressSettings', function($c) use($container){
 			$menu = $container->query('WpOptionMenu');
-			return new Settings('cppress_settings', 'cppress', $menu, $c);
+			return new Settings('cppress_settings', $menu);
 		});
 		$container->registerService('WpEditor', function($c){
 			return new Editor();
@@ -95,25 +95,19 @@ class BackEndApplication extends CpPressApplication{
 		$menu->add(function(){
 			self::main('SettingsController', 'main', $this->getContainer());
 		});
-		$settings = $this->getSettings();
-		$settings->addSections();
-		$settings->addFields();
-		$settings->registerAll();
+		$this->getSettings()->createSettingsSection();
 	}
 
 	public function registerBackEndAjax(){
 		$hookObj = $this->getContainer()->query('AjaxHook');
-		$hookObj->register('page_sidebar_grid', function(){
-			self::main('PageController', 'xhr_page_sidebar', $this->getContainer(), array('grid'));
-		});
-		$hookObj->register('page_widget_form', function(){
-			self::main('PageController', 'xhr_page_widget_form', $this->getContainer());
-		});
 		$hookObj->register('icon_family', function(){
 			self::main('FieldsController', 'xhr_icon_family', $this->getContainer());
 		});
 		$hookObj->register('widget_search_post', function(){
 			self::main('PostController', 'xhr_widget_search_post', $this->getContainer());
+		});
+		$hookObj->register('widget_search_taxonomy', function(){
+			self::main('PostController', 'xhr_widget_search_taxonomy', $this->getContainer());
 		});
 		$hookObj->register('contact_form_tag', function(){
 			self::main('ContactFormController', 'xhr_taggenerator', $this->getContainer());
@@ -185,7 +179,8 @@ class BackEndApplication extends CpPressApplication{
 									'teeny' => false,
 									'media_buttons' => false,
 									'editor_height' => 230
-							)
+							),
+							$request->getParam('widget', null)
 					)
 			);
 			self::main('FieldsController', 'xhr_marker', $container, array($editor));
@@ -237,9 +232,9 @@ class BackEndApplication extends CpPressApplication{
 			$request = $container->query('Request');
 			$val = $request->getParam('values', array());
 			if(!empty($val)){
-				$link = $val['link']; $img = $val['img']; $imgExt = $val['img_ext']; $content = $val['content'];
+				$link = $val['link']; $img = $val['img']; $imgExt = $val['img_ext']; $content = $val['content']; $taxonomy = $val['taxonomy'];
 			}else{
-				$link = ''; $img = ''; $imgExt = ''; $content = '';
+				$link = ''; $img = ''; $imgExt = ''; $content = ''; $taxonomy = '';
 			}
 			$media = BackEndApplication::part(
 				'FieldsController', 'media_button', $this->container,
@@ -262,7 +257,14 @@ class BackEndApplication extends CpPressApplication{
 					$request->getParam('id').'_link',
 					$request->getParam('name').'[link][]',
 					$link,
-					$validPostTypes
+				)
+			);
+			$taxonomier = self::part(
+				'FieldsController', 'taxonomy_button', $container,
+				array(
+					$request->getParam('id').'_taxonomy',
+					$request->getParam('name').'[taxonomy][]',
+					$taxonomy,
 				)
 			);
 			$editor = self::part(
@@ -275,13 +277,11 @@ class BackEndApplication extends CpPressApplication{
 						'teeny' => false,
 						'media_buttons' => false,
 						'editor_height' => 230
-					)
+					),
+					$request->getParam('widget', null)
 				)	
 			);
-			self::main('SliderController', 'xhr_add', $this->getContainer(), array($media, $linker, $editor));
-		});
-		$hookObj->register('widget_slider_add_sentences', function(){
-			self::main('SliderController', 'xhr_add_parallax', $this->getContainer());
+			self::main('SliderController', 'xhr_add', $this->getContainer(), array($media, $linker, $taxonomier, $editor));
 		});
 		$hookObj->register('widget_slider_add_singlepost', function(){
 			$container = $this->getContainer();
@@ -315,7 +315,7 @@ class BackEndApplication extends CpPressApplication{
 		$hook->massRegister();
 	}
 
-	public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1){+
+	public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1){
 		$hookObj = $this->getContainer()->query('BackEndHook');
 		$hookObj->register($hook, $closure, $priority, $acceptedArgs);
 	}
@@ -332,7 +332,7 @@ class BackEndApplication extends CpPressApplication{
 
 	public function registerFilter($filter, Closure $closure, $priority=10, $acceptedArgs=1){
 		$filterObj = $this->getContainer()->query('BackEndFilter');
-		$filterkObj->register($filter, $closure, $priority, $acceptedArgs);
+		$filterObj->register($filter, $closure, $priority, $acceptedArgs);
 	}
 
 	public function execFilters(){
@@ -340,26 +340,23 @@ class BackEndApplication extends CpPressApplication{
 		$filter->execAll();
 	}
 
+	/**
+	 * @param SettingsInterface $settings
+	 */
 	public function getSettings($settings=''){
 		return $this->getContainer()->query('CpPress'.$settings.'Settings');
 	}
 
 	public function save($id){
 		$container = $this->getContainer();
-		$page = $container->query('PageController');
-		$page->save($id);
 		$event = $container->query('EventController');
 		$event->save($id);
-		$attachment = $container->query('AttachmentController');
-		$attachment->save($id);
-		$multiLanguage = $container->query('MultiLanguageController');
-		$multiLanguage->save($id);
 	}
 
 	private function registerControllers(){
 		$container = $this->getContainer();
 		$container->registerService('FieldsController', function($c){
-			return new FieldsController('FieldApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
+			return new FieldsController('FieldApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('SocialmediaController', function($c){
 			return new SocialmediaController('SocialmediaApp', $c->query('Request'), array($this->themeRoot), $this->themeUri);
@@ -393,7 +390,7 @@ class BackEndApplication extends CpPressApplication{
 			return new EventController('EventApp', $c->query('Request'), array($this->themeRoot));
 		});
 		$container->registerService('GalleryController', function($c){
-			return new GalleryController('GalleryApp', $c->query('Request'), array($this->themeRoot));
+			return new GalleryController('GalleryApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('PortfolioController', function($c){
 			return new PortfolioController(
@@ -404,13 +401,13 @@ class BackEndApplication extends CpPressApplication{
 			);
 		});
 		$container->registerService('SliderController', function($c){
-			return new SliderController('SliderApp', $c->query('Request'), array($this->themeRoot));
+			return new SliderController('SliderApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('DialogController', function($c){
 			return new DialogController('DialogApp', $c->query('Request'), array($this->themeRoot));
 		});
 		$container->registerService('ContactFormController', function($c){
-			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot));
+			return new ContactFormController('ContactFormApp', $c->query('Request'), array($this->themeRoot), $c->query('BackEndFilter'));
 		});
 		$container->registerService('MultiLanguageController', function($c){
 			return new MultiLanguageController('LanguageApp', $c->query('Request'), array($this->themeRoot));

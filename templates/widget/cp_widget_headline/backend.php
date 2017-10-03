@@ -1,10 +1,7 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Text', 'cppress')?>:</label>
-  <input class="widefat"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'htag' ); ?>"><?php _e('H Tag', 'cppress')?>:</label>
@@ -40,6 +37,24 @@
 					<option value="center" <?php selected($instance['align'], 'center'); ?>><?php _e('Center', 'cppress') ?></option>
 					<option value="justify" <?php selected($instance['align'], 'justify'); ?>><?php _e('Justify', 'cppress') ?></option>
 			</select>
+		</div>
+		<div class="cp-widget-field">
+			<label
+				for="<?= $widget->get_field_id( 'titleclass' ); ?>"><?php _e( 'Title class', 'cppress' ) ?>
+				:</label>
+			<input class="widefat"
+			       id="<?= $widget->get_field_id( 'titleclass' ); ?>"
+			       name="<?= $widget->get_field_name( 'titleclass' ); ?>"
+			       value="<? isset( $instance['titleclass'] ) ? e( $instance['titleclass'] ) : e( '' ); ?>"/>
+		</div>
+		<div class="cp-widget-field">
+			<label
+				for="<?= $widget->get_field_id( 'containerclass' ); ?>"><?php _e( 'Title container class', 'cppress' ) ?>
+				:</label>
+			<input class="widefat"
+			       id="<?= $widget->get_field_id( 'containerclass' ); ?>"
+			       name="<?= $widget->get_field_name( 'containerclass' ); ?>"
+			       value="<? isset( $instance['containerclass'] ) ? e( $instance['containerclass'] ) : e( '' ); ?>"/>
 		</div>
 	</div>
 </div>

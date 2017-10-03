@@ -9,9 +9,20 @@
 		}
 	?>
 	</div>
-	<textarea 
-		id="<?php echo $widget['form']['id']; ?>" 
-		name="<?php echo $widget['form']['name']; ?>" cols="100" rows="14" class="large-text code">
-		<?php echo trim($instance['form']); ?>	
+	<?php
+	$attrs = $filter->apply('cppress_widget_attrs', array(
+		'id' => $widget['form']['id'],
+		'name' => $widget['form']['name'],
+		'class' => "large-text code code-editor",
+		'cols' => "100",
+		'rows' => "14"
+	), $instance, 'form');
+	?>
+	<textarea
+		<?php foreach($attrs as $name => $value){
+			echo ' '.$name.'="'.$value.'"';
+		}?>
+	>
+	<?php echo $filter->apply('cppress_widget_content', $instance['form'], $instance); ?>
 	</textarea>
 </div>

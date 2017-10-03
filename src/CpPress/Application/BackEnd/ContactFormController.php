@@ -6,14 +6,19 @@ use \Commonhelp\App\Http\RequestInterface;
 use CpPress\Application\WP\Admin\Settings;
 use CpPress\Application\WP\Admin\PostMeta;
 use CpPress\Application\WP\Shortcode\ContactFormShortcodeManager;
+use Commonhelp\WP\WPTemplate;
+use CpPress\Application\WP\Hook\Filter;
 
 class ContactFormController extends WPController{
 	
 	private $options;
 	private $fields;
 	
-	public function __construct($appName, RequestInterface $request, $templateDirs = array()){
+	private $backEndFilter;
+	
+	public function __construct($appName, RequestInterface $request, $templateDirs = array(), Filter $backEndFilter){
 		parent::__construct($appName, $request, $templateDirs);
+		$this->backEndFilter = $backEndFilter;
 		$this->options = get_option('cppress-options-contactform');
 		$this->fields = ContactFormShortcodeManager::$fields;
 	}
@@ -22,6 +27,7 @@ class ContactFormController extends WPController{
 		$this->assign('fields', $this->fields);
 		$this->assign('fields_json', htmlspecialchars(json_encode($this->fields, JSON_HEX_TAG)));
 		$this->assign('instance', $instance);
+		$this->assign('filter', $this->backEndFilter);
 		$this->assign('widget', $widget);
 	}
 	
@@ -40,10 +46,12 @@ class ContactFormController extends WPController{
 		$this->assign('shortcode', '[' . $args['hclass'] .' ' . $name . ']');
 	}
 	
-	public function mail_template_form($instance, $widget, $link){
+	public function mail_template_form($instance, $widget, $link, WPTemplate $template){
 		$this->assign('instance', $instance);
 		$this->assign('widget', $widget);
 		$this->assign('link', $link);
+		$this->assign('template', $template);
+		$this->assign('filter', $this->backEndFilter);
 	}
 	
 }

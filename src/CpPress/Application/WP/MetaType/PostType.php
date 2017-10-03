@@ -1,8 +1,8 @@
 <?php
 namespace CpPress\Application\WP\MetaType;
 
+use CpPress\Application\WP\Theme\Feature\BaseFeature;
 use CpPress\Exception\PostTypeException;
-use CpPress\Exception\CpPress\Exception;
 use CpPress\Application\WP\Admin\MetaBox;
 
 class PostType extends MetaType{
@@ -70,9 +70,11 @@ class PostType extends MetaType{
 			}
 			
 			throw new PostTypeException('Invalid feature for post type support '.$feature);
-		}else if($feature instanceof MetaBox){
-			$feature->setPostType($this);
+		}else if($feature instanceof MetaBox) {
+			$feature->setPostType( $this );
 			$feature->add();
+		}else if($feature instanceof BaseFeature){
+			$feature->set('post_type', $this);
 		}else{
 			throw new PostTypeException('Invalid feature for post type support '.$feature);
 		}

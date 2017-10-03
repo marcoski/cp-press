@@ -176,7 +176,6 @@
           .attr('href', this.iconsCache[family].style)
           .appendTo('head');
 	     }
-	     
 	     for(var i in this.iconsCache[family].icons){
 	       var icon = $('<div data-cp-icon="' + this.iconsCache[family].icons[i] +  '"/>')
 	         .attr('data-value', family + '-' + i)
@@ -328,8 +327,9 @@
       },
       
       cpAjax: null,
-      interval: null,
-      validTypes: null,
+      intervalTimeOut: null,
+      args: null,
+      action: null,
       $search: null,
       $input: null,
       $wtitle: null,
@@ -339,7 +339,13 @@
       
       initialize: function(){
         this.cpAjax = $.fn.cpajax(this);
-        this.validTypes = this.$el.data('valid-types');
+        if(this.$el.hasClass('cp-widget-field-type-taxonomy')){
+            this.args = this.$el.data('excluded-taxonomies');
+            this.action = 'widget_search_taxonomy'
+        }else{
+            this.args = this.$el.data('valid-types');
+            this.action = 'widget_search_post';
+        }
         this.$search = this.$el.find('.content-text-search');
         this.$input = this.$el.find('.url-input-wrapper input');
         this.$wtitle = $("[name*='[wtitle]']").not('.cp-widget-title-noedit');
@@ -349,7 +355,7 @@
       
       toggle: function(e){
         e.preventDefault();
-        $$ = $(e.target);
+        var $$ = $(e.target);
         $$.blur();
         this.setPosition($$);
         this.$s.toggle();
@@ -366,10 +372,17 @@
       select: function(e){
         e.preventDefault();
         var $$ = $(e.target);
-        if(this.$wtitle.length > 0){
-        	this.$wtitle.val($$.data('post_title'));
-        }
-        this.$input.val($$.data('post_type') + ': ' + $$.data('ID'));
+          if(this.$el.hasClass('cp-widget-field-type-taxonomy')){
+              if(this.$wtitle.length > 0){
+                  this.$wtitle.val($$.data('name'));
+              }
+              this.$input.val($$.data('taxonomy') + ': ' + $$.data('slug'));
+          }else{
+              if(this.$wtitle.length > 0){
+                  this.$wtitle.val($$.data('post_title'));
+              }
+              this.$input.val($$.data('post_type') + ': ' + $$.data('ID'));
+          }
         this.$input.trigger('change');
         this.$input.trigger('linker.change');
         this.$s.toggle();
@@ -377,8 +390,8 @@
       
       interval: function(){
         var _that = this;
-        if(this.interval !== null){
-          clearTimeout(this.interval);
+        if(this.intervalTimeOut !== null){
+          clearTimeout(this.intervalTimeOut);
         }
         
         this.interval = setTimeout(function(){
@@ -390,28 +403,14 @@
         var _that = this;
         var query = this.$search.val();
         this.$ul.empty().addClass('loading');
-        this.cpAjax.call('widget_search_post', function(data){
+        this.cpAjax.call(this.action, function(data){
         	if(data.length > 0){
 	          for(var i=0; i<data.length; i++){
-	            if(data[i].post_title === ''){
-	              data[i].post_title = '&nbsp;';
-	            }
-	            
-	            var title;
-	            if(data[i].post_title.length > 30){
-	              title = data[i].post_title.substring(0, 30) + '...';
-	            }else{
-	              title = data[i].post_title;
-	            }
-	            
-	            _that.$ul.append(
-	              $('<li>')
-	                .addClass('post')
-	                .html(title + ' <span>('+data[i].post_type+')</span>')
-	                .data(data[i])
-	            );
-	            
-	            
+                  if(_that.$el.hasClass('cp-widget-field-type-taxonomy')){
+                      _that.renderTaxonomy(data[i]);
+                  }else{
+                      _that.renderPost(data[i]);
+                  }
 	          } 
 	         }else{
 	         		_that.$ul.append(
@@ -421,8 +420,47 @@
 	           	);
 	         }
 	         _that.$ul.removeClass('loading');
-        }, {query: query, valid: this.validTypes});
-        
+        }, {query: query, args: this.args});
+      },
+
+      renderPost: function(obj){
+          if(obj.post_title === ''){
+              obj.post_title = '&nbsp;';
+          }
+
+          var title;
+          if(obj.post_title.length > 30){
+              title = obj.post_title.substring(0, 30) + '...';
+          }else{
+              title = obj.post_title;
+          }
+
+          this.$ul.append(
+              $('<li>')
+                  .addClass('post')
+                  .html(title + ' <span>('+obj.post_type+')</span>')
+                  .data(obj)
+          );
+      },
+
+      renderTaxonomy: function(obj){
+          if(obj.name === ''){
+              obj.name = '&nbsp;';
+          }
+
+          var title;
+          if(obj.name.length > 30){
+              title = obj.name.substring(0, 30) + '...';
+          }else{
+              title = obj.name;
+          }
+
+          this.$ul.append(
+              $('<li>')
+                  .addClass('post')
+                  .html(title + ' <span>('+obj.taxonomy+')</span>')
+                  .data(obj)
+          );
       }
   
   });
@@ -488,13 +526,15 @@
       this.$counter.val(this.countItem);
       this.$items.append($item);
       $item.addClass('loading');
+      var args = {id: this.data.itemId, name: this.data.elementName, values: values, count: this.countItem};
+      $(document).trigger('repeater.preadd', [args]);
       this.cpAjax.call(this.data.action.add, function(html){
-        $item.find('.cp-widget-field-repeater-item-form').append(html.data);
-        $.CpField.fn.enable($item, {exclude: ['repeater']});
-        $item.removeClass('loading');
-        _that.sortObj.refresh();
-        $item.trigger('repeater.add');
-      }, {id: this.data.itemId, name: this.data.elementName, values: values, count: this.countItem});
+        	$item.find('.cp-widget-field-repeater-item-form').append(html.data);
+        	$.CpField.fn.enable($item, {exclude: ['repeater']});
+        	$item.removeClass('loading');
+        	_that.sortObj.refresh();
+        	$item.trigger('repeater.add');
+      }, args);
     },
     
     change: function(e){

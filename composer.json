@@ -1,32 +1,36 @@
 {
-    "name": "commonhelp/cppress",
-    "type": "project",
-    "description": "Wordpress plugin for application development",
-    "keywords": ["wordpress","plugin", "application"],
-    "homepage": "https://github.com/marcoski/cp-press",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Marco 'Marcoski' Trognoni",
-            "email": "mtrognon@commonhelp.it",
-            "homepage": "http://www.commonhelp.it",
-            "role": "Developer"
-        }
-    ],
-    "autoload": {
-    	"psr-4": {
-    		"CpPress\\": "src/CpPress"
-    	}
-    },
-    "minimum-stability": "dev",
-	"repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/marcoski/commonhelp"
-        }
-    ],
-    "require": {
-     	"php": ">=5.4",
-        "commonhelp/libs": "0.5.x-dev"
-    }
+	"name" : "commonhelp/cppress",
+	"type" : "project",
+	"description" : "Wordpress plugin for application development",
+	"keywords" : [
+		"wordpress",
+		"plugin",
+		"application"
+	],
+	"homepage" : "https://github.com/marcoski/cp-press",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Marco 'Marcoski' Trognoni",
+			"email" : "mtrognon@commonhelp.it",
+			"homepage" : "http://www.commonhelp.it",
+			"role" : "Developer"
+		}
+	],
+	"autoload" : {
+		"psr-4" : {
+			"CpPress\\" : "src/CpPress",
+			"Commonhelp\\" : "src/Commonhelp"
+		}
+	},
+	"minimum-stability" : "dev",
+	"repositories" : [{
+			"type" : "git",
+			"url" : "https://github.com/marcoski/commonhelp"
+		}
+	],
+	"require" : {
+		"php" : ">=5.6",
+		"ircmaxell/random-lib" : "*",
+		"symfony/ldap" : "*"
+	}
 }

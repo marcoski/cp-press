@@ -28,9 +28,6 @@ class PostController extends WPController{
 		$this->query = $query;
 	}
 	
-	public function singlebox(){
-	}
-	
 	public function advanced(CpWidgetBase $widget, $instance, array $options){
 		$options = wp_parse_args($options, array('single' => false, 'show_view_options' => false));
 		$instance = $this->getTaxonomyInstanceCompatibility($instance);
@@ -77,13 +74,40 @@ class PostController extends WPController{
 		$this->assign('id', $id);
 		$this->assign('value', $value);
 	}
-	
+
+	/**
+	 * @responder wpjson
+	 */
+	public function xhr_widget_search_taxonomy(){
+		$excludedTaxonomies = $this->getParam('args', array());
+		$taxonomies = get_taxonomies(array('public' => true), 'object');
+		$results = array();
+		$query = $this->getParam('query');
+		foreach($taxonomies as $taxonomy){
+			if(in_array($taxonomy->name, $excludedTaxonomies)){
+				continue;
+			}
+			$terms = get_terms(array('taxonomy' => $taxonomy->name, 'hide_empty' => false));
+			foreach($terms as $term){
+				if('' === $query){
+					$results[] = $term;
+				}
+				if(false !== strpos($term->name, $query)){
+					$results[] = $term;
+				}
+			}
+		}
+
+		return $results;
+	}
+
+
 	/**
 	 * @responder wpjson
 	 */
 	public function xhr_widget_search_post(){
 		global $wpdb;
-		$validTypes = $this->getParam('valid', array());
+		$validTypes = $this->getParam('args', array());
 		if(empty($validTypes)){
 			$postTypes = PostType::getPostTypes(array(
 					'public' => true,
@@ -121,8 +145,8 @@ class PostController extends WPController{
 	
 	private function getTaxonomiesRepeater($widget, $instance){
 		$repeaters = array();
-		
-		foreach($this->getTaxonomiesToForm($instance['posttype']) as $taxonomy => $taxonomyRepeater){
+		$postType = isset($instance['posttype']) ? $instance['posttype'] : 'post';
+		foreach($this->getTaxonomiesToForm($postType) as $taxonomy => $taxonomyRepeater){
 			$repeaters[$taxonomy] = BackEndApplication::part(
 					'FieldsController', 'repeater', CpPress::$App->getContainer(),
 					array(
@@ -154,7 +178,7 @@ class PostController extends WPController{
 	}
 	
 	private function getTaxonomy($id){
-		preg_match("/\[[0-9]+\]\[([A-Za-z0-9_]+)\]/", $id, $matches);
+		preg_match("/\\[[0-9]+\\]\\[([A-Za-z0-9_-]+)\\]/", $id, $matches);
 		$taxForm = $matches[1];
 		foreach(PostController::$convertTaxonomyToFormForCompatibility as $taxonomy => $taxCompatibility){
 			if($taxForm === $taxonomy){
@@ -167,6 +191,7 @@ class PostController extends WPController{
 	}
 	
 	private function getTaxonomyInstanceCompatibility($instance){
+		$postType = isset($instance['posttype']) ? $instance['posttype'] : 'post';
 		$taxonomies = get_object_taxonomies($postType);
 		$taxonomies = array_diff_key($taxonomies, PostController::$exludedTaxonomies);
 		foreach(PostController::$convertTaxonomyToFormForCompatibility as $taxonomy => $taxCompatibility){

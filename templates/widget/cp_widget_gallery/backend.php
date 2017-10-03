@@ -1,10 +1,7 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
-  <input class="widefat"
-    id="<?= $widget->get_field_id( 'wtitle' ); ?>"
-    name="<?= $widget->get_field_name( 'wtitle' ); ?>"
-    value="<?= $instance['wtitle']; ?>"
-  />
+  <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <?= $repeater ?>
 <div class="cp-widget-field cp-widget-type-section">
@@ -14,7 +11,7 @@
 			<label><?php _e('Template', 'cppress'); ?></label>
 			<select name="<?= $widget->get_field_name( 'template' ); ?>" >
 				<option value="carousel" <? selected( $instance['template'], 'carousel' ); ?>><?php _e('Carousel', 'cppress'); ?></option>
-				<option value="list" <? selected( $instance['template'], 'glist' ); ?>><?php _e('List', 'cppress') ?></option>
+				<option value="glist" <? selected( $instance['template'], 'glist' ); ?>><?php _e('List', 'cppress') ?></option>
 			</select>
 			<div class="cp-widget-field-description">
 				<?php _e('Gallery frontend template. Default is bootstrap carousel', 'cppress')?>.

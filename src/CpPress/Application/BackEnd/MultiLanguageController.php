@@ -17,8 +17,7 @@ class MultiLanguageController extends WPController{
 		
 	}
 	
-	public function language($post){
-		$country = PostMeta::find($post->ID, 'cp-press-country');
+	public function language($country){
 		$countries = unserialize($this->counriesISO3166);
 		$languages = unserialize($this->languagesISO939);
 		$flagDir = dirname(dirname(plugin_dir_path(CpPress::$FILE))) . '/assets/flags/4x3';

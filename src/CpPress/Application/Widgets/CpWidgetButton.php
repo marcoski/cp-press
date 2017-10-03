@@ -28,6 +28,9 @@ class CpWidgetButton extends CpWidgetBase{
 		if(!filter_var($instance['link'], FILTER_VALIDATE_URL)){
 			$instance['link'] = FieldsController::getLinkPermalink($instance['link']);
 		}
+		if(isset($instance['taxonomy']) && $instance['taxonomy'] !== ''){
+			$instance['link'] = FieldsController::getTaxonomyPermalink($instance['taxonomy']);
+		}
 		$styles = array(
 			'background-color' => $instance['bcolor'] != '' ? $instance['bcolor'] : null,
 			'color' => $instance['bcolor'] != '' ? $instance['tcolor'] : null,
@@ -55,6 +58,14 @@ class CpWidgetButton extends CpWidgetBase{
 						$instance['link'],
 				)
 		);
+		$taxonomy = BackEndApplication::part(
+			'FieldsController', 'taxonomy_button', $this->container,
+			array(
+				$this->get_field_id( 'taxonomy' ),
+				$this->get_field_name( 'taxonomy' ),
+				$instance['taxonomy'],
+			)
+		);
 		$icon = BackEndApplication::part(
 				'FieldsController', 'icon_button', $this->container,
 				array(
@@ -76,6 +87,7 @@ class CpWidgetButton extends CpWidgetBase{
 		);
 		$this->assign('icon', $icon);
 		$this->assign('link', $link);
+		$this->assign('taxonomy', $taxonomy);
 		return parent::form($instance);
 	}
 

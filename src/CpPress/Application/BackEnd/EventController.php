@@ -76,8 +76,12 @@ class EventController extends WPController{
 				$endDateStr = $event['when']['event_end_date'];
 				$dtEnd = \DateTime::createFromFormat('d/m/Y', $endDateStr);
 			}
-			update_post_meta($id, 'cp-press-event-start', $dtStart->getTimestamp());
-			update_post_meta($id, 'cp-press-event-end', $dtEnd->getTimestamp());
+			if(false !== $dtStart){
+                update_post_meta($id, 'cp-press-event-start', $dtStart->getTimestamp());
+            }
+			if(false !== $dtEnd) {
+                update_post_meta($id, 'cp-press-event-end', $dtEnd->getTimestamp());
+            }
 			update_post_meta($id, 'cp-press-event', $_POST['cp-press-event']);
 		}
 	}
