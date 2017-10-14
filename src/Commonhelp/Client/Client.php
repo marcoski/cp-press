@@ -2,7 +2,8 @@
 
 namespace Commonhelp\Client;
 
-use Commonhelp\Client\Exception;
+use Commonhelp\Client\Exception\ClientException;
+use Commonhelp\Client\Exception\InvalidUrlException;
 use Commonhelp\DI\SimpleContainer;
 use Commonhelp\Config\Config;
 
@@ -197,9 +198,7 @@ abstract class Client{
 		if ($url !== '') {
 			$this->url = $url;
 		}
-
 		$response = $this->doRequest();
-
 		$this->statusCode = $response['status'];
 		$this->handleNotModifiedResponse($response);
 		$this->handleNotFoundResponse($response);

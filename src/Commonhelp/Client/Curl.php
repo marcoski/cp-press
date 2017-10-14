@@ -260,7 +260,6 @@ class Curl extends Client{
 
         // Update the url if there where redirects
         $this->url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-
         curl_close($ch);
     }
 
@@ -273,7 +272,6 @@ class Curl extends Client{
      */
     public function doRequest($follow_location = true){
         $this->executeContext();
-
         list($status, $headers) = HttpHeaders::parse(explode("\n", $this->responseHeaders[$this->responseHeadersCount - 1]));
 
         if ($follow_location && ($status == 301 || $status == 302)) {

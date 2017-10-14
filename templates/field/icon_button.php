@@ -24,7 +24,7 @@
       <input class="wp-color-picker" id="<?= $id['color'] ?>" name="<?= $name['color'] ?>" value="<?= $color ?>">
     </div>
     <div class="cp-widget-field">
-      <label for="<?= $id['class'] ?>"><?php _e('Container class', 'cppress')?>:</label>
+      <label for="<?= $id['class'] ?>"><?php _e('Icon class', 'cppress')?>:</label>
       <input class="widefat" id="<?= $id['class'] ?>" name="<?= $name['class'] ?>" value="<?= $class ?>">
     </div>
     <div class="cp-widget-field">

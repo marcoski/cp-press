@@ -40,7 +40,7 @@ class CpWidgetButton extends CpWidgetBase{
 		);
 		$style = $this->filter->apply('cppress_widget_button_style', $this->formatStyles($styles), $instance['wtitle']);
 		$this->assign('style', $style);
-		
+
 		return parent::widget($args, $instance);
 	}
 
@@ -70,18 +70,21 @@ class CpWidgetButton extends CpWidgetBase{
 				'FieldsController', 'icon_button', $this->container,
 				array(
 						array(
-								'icon' => $this->get_field_id( 'icon' ),
-								'color' => $this->get_field_id( 'iconcolor' ),
-								'class' => $this->get_field_id( 'iconclass' ),
+                            'icon' => $this->get_field_id( 'icon' ),
+                            'color' => $this->get_field_id( 'iconcolor' ),
+                            'class' => $this->get_field_id( 'iconclass' ),
+                            'iconposition' => $this->get_field_id('iconposition')
 						),
 						array(
-								'icon' => $this->get_field_name( 'icon' ),
-								'color' => $this->get_field_name( 'iconcolor' ),
-								'class' => $this->get_field_name( 'iconclass' ),
+                            'icon' => $this->get_field_name( 'icon' ),
+                            'color' => $this->get_field_name( 'iconcolor' ),
+                            'class' => $this->get_field_name( 'iconclass' ),
+                            'iconposition' => $this->get_field_name('iconposition')
 						),
 						$instance['icon'],
 						$instance['iconcolor'],
 						$instance['iconclass'],
+						$instance['iconposition'],
 						true
 				)
 		);

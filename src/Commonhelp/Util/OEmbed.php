@@ -47,7 +47,16 @@ class OEmbed{
 			'#https?://(www\.)?reverbnation\.com/.*#i' => array('https://www.reverbnation.com/oembed', true),
 			'#https?://(www\.)?reddit\.com/r/[^/]+/comments/.*#i' => array('https://www.reddit.com/oembed', true),
 			'#https?://(www\.)?speakerdeck\.com/.*#i' => array('https://speakerdeck.com/oembed.{format}', true),
-			'#http://(www\.)?ustream.tv/*#i' => array('http://www.ustream.tv/oembed', true)
+			'#http://(www\.)?ustream.tv/*#i' => array('http://www.ustream.tv/oembed', true),
+            '#https?://www\.facebook\.com/video.php.*#i'      => array('https://www.facebook.com/plugins/video/oembed.json/', true),
+            '#https?://www\.facebook\.com/.*/videos/.*#i'     => array('https://www.facebook.com/plugins/video/oembed.json/', true),
+            '#https?://www\.facebook\.com/.*/posts/.*#i'      => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/.*/activity/.*#i'   => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/photo(s/|.php).*#i' => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/permalink.php.*#i'  => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/media/.*#i'         => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/questions/.*#i'     => array('https://www.facebook.com/plugins/post/oembed.json/', true),
+            '#https?://www\.facebook\.com/notes/.*#i'         => array('https://www.facebook.com/plugins/post/oembed.json/', true)
 		);
 	
 	private $linkTypes =array(
@@ -55,12 +64,16 @@ class OEmbed{
 		'text/xml+oembed' => 'xml',
 		'application/xml+oembed' => 'xml',
 	);
-	
+
+    /**
+     * @var Client;
+     */
 	private $client;
 	private $request;
 	
 	public function __construct(Request $request){
 		$this->client = Client::getInstance();
+		$this->client->setUserAgent('WordPress/;' . home_url());
 		$this->request = $request;
 	}
 	
@@ -333,10 +346,10 @@ class OEmbed{
 	private function fetchWithFormat($provider, $format){
 		$provider = $this->addQueryArg('format', $format, $provider);
 		$this->client->execute($provider);
+
 		if(!$body = $this->client->getContent()){
 			return false;
 		}
-		
 		$parseMethod = 'parse'.Inflector::camelize($format);
 		return $this->$parseMethod($body);
 	}
