@@ -8,7 +8,6 @@ use CpPress\CpPress;
 use CpPress\Application\WP\Admin\Menu\OptionsMenu;
 use CpPress\Application\BackEnd\SettingsController;
 use CpPress\Application\WP\Admin\Settings;
-use CpPress\Application\WP\Admin\Menu\Menu;
 use CpPress\Application\BackEnd\PageController;
 use CpPress\Application\BackEnd\LinkController;
 use CpPress\Application\BackEnd\PostController;
@@ -20,10 +19,8 @@ use CpPress\Application\BackEnd\DialogController;
 use CpPress\Application\BackEnd\NewsController;
 use CpPress\Application\BackEnd\SocialmediaController;
 use CpPress\Application\WP\Theme\Editor;
-use CpPress\Application\WP\Theme\Media\Image;
 use CpPress\Application\WP\Query\Query;
 use CpPress\Application\WP\MetaType\PostType;
-use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\BackEnd\FieldsController;
 use CpPress\Application\BackEnd\AttachmentController;
 use CpPress\Application\BackEnd\ContactFormController;
@@ -298,7 +295,6 @@ class BackEndApplication extends CpPressApplication{
 							$request->getParam('id').'_post',
 							$request->getParam('name').'[post][]',
 							$link,
-							$validPostTypes
 					)
 			);
 			self::main('SliderController', 'xhr_add_singlepost', $this->getContainer(), array($linker));
@@ -369,8 +365,9 @@ class BackEndApplication extends CpPressApplication{
 			return new SettingsController('SettingsApp', $c->query('Request'), array($this->themeRoot), $this->themeUri, $settings);
 		});
 		$container->registerService('PageController', function($c){
+            $hook = $c->query('BackEndHook');
 			$widgets = array();
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($hook->getWidgets() as $widget){
 				$wObj = $c->query($widget);
 				$widgets[$widget] = $wObj;
 			}
@@ -413,6 +410,15 @@ class BackEndApplication extends CpPressApplication{
 			return new MultiLanguageController('LanguageApp', $c->query('Request'), array($this->themeRoot));
 		});
 	}
+
+	public function registerFilesystem(){
+	    WP_Filesystem();
+	    $container = $this->getContainer();
+	    $container->registerService('Filesystem', function(){
+	        global $wp_filesystem;
+	        return $wp_filesystem;
+        });
+    }
 	
 	public static function isAlowedPage($page){
 		return !in_array($page, self::$deniedPages);

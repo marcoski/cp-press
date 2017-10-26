@@ -921,6 +921,7 @@ section.cp_content_type{
 
 .cp-panel-dialog .cp-rows{
   border: 0px;
+    min-height: 400px;
 }
 
 .cp-rows .cp-grid, .cp-rows-inside .cp-grid-inside{
@@ -1001,12 +1002,26 @@ section.cp_content_type{
 	content: '\f211';
 }
 
+
+
 .cp-row-move:hover, .cp-section-move:hover{
 	color: #0c49c4;
 }
 
 .cp-row-move, .cp-section-move{
 	cursor: move;
+}
+
+.cp-row-plus:before{
+    content: '\f133';
+}
+
+.cp-row-plus:hover{
+    color: #0c49c4;
+}
+
+.cp-row-plus{
+    cursor: pointer;
 }
 
 .cp-row-ctype:hover{
@@ -1227,6 +1242,34 @@ table.cp-link tr.cp-link textarea {
 
 .cp-widget-icon{
   float: left;
+}
+
+.cp-widgets-list-button{
+    width: 100%;
+}
+
+.cp-widgets-list-button h3{
+    font-size: 14px;
+    padding: 0px 12px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.cp-widgets-handler-lists{
+    position: absolute;
+    background: white;
+    height: 360px;
+    overflow-y: scroll;
+    padding: 5px;
+}
+
+.cp-widgets-handler-lists .cp-widget-wrapper{
+    height: 30px;
+}
+
+.cp-widgets-handler-lists ul{
+    margin: 0;
+    padding: 0;
 }
 
 .cp-widget-button h3{
@@ -1873,4 +1916,18 @@ table.cp-link tr.cp-link textarea {
 img.cp-multithumbnail {
     max-width: 100%;
     height: auto;
+}
+
+.cp-widget-tinymce-container .ace-active .switch-ace{
+    border-color: #ccc #ccc #e9e9e9;
+    background-color: #e9e9e9;
+    color: #333;
+}
+
+.cp-widget-tinymce-container .ace-active .quicktags-toolbar{
+    display: none;
+}
+
+cp-widget-tinymce-container{
+    width: auto !important;
 }

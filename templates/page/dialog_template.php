@@ -44,6 +44,28 @@
 		</div>
 	</div>
 </script>
+<script type="text/html" id='tmpl-cppress-dialog-widget-handler'>
+    <div class="cp-row-preview row cp-rows nav-menus-php cp-widgets-handler">
+        <# for(var i=0; i<data.count; i++){ #>
+        <div class="cp-grid col-md-{{ data.weight[i] }} cp-row-list" data-cell="{{ i }}">
+            <div class="cp-grid-select">
+                <div class="menu-item-bar">
+                    <div class="menu-item-handle ui-sortable-handle">
+                        <span class="item-title">
+                            <span class="menu-item-title">Select Widget: Column {{ i }}</span>
+                        </span>
+                        <span class="item-controls">
+                            <a class="item-edit cp-widgets-list-expand" id="list-{{ i }}" href="#cp-widgets-list-{{i}}">Select Widget: Column {{ i }}</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item-settings wp-clearfix cp-widgets-handler-lists" id="cp-widgets-list-{{i}}" data-cell="{{ i }}" style="display: none;"></div>
+            <div class="cp-row-droppable"></div>
+        </div>
+        <# } #>
+    </div>
+</script>
 <script type="text/html" id='tmpl-cppress-dialog-cell'>
 	<div class="cp-grid col-md-{{ data.weight }} cp-row-list">
 		<div class="cp-grid-select">

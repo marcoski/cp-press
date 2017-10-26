@@ -40,6 +40,17 @@ abstract class BaseField implements SettingsFieldInterface{
 			$this->args
 		);
 	}
+
+	public function addSilentField(){
+        add_settings_field(
+            $this->id,
+            $this->title,
+            array($this, 'noop'),
+            $this->section->getPage(),
+            $this->section->getId(),
+            $this->args
+        );
+    }
 	
 	public function getId(){
 		return $this->id;
@@ -97,6 +108,10 @@ abstract class BaseField implements SettingsFieldInterface{
 	public function all(){
 		return $this->args;
 	}
+
+	public function noop()
+    {
+    }
 	
 	abstract public function render(array $args);
 	

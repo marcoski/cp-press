@@ -16,9 +16,6 @@ class FeatureFactory implements ServiceProviderInterface {
 		$container->registerService('CpLanguage', function(WPContainer $container){
 			return new LanguageFeature($container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container->query('WPStyles'), $container);
 		});
-		$container->registerService('CpPageWidgets', function(WPContainer $container){
-			return new PageWidgetsFeature($container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container->query('WPStyles'), $container);
-		});
 		$container->registerService('CpPageContent', function(WPContainer $container){
 			return new PageContentFeature($container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container->query('WPStyles'), $container);
 		});
@@ -37,12 +34,6 @@ class FeatureFactory implements ServiceProviderInterface {
 		$language = new LanguageFeature($container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container->query('WPStyles'), $container);
 		$language->hooks();
 		return $language;
-	}
-
-	public static function widgets(ContainerInterface $container){
-		$widgets = new PageWidgetsFeature($container->query('BackEndHook'), $container->query('BackEndFilter'), $container->query('WPScripts'), $container->query('WPStyles'), $container);
-		$widgets->hooks();
-		return $widgets;
 	}
 
 	public static function content(ContainerInterface $container){

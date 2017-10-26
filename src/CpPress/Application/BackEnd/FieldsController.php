@@ -197,7 +197,7 @@ class FieldsController extends WPController {
 			'teeny' => false,
 			'media_buttons' => false,
 			'editor_height' => 230,
-			'editor_class' => 'cp-widget-input'
+			'editor_class' => 'cp-widget-input cp-widget-editor'
 		);
 		$settings = wp_parse_args($settings, $default);
 		$editor = new Editor($widget);

@@ -19,6 +19,7 @@ use CpPress\Application\WP\Asset\Scripts;
 use CpPress\Application\WP\Asset\Styles;
 use CpPress\Application\WP\Hook\Filter;
 use CpPress\Application\WP\Hook\Hook;
+use CpPress\Exception\CpPressException;
 
 class PageContentFeature extends BaseFeature {
 
@@ -53,6 +54,7 @@ class PageContentFeature extends BaseFeature {
 
 	public function adminEnqueueScripts( $hook ) {
 		if(BackEndApplication::isAlowedPage($hook)){
+		    $this->scripts->enqueue('FileSaver');
 			$this->scripts->enqueue('cp-press-dialog', array('backbone', 'underscore', 'wp-util'));
 			$this->scripts->enqueue('cp-press-dragbg');
 			$this->scripts->enqueue('cp-press-admin');
@@ -60,7 +62,7 @@ class PageContentFeature extends BaseFeature {
 			$this->scripts->enqueue('cp-press-page-admin', array('backbone', 'underscore'));
 			$this->scripts->enqueue('cp-press-field-admin', array('backbone', 'underscore'));
 			$this->scripts->enqueue('cp-press-field-tinymce');
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($this->hook->getWidgets() as $widget){
 				$wObj = $this->container->query($widget);
 				$wObj->enqueueAdminScripts();
 				$wObj->localizeAdminScripts();
@@ -80,7 +82,13 @@ class PageContentFeature extends BaseFeature {
 		$template = BackEndApplication::part('PageController', 'page_template', $this->container);
 		$fields = BackEndApplication::part('FieldsController', 'template', $this->container);
 		$pdTemplate = BackEndApplication::part('PageController', 'dialog_template', $this->container);
-		BackEndApplication::main('PageController', 'content', $this->container, array($layout, $dialog, $template, $fields, $pdTemplate));
+		$widgetsTemplate = BackEndApplication::part('PageController', 'widgets_template', $this->container);
+		BackEndApplication::main(
+		    'PageController',
+            'content',
+            $this->container,
+            array($layout, $dialog, $template, $fields, $pdTemplate, $widgetsTemplate)
+        );
 	}
 
 	public function save($postId){
@@ -110,7 +118,10 @@ class PageContentFeature extends BaseFeature {
 	private function saveWidgets($widgets){
 		for($i=0; $i<count($widgets); $i++){
 			$info = $widgets[$i]['widget_info'];
-			$info['class'] = 'CpPress\\Application\\Widgets\\'.Inflector::camelize($info['id_base']);
+			$info['class'] = $this->searchWidgetClass($info['id_base']);
+			if($info['class'] === null){
+			    throw new CpPressException('Invalid Widget Class: '.Inflector::camelize($info['id_base']));
+            }
 			if($info['raw']){
 				$theWidget = new $info['class'];
 				$widgets[$i] = $theWidget->update($widgets[$i], $widgets[$i]);
@@ -120,6 +131,16 @@ class PageContentFeature extends BaseFeature {
 		}
 		return $widgets;
 	}
+
+	private function searchWidgetClass($widget){
+	    foreach($this->hook->getWidgets() as $w){
+	        if(preg_match('/'.Inflector::camelize($widget).'/', $w)){
+	            return $w;
+            }
+        }
+
+        return null;
+    }
 
 
 

@@ -18,21 +18,20 @@ class FrontEventController extends WPController{
 	
 	public function when($post){
 		$event = PostMeta::find($post->ID, 'cp-press-event');
-		if($event['when']['event_start_time'] !== ''){
+		if(isset($event['when']['event_start_time']) && $event['when']['event_start_time'] !== ''){
 			$startDateStr = $event['when']['event_start_date'].' '.$event['when']['event_start_time'];
 			$dtStart = \DateTime::createFromFormat('d/m/Y G:i', $startDateStr);
 		}else{
 			$startDateStr = $event['when']['event_start_date'];
 			$dtStart = \DateTime::createFromFormat('d/m/Y', $startDateStr);
 		}
-		if($event['when']['event_end_time'] !== ''){
+		if(isset($event['when']['event_end_time']) && $event['when']['event_end_time'] !== ''){
 			$endDateStr = $event['when']['event_end_date'].' '.$event['when']['event_end_time'];
 			$dtEnd = \DateTime::createFromFormat('d/m/Y G:i', $endDateStr);
 		}else{
 			$endDateStr = $event['when']['event_end_date'];
 			$dtEnd = \DateTime::createFromFormat('d/m/Y', $endDateStr);
 		}
-		
 		return new DataResponse(array(
 			'start' => $dtStart,
 			'end' => $dtEnd,

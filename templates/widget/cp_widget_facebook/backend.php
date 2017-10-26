@@ -136,5 +136,13 @@
 				<?php _e( '(in pixels, optional)', 'cppress' ); ?><br />
 				<?php _e( 'Leave empty for default sizing', 'cppress' ); ?>
 			</div>
+            <label for="<?= $widget->get_field_id( 'showtitle' ); ?>">
+                <input class="widefat"
+                       id="<?= $widget->get_field_id( 'showtitle' ); ?>"
+                       name="<?= $widget->get_field_name( 'showtitle' ); ?>"
+                       type="checkbox"
+                       value="1" <?php checked( '1', $instance['showtitle'] ); ?> />&nbsp;
+                <?php _e('Show title', 'cppress')?>
+            </label>
 		</div>
 </div>

@@ -53,8 +53,18 @@ class FrontPageController extends WPController{
 		$this->assign('sections', $sections);
 		$this->assign('layout_data', $layout_data);
 		$this->assign('filter', $this->filter);
-		$this->assign('widgetsFactory', $this->widgets);
+		$this->assign('widgetsFactory', $this->makeWidgetsFactory());
 		$this->assign('post', $post);
 	}
+
+	private function makeWidgetsFactory()
+    {
+        $widgetFactory = [];
+        foreach($this->widgets as $className => $widget){
+           $widgetFactory[str_replace('\\', '', $className)] = $widget;
+        }
+
+        return $widgetFactory;
+    }
 	
 }

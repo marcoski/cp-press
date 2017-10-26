@@ -3,13 +3,7 @@ use Commonhelp\Util\Inflector;
 
 if(!function_exists('render_widget')){
 	function render_widget($widgetsFactory, $instance, $widget, $section, $grid, $cell, $panel, $isFirst, $isLast, $postId=false){
-		preg_match("/cp_press_([a-z0-9]*)_([a-z0-9]*)_([a-z0-9_]*)/", Inflector::underscore($widget['class']), $classParts);
-		$widget = (
-				'CpPress' . '\\' .
-				Inflector::camelize($classParts[1]) . '\\' .
-				Inflector::camelize($classParts[2]) . '\\' .
-				Inflector::camelize($classParts[3])
-		);
+		$widget = $widget['class'];
 		if(isset($widgetsFactory[$widget])){
 			$the_widget = $widgetsFactory[$widget];
 			$the_widget = apply_filters( 'cppress_widget_object', $the_widget, $widget, $instance );
@@ -42,8 +36,8 @@ if(!function_exists('render_widget')){
 				'widget_id' => 'widget-' . $grid . '-' . $cell . '-' . $panel
 			);
 			$args = apply_filters('cppress_layout_widget_args', $args);
-			
 			if(!empty($the_widget) && is_a($the_widget, 'WP_Widget')){
+
 				echo $the_widget->widget($args, $instance);
 			}else{
 				echo apply_filters('cppress_layout_missing_widget', $args['before_widget'] . $args['after_widget'], $widget, $args , $instance);

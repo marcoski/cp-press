@@ -557,7 +557,6 @@ jQuery(document).ready(function () {
             gridView.render();
             gridView.$el.appendTo(this.$('.cp-grids-container')).hide().fadeIn();
             this.refreshSortable();
-            this.pageBuilder.initDropable();
         },
 
         initSortable: function () {
@@ -583,7 +582,8 @@ jQuery(document).ready(function () {
         events: {
             "click .cp-row-dropdown[data-action=edit]": "edit",
             "click .cp-row-dropdown[data-action=delete]": "deleteConfirm",
-            "click .cp-row-dropdown[data-action=duplicate]": "duplicate"
+            "click .cp-row-dropdown[data-action=duplicate]": "duplicate",
+            "click .cp-row-plus": "rowWidgetHandling",
         },
 
         initialize: function () {
@@ -612,9 +612,15 @@ jQuery(document).ready(function () {
             this.dialog.render();
             this.dialog.on('grid:edit', function () {
                 this.section.pageBuilder.model.refreshLayoutData();
-                this.section.pageBuilder.initDropable();
             }, this);
             return false;
+        },
+
+        rowWidgetHandling: function(e){
+            this.dialog = new $.CpDialog.widgetHandler.View();
+            this.dialog.setView(this);
+            this.dialog.setModel(this.model);
+            this.dialog.render();
         },
 
         destroy: function () {
@@ -824,7 +830,8 @@ jQuery(document).ready(function () {
             var widgetTitle = this.getTitle();
             this.setElement(this.template({
                 title: widgetTitle,
-                description: this.model.get('description')
+                description: this.model.get('description'),
+                showWidgetOp: true
             }));
             this.$el.data('view', this);
             return this;
@@ -854,14 +861,6 @@ jQuery(document).ready(function () {
 
         $widgetsList: null,
 
-        dragOptions: {
-            snap: '.cp-row-droppable',
-            scrollSpeed: 13,
-            scrollSensitivity: 100
-        },
-
-        dropOptions: {},
-
         events: {
             "click #cp_add_section": "addSection",
             "click #cp_export_content": "export",
@@ -877,14 +876,12 @@ jQuery(document).ready(function () {
             this.layout = JSON.parse(this.$input.val());
             this.listenTo(this.model.sections, "add", this.onSectionAdd);
             this.listenTo(this.model, "change:data", this.storeLayout);
-            this.initDragable();
         },
 
         render: function () {
             $p = $(this.template());
             $p.insertAfter(this.$rowHead);
             this.initSortable();
-            this.initDropable();
             return this;
         },
 
@@ -902,33 +899,10 @@ jQuery(document).ready(function () {
             this.load();
         },
 
-        dropWidget: function (ev, ui) {
-            var cellView = $(ev.target).parent().data('view');
-            cellView.loadWidget(ui.draggable);
-        },
-
         addSection: function () {
             section = new $.CpPage.Model.Section();
             section.setGrids(1, [[12]]);
             this.model.sections.add(section);
-        },
-
-        initDragable: function () {
-            this.$widgetsList = $('#cp-press-page-widgets').find('li.cp-draggable')
-                .cpdragdrop($('div.cp-row-droppable'));
-            _.each(this.$widgetsList, function (el) {
-                el.drag(this.dragOptions);
-            }, this);
-        },
-
-        initDropable: function () {
-            this.dropOptions.drop = this.dropWidget;
-            this.$widgetsList = $('#cp-press-page-widgets').find('li.cp-draggable')
-                .cpdragdrop($('div.cp-row-droppable'));
-            _.each(this.$widgetsList, function (el) {
-                el.setDropable($('div.cp-row-droppable'));
-                el.drop(this.dropOptions);
-            }, this);
         },
 
         initSortable: function () {
@@ -991,7 +965,6 @@ jQuery(document).ready(function () {
             sectionView.$el.appendTo(this.$('#cp_press_rows_container')).hide().fadeIn();
             sectionView.initSortable();
             this.refreshSortable();
-            this.initDropable();
             this.model.refreshLayoutData();
         },
 
@@ -1007,11 +980,12 @@ jQuery(document).ready(function () {
         export: function (e) {
             var data = this.$input.val();
             var file = new Blob([data], {type: 'application/json'});
-            var fileName = 'export-' + this.elData.postname + '-' + this.elData.post + '.json';
-            var a = document.createElement('a');
+            var fileName = 'export-' + this.elData.posttype + '-' + this.elData.postname + '.json';
+            /*var a = document.createElement('a');
             a.href = URL.createObjectURL(file);
             a.download = fileName;
-            a.click();
+            a.click();*/
+            saveAs(file, fileName);
         },
 
         import: function (e) {
@@ -1039,7 +1013,6 @@ jQuery(document).ready(function () {
             };
             reader.readAsText(file);
         }
-
     });
 
     $.CpPage.fn.deleteConfirm = function (e, view) {

@@ -22,7 +22,7 @@ class FrontEndHook extends Hook{
 			$this->app->setup();
 			$this->app->registerFrontEndAjax();
 			$container = $this->app->getContainer();
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($this->getWidgets() as $widget){
 				$container->registerService($widget, function($c) use ($widget){
                     /** @var CpWidgetBase $w */
 					$w = new $widget();
@@ -51,7 +51,7 @@ class FrontEndHook extends Hook{
 			$scripts->enqueue('cp-press-search', array('jquery', 'backbone'), false, true);
 			$scripts->enqueue('cp-press-paginator', array('jquery', 'backbone'), false, true);
 			$this->app->loadCpPressFont();
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($this->getWidgets() as $widget){
 				$container = $this->app->getContainer();
                 /** @var CpWidgetBase $wObj */
 				$wObj = $container->query($widget);

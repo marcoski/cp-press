@@ -10,6 +10,7 @@ namespace CpPress\Application\WP\Theme\Feature;
 
 
 use Commonhelp\WP\WPContainer;
+use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\WP\Admin\MetaBox;
 use CpPress\Application\WP\Asset\Scripts;
 use CpPress\Application\WP\Asset\Styles;

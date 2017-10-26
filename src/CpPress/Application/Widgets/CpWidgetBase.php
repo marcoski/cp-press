@@ -1,6 +1,8 @@
 <?php
 namespace CpPress\Application\Widgets;
 
+use Commonhelp\DI\Container;
+use CpPress\Application\Widgets\Settings\CpWidgetSettings;
 use WP_Widget;
 use Commonhelp\WP\WPIController;
 use Commonhelp\Util\Inflector;
@@ -13,9 +15,12 @@ use CpPress\Application\WP\Asset\Styles;
 
 abstract class CpWidgetBase extends WP_Widget implements WPIController {
 
-	private $vars;
+	protected $vars;
 	protected $templateDirs;
 	protected $icon;
+    /**
+     * @var Container
+     */
 	protected $container;
 	protected $adminScripts = array();
 	protected $adminStyles = array();
@@ -31,6 +36,9 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 	private $styles;
 	protected $filter;
 
+	/** @var   */
+	protected $settings;
+
 	public function __construct( $name, $widget_options = array(), $control_options = array(), array $templateDirs = array() ) {
 		if ( ! empty( $templateDirs ) ) {
 			$this->templateDirs = $templateDirs;
@@ -43,6 +51,8 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 			( new \ReflectionClass( $this ) )->getShortName()
 		);
 		$widget_options['classname'] = Inflector::dasherize( $id_base );
+        $settingsBaseName = str_replace('_', '-', $id_base).'-settings';
+        $this->settings = CpWidgetSettings::getOptions($settingsBaseName);
 		parent::__construct(
 			$id_base,
 			$name,
@@ -193,7 +203,8 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 		$this->assign( 'id_base', $this->id_base );
 		$this->assign( 'filter', $this->filter );
 		$this->assign( 'template', $this->template );
-
+		/** TEMPLATE BACKEND SYSTEM */
+        //dump($this->container->get('Filesystem'));
 		return $this->render();
 	}
 

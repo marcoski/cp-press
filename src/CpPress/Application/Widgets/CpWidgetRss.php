@@ -33,9 +33,8 @@ class CpWidgetRss extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-	/*	if(filter_var($instance['rsslink'], FILTER_VALIDATE_URL)){
+		if(filter_var($instance['rsslink'], FILTER_VALIDATE_URL)){
 			try{
-				$rssConfig = new RssConfig();
 				$resource = $this->reader->download($instance['rsslink']);
 				$parser = $this->reader->getParser(
 						$resource->getUrl(),
@@ -43,14 +42,14 @@ class CpWidgetRss extends CpWidgetBase{
 						$resource->getEncoding()
 				);
 				$parser->enableContentGrabber(true);
+				dump($parser->execute());
 				$this->assign('feeds', $parser->execute());
 			}catch(\Exception $e){
 				$this->assign('feeds', array());
 			}
 		}else{
 			$this->assign('feeds', array());
-		}*/
-		$this->assign('feeds', array());
+		}
 		return parent::widget($args, $instance);
 	}
 

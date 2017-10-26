@@ -20,6 +20,12 @@ class CpWidgetText extends CpWidgetBase{
 				$templateDirs
 		);
 		$this->icon = 'dashicons-text';
+        $this->adminScripts = array(
+            array(
+                'source' => 'cp-text-admin',
+                'deps' => array('jquery', 'backbone', 'underscore')
+            )
+        );
 		$this->frontStyles = array(
 			array(
 				'source' => 'cp-widgettext-responsive-embed'

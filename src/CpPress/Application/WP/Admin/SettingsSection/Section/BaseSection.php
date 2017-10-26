@@ -1,6 +1,7 @@
 <?php
 namespace CpPress\Application\WP\Admin\SettingsSection\Section;
 
+use CpPress\Application\WP\Admin\SettingsField\Field\AccordionField;
 use CpPress\Application\WP\Admin\SettingsSection\SettingsSectionInterface;
 use CpPress\Application\WP\Admin\SettingsField\SettingsFieldFactoryInterface;
 use Commonhelp\Util\Collections\OrderedHashMap;
@@ -10,6 +11,8 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 	protected $id;
 	protected $title;
 	protected $page;
+
+	protected $silent;
 	
 	/**
 	 * @var SettingsSectionInterface;
@@ -30,6 +33,7 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 		$this->settingsFieldFactory = $settingsFieldFactory;
 		$this->parent = null;
 		$this->children = new OrderedHashMap();
+		$this->silent = false;
 	}
 	
 	public function addSection(){
@@ -67,7 +71,10 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 		$this->page = $page;
 		return $this;
 	}
-	
+
+    /**
+     * @return SettingsFieldFactoryInterface
+     */
 	public function getSettingsFieldFactory(){
 		return $this->settingsFieldFactory;
 	}
@@ -75,13 +82,16 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 	public function sanitize(array $inputs){
 		$outputs = array();
 		foreach($inputs as $name => $value){
-			foreach(self::getAllFields($this) as $field){
-				if($field->getName() === $name){
-					$outputs[$name] = $field->sanitize($value);
-				}
+			foreach((array) self::getAllFields($this) as $field){
+                if($field instanceof AccordionField){
+                    $outputs[$name] = $field->sanitize($value);
+                }else{
+                    if($field->getName() === $name){
+                        $outputs[$name] = $field->sanitize($value);
+                    }
+                }
 			}
 		}
-		
 		return $outputs;
 	}
 	
@@ -91,7 +101,7 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 				$fields = array_merge($fields, $child->getSettingsFieldFactory()->all());
 			}
 		}
-		return array_merge($fields, $section->getSettingsFieldFactory()->all());;
+		return array_merge($fields, (array) $section->getSettingsFieldFactory()->all());;
 	}
 	
 	public function getParent(){
@@ -127,7 +137,7 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 	public function remove($id){
 		if(isset($this->children[$id])){
 			$this->children[$id]->setParent(null);
-			unset($this->children[$name]);
+			unset($this->children[$id]);
 		}
 		
 		return $this;
@@ -176,6 +186,10 @@ abstract class BaseSection implements \IteratorAggregate, SettingsSectionInterfa
 	public function count(){
 		return count($this->children);
 	}
+
+	public function isSilent(){
+	    return $this->silent;
+    }
 	
 	abstract public function render();
 }

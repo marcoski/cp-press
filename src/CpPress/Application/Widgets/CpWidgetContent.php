@@ -42,13 +42,17 @@ class CpWidgetContent extends CpWidgetBase{
 	 */
 	public function form($instance){
 		$instance = PostController::correctInstanceForCompatibility($instance);
-		$advanced = BackEndApplication::part(
-				'PostController', 
-				'advanced', 
-				$this->container, 
-				array($this, $instance, array('single' => true, 'show_view_options' => true)
-			)
-		);
+		if(isset($this->settings['cp-widget-content-settings-disable-advanced-options'])){
+		    $advanced = '';
+        }else{
+            $advanced = BackEndApplication::part(
+                'PostController',
+                'advanced',
+                $this->container,
+                array($this, $instance, array('single' => true, 'show_view_options' => true)
+                )
+            );
+        }
 		$posts = BackEndApplication::part(
 				'FieldsController', 'link_button', $this->container,
 				array(
@@ -58,25 +62,29 @@ class CpWidgetContent extends CpWidgetBase{
 				)
 		);
 		$this->assign('post_list', $posts);
-		$icon = BackEndApplication::part(
-			'FieldsController', 'icon_button', $this->container,
-			array(
-				array(
-					'icon' => $this->get_field_id( 'icon' ),
-					'color' => $this->get_field_id( 'iconcolor' ),
-					'class' => $this->get_field_id( 'iconclass' ),
-				),
-				array(
-					'icon' => $this->get_field_name( 'icon' ),
-					'color' => $this->get_field_name( 'iconcolor' ),
-					'class' => $this->get_field_name( 'iconclass' ),
-				),
-				$instance['icon'],
-				$instance['iconcolor'],
-				$instance['iconclass'],
-				true
-			)
-		);
+		if(isset($this->settings['cp-widget-content-settings-disable-icon'])){
+		    $icon = '';
+        }else{
+            $icon = BackEndApplication::part(
+                'FieldsController', 'icon_button', $this->container,
+                array(
+                    array(
+                        'icon' => $this->get_field_id( 'icon' ),
+                        'color' => $this->get_field_id( 'iconcolor' ),
+                        'class' => $this->get_field_id( 'iconclass' ),
+                    ),
+                    array(
+                        'icon' => $this->get_field_name( 'icon' ),
+                        'color' => $this->get_field_name( 'iconcolor' ),
+                        'class' => $this->get_field_name( 'iconclass' ),
+                    ),
+                    $instance['icon'],
+                    $instance['iconcolor'],
+                    $instance['iconclass'],
+                    true
+                )
+            );
+        }
 		$this->assign('icon', $icon);
 		$this->assign('advanced', $advanced);
 		return parent::form($instance);

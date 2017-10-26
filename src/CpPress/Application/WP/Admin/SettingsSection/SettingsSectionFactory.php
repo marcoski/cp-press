@@ -1,6 +1,9 @@
 <?php
 namespace CpPress\Application\WP\Admin\SettingsSection;
 
+use CpPress\Application\Widgets\Settings\WidgetSection;
+use CpPress\Application\Widgets\Settings\WidgetsSettingsFieldFactory;
+use CpPress\Application\WP\Admin\SettingsField\Field\BaseField;
 use CpPress\Application\WP\Admin\SettingsSection\Section\GeneralSection;
 use CpPress\Application\WP\Admin\SettingsSection\Section\AttachmentSection;
 use CpPress\Exception\SettingsException;
@@ -18,14 +21,10 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 	private $sections;
 	
 	public function create(){
-		$generalSection = new GeneralSection(new GeneralSettingsFieldFactory());
 		$attachmentSection = new AttachmentSection(new AttachmentSettingsFieldFactory());
 		
 		$this->sections = array(
-			'cppress-options-general' => 
-				$generalSection->setId('cppress-options-general')
-				->setTitle(__('General Settings', 'cppress'))
-				->setPage('cppress-options-general'),
+			'cppress-options-general' => $this->createGeneralSection(),
 			'cppress-options-attachment' =>
 				$attachmentSection->setId('cppress-options-attachment')
 				->setTitle(__('Attachment Settings', 'cppress'))
@@ -37,15 +36,35 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 	}
 	
 	public function render($section){
-		if(!$this->has($section)){
+		if(!($section instanceof SettingsSectionInterface) && !$this->has($section)){
 			throw new SettingsException(sprintf('No section "%s" registered', $section));
 		}
-		do_settings_sections($section);
-		foreach($this->get($section) as $childSection){
-			do_settings_sections($childSection->getId());
-		}
+		if(!($section instanceof SettingsSectionInterface)){
+		    $section = $this->get($section);
+        }
+        if(!$section->isSilent()){
+            do_settings_sections($section->getId());
+        }else{
+            /** @var BaseField $field */
+            if($section->getSettingsFieldFactory()->all() !== null){
+                /** @var BaseField $field */
+                foreach($section->getSettingsFieldFactory()->all() as $field){
+                    $field->render($field->all());
+                }
+            }else{
+                /** @var SettingsSectionInterface $child */
+                foreach($section as $child){
+                    $this->render($child);
+                }
+            }
+        }
+
 	}
-	
+
+    /**
+     * @param string $section
+     * @return SettingsSectionInterface | null
+     */
 	public function get($section){
 		if($this->has($section)){
 			return $this->sections[$section];
@@ -96,5 +115,19 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 		
 		return $ldapSection;
 	}
+
+	private function createGeneralSection(){
+        $generalSection = new GeneralSection(new GeneralSettingsFieldFactory());
+        $generalSection->setId('cppress-options-general')
+            ->setTitle(__('General Settings', 'cppress'))
+            ->setPage('cppress-options-general');
+
+        $widgetsSection = new WidgetSection(new WidgetsSettingsFieldFactory());
+        $widgetsSection->setId('cppress-options-widgets')
+            ->setTitle(__('Widgets Settings', 'cppress'));
+        $generalSection->add($widgetsSection);
+
+        return $generalSection;
+    }
 	
 }

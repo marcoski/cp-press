@@ -2,6 +2,7 @@
 
 namespace Commonhelp\Rss\Reader;
 
+use Commonhelp\Rss\Parser\Parser;
 use DOMXPath;
 
 use Commonhelp\Client\Client;
@@ -73,7 +74,7 @@ class Reader{
      * @return \Commonhelp\Client\Client
      */
     public function discover($url, $lastModified = '', $etag = '', $username = '', $password = ''){
-        $client = $this->download($url, $last_modified, $etag, $username, $password);
+        $client = $this->download($url, $lastModified, $etag, $username, $password);
 
         // It's already a feed or the feed was not modified
         if (!$client->isModified() || $this->detectFormat($client->getContent())) {
@@ -133,7 +134,7 @@ class Reader{
      * @param string $content  Feed content
      * @param string $encoding HTTP encoding
      *
-     * @return \PicoFeed\Parser\Parser
+     * @return Parser
      */
     public function getParser($url, $content, $encoding){
         $format = $this->detectFormat($content);

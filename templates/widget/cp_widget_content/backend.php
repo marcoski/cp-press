@@ -10,12 +10,9 @@
 	<label class="section"><?php _e('Options', 'cppress')?></label>
 	<div class="cp-widget-section cp-widget-section-hide">
 		<div class="cp-widget-field cp-widget-input">
-		  <label for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e('Custom template name', 'cppress')?>:</label>
-		  <input class="widefat"
-		    id="<?= $widget->get_field_id( 'templatename' ); ?>"
-		    name="<?= $widget->get_field_name( 'templatename' ); ?>"
-		    value="<?= $instance['templatename']; ?>"
-		  />
+            <label for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e('Custom template name', 'cppress')?>:</label>
+            <?php echo $template->inc('/templates/widget/widget-parts/template',
+                array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 		<div class="cp-widget-field">
 			<label for="<?= $widget->get_field_id( 'hidethumb' ); ?>">

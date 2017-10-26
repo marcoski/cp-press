@@ -226,8 +226,9 @@ class FrontPostController extends WPController{
 				$offset = $instance['limit'] * ($page-1);
 			}
 		}
-		return array(
-				'post_type'			=> isset($instance['posttype']) ? $instance['posttype'] : 'post',
+		$postType = isset($instance['posttype']) ? $instance['posttype'] : 'post';
+		return apply_filters('cppress_loop_args', array(
+				'post_type'			=> $postType,
 				'posts_per_page'	=> isset($instance['limit']) ? $instance['limit'] : '1',
 				'tax_query' 	=> FrontPostController::getTaxQuery($instance),
 				'offset'			=> $offset,
@@ -235,7 +236,7 @@ class FrontPostController extends WPController{
 				'orderby'			=> $instance['orderby'],
 				/* Set it to false to allow WPML modifying the query. */
 				'suppress_filters' => false
-		);
+		), $postType);
 	}
 	
 	private static function getTaxQuery($instance){

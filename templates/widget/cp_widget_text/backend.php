@@ -63,11 +63,8 @@
 			<label
 				for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e( 'Custom template name', 'cppress' ) ?>
 				:</label>
-			<input class="widefat"
-			       id="<?= $widget->get_field_id( 'templatename' ); ?>"
-			       name="<?= $widget->get_field_name( 'templatename' ); ?>"
-			       value="<?= $instance['templatename']; ?>"
-			/>
+            <?php echo $template->inc('/templates/widget/widget-parts/template',
+                array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 
 		<div class="cp-widget-field">

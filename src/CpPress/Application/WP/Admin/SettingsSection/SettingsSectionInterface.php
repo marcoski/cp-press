@@ -40,5 +40,7 @@ interface SettingsSectionInterface extends \ArrayAccess, \Traversable, \Countabl
 	public function getRoot();
 	
 	public function isRoot();
+
+	public function isSilent();
 	
 }

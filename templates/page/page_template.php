@@ -29,17 +29,18 @@
 	<div class="cp-grids">
 		<div class="cp-toolbar cp-row-toolbar">
 			<div class="cp-row-icons cp-row-move" title="<? esc_attr_e('Sort Row', 'cppress'); ?>"></br></div>
-				<div class="cp-row-icons cp-row-settings cp-dropdown" title="<? esc_attr_e('Delete Section', 'cppress'); ?>">
-					<div class="cp-dropdown-links">
-						<ul>
-							<li><a href="#" class="cp-row-dropdown" data-action="edit"><?= __('Edit Row', 'cppress'); ?></a></li>
-							<li><a href="#" class="cp-row-dropdown" data-action="duplicate"><?= __('Duplicate Row', 'cppress'); ?></a></li>
-							<li><a href="#" class="cp-row-dropdown cp-dropdown-delete" data-action="delete"><?= __('Delete Row', 'cppress'); ?></a></li>
-							<div class="cp-dropdown-pointer"></div>
-						</ul>
-					</div>
-				</div>
-			</div>
+            <div class="cp-row-icons cp-row-settings cp-dropdown" title="<? esc_attr_e('Delete Section', 'cppress'); ?>">
+                <div class="cp-dropdown-links">
+                    <ul>
+                        <li><a href="#" class="cp-row-dropdown" data-action="edit"><?= __('Edit Row', 'cppress'); ?></a></li>
+                        <li><a href="#" class="cp-row-dropdown" data-action="duplicate"><?= __('Duplicate Row', 'cppress'); ?></a></li>
+                        <li><a href="#" class="cp-row-dropdown cp-dropdown-delete" data-action="delete"><?= __('Delete Row', 'cppress'); ?></a></li>
+                        <div class="cp-dropdown-pointer"></div>
+                    </ul>
+                </div>
+            </div>
+            <div class="cp-row-icons cp-row-plus" title="<? esc_attr_e('Widgets Handling', 'cppress'); ?>"></br></div>
+        </div>
 			<div class="row cp-rows">
 			</div>
 		</div>
@@ -55,11 +56,13 @@
 		<div class="cp-widget-wrapper">
 			<div class="title">
 				<h4>{{ data.title }}</h4>
-					<span class="actions">
-						<a href="#" class="widget-edit"><?php _e('Edit', 'cppress') ?></a>
-						<a href="#" class="widget-duplicate"><?php _e('Duplicate', 'cppress') ?></a>
-						<a href="#" class="widget-delete"><?php _e('Delete', 'cppress') ?></a>
-					</span>
+                <# if(data.showWidgetOp){ #>
+                <span class="actions">
+                    <a href="#" class="widget-edit"><?php _e('Edit', 'cppress') ?></a>
+                    <a href="#" class="widget-duplicate"><?php _e('Duplicate', 'cppress') ?></a>
+                    <a href="#" class="widget-delete"><?php _e('Delete', 'cppress') ?></a>
+                </span>
+                <# } #>
 			</div>
 			<small class="description">{{ data.description }}</small>
 		</div>

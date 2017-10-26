@@ -17,6 +17,10 @@
 		View: {}
 	};
 
+	$.CpDialog.widgetHandler = {
+		View: {}
+	};
+
 	$.CpDialog.grid.Widget = Backbone.View.extend({
 		widgetLoaded: false,
 		cpAjax: null,
@@ -92,6 +96,16 @@
 		}
 
 	});
+
+	$.CpDialog.grid.WidgetsList = Backbone.View.extend({
+        el: '<ul>',
+
+        render: function(){
+            this.$el.append(wp.template('cppress-dialog-widgets-list'));
+
+            return this.$el;
+        }
+    });
 
 	$.CpDialog.grid.View = $.CpDialog.dialog.View.extend({
 		id: "cppress_page_dialog",
@@ -373,6 +387,107 @@
 	      this.close(e);
 		}
 
+	});
+
+	$.CpDialog.widgetHandler.View = $.CpDialog.grid.View.extend({
+        content: 'cppress-dialog-widget-handler',
+        button: 'cppress-dialog-save-cancel',
+        title: 'Widgets Handler',
+        icons: null,
+        widgetsList: new $.CpDialog.grid.WidgetsList(),
+
+        render: function(){
+            var widgetTemplate = wp.template("cppress-page-widget");
+            var _that = this;
+            var cellCount = this.model.cells.length;
+            var cellWeight = [];
+            var widgetsHandler = [];
+            var cellWidgetsBoxes = [];
+            this.model.cells.forEach(function(el, i){
+                cellWeight[i] = el.get('weight');
+                widgetsHandler[i] = [];
+                cellWidgetsBoxes[i] = '';
+                el.widgets.forEach(function(widget, j){
+                    cellWidgetsBoxes[i] += widgetTemplate({
+                        title: widget.get('title'),
+                        description: widget.get('description')
+                    });
+                    widgetsHandler[i][j] = {
+                        widgetTitle: widget.get('title'),
+                        widgetDescription: widget.get('description'),
+                        widgetIcon: widget.get('icon'),
+                        widgetClassname: widget.get('class'),
+                        id: widget.get('id_base')
+                    }
+                });
+            });
+            this.renderWindow({count: cellCount, weight: cellWeight});
+            this.renderWidgets(cellWidgetsBoxes);
+            this.$el.find('div.navigation-bar').remove();
+            this.$el.find('article').css({"right": 30});
+            this.$el.find('.cp-widgets-handler-lists').append(this.widgetsList.render());
+            this.$el.find('.cp-widgets-list-expand').click(function(){
+                var id = $(this).attr('id');
+                _that.$el.find('#cp-widgets-'+id).toggle();
+            });
+            this.$el.find('.cp-widgets-handler').data('widgets', widgetsHandler);
+            this.$el.find('.cp-widgets-list-button').click(function(e){
+               var widgetData = $(this).data();
+               widgetData.id = $(this).attr('id');
+               var cell = $(this).parents('div.cp-widgets-handler-lists').data('cell');
+               var widgetsHandler = _that.$el.find('.cp-widgets-handler').data('widgets');
+               if(typeof widgetsHandler[cell] !== 'undefined'){
+                   widgetsHandler[cell].push(widgetData);
+               }else{
+                   throw new Error('No cell found in widgetsHandler');
+               }
+               $(this).parents('div.cp-widgets-handler-lists').toggle();
+               _that.$el.find('.cp-row-list[data-cell="'+cell+'"] .cp-row-droppable').append(widgetTemplate({
+                   title: widgetData.widgetTitle,
+                   description: widgetData.widgetDescription,
+                   showWidgetOp: false
+               }));
+
+                _that.$el.find('.cp-widgets-handler').data('widgets', widgetsHandler);
+            });
+        },
+
+        renderWidgets: function(widgets){
+            var _that = this;
+            this.model.cells.forEach(function(cell, i){
+                _that.$el.find('.cp-row-list[data-cell="'+i+'"] .cp-row-droppable').append(widgets[i]);
+            })
+        },
+
+        save: function(e){
+            var widgetsHandler = this.$el.find('.cp-widgets-handler').data('widgets');
+            for(var i=0; i<widgetsHandler.length; i++){
+                var Cell = this.model.cells.at(i);
+                _.each(Cell.widgets.toArray(), function(widget, index){
+                	widgetsHandler[i][index].widgetData = widget.get('data');
+                	widget.destroy();
+                });
+
+                for(var j=0; j<widgetsHandler[i].length; j++){
+                    var widget = new $.CpPage.Model.Widget();
+                    widget.cell = Cell;
+                    var values = {};
+                    if(widgetsHandler[i][j].hasOwnProperty('widgetData')){
+                    	values = widgetsHandler[i][j].widgetData;
+					}
+                    widget.setData(values);
+                    widget.set('title', widgetsHandler[i][j].widgetTitle);
+                    widget.set('icon', widgetsHandler[i][j].widgetIcon);
+                    widget.set('description', widgetsHandler[i][j].widgetDescription);
+                    widget.set('class', widgetsHandler[i][j].widgetClassname);
+                    widget.set('raw', false);
+                    widget.set('id_base', widgetsHandler[i][j].id);
+                    Cell.widgets.add(widget);
+                }
+            }
+
+            this.close(e);
+        }
 	});
 
 }(jQuery, _));

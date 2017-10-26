@@ -2,6 +2,7 @@
 namespace CpPress\Application\WP\Hook;
 
 use CpPress\Application\CpPressApplication;
+use CpPress\Application\Widgets\CpWidgetBase;
 
 abstract class Hook{
 	
@@ -52,6 +53,21 @@ abstract class Hook{
 			unset($this->registered[$hook]);
 		}
 	}
+
+    /**
+     * @return CpPressApplication
+     */
+	public function getApp(){
+	    return $this->app;
+    }
+
+    public function getWidgets(){
+	    $widgets = array_filter(CpWidgetBase::getWidgets(), function($widget){
+	        $widgetsReflections = new \ReflectionClass($widget);
+	        return $widgetsReflections->isInstantiable();
+        });
+	    return apply_filters('cppress_widgets', $widgets);
+    }
 	
 	abstract public function massRegister();
 }

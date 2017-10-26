@@ -19,8 +19,9 @@ class PageController extends WPController{
 		$this->widgets = $widgets;
 	}
 
-	public function content($layout, $dialog, $template, $fields, $pdTemplate){
-
+	public function content($layout, $dialog, $template, $fields, $pdTemplate, $widgetsTemplate)
+    {
+        $post = get_post();
 		$fakeEditor = new Editor();
 		$fakeEditor->init(
 				'cp-widget-fake-editor',
@@ -37,15 +38,20 @@ class PageController extends WPController{
 		$this->assign('page_tmpl', $template);
 		$this->assign('page_dialog_tmpl', $pdTemplate);
 		$this->assign('fields_tmpl', $fields);
+		$this->assign('widgets_tmpl', $widgetsTemplate);
 		$this->assign('layout', $layout);
 		$this->assign('json_layout', htmlspecialchars(json_encode($layout, JSON_HEX_TAG)));
-		$this->assign('post_id', $post->ID);
 		$this->assign('post_name', $post->post_name);
+		$this->assign('post_type', $post->post_type);
 	}
 
 	public function widgets(){
 		$this->assign('widgets', $this->widgets);
 	}
+
+	public function widgets_template(){
+        $this->assign('widgets', $this->widgets);
+    }
 
 	public function page_template(){
 	}

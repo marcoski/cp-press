@@ -27,6 +27,7 @@ class BackEndHook extends Hook{
 			$this->create('cppress_login_head');
 		});
 		$this->register('admin_init', function(){
+		    $this->app->registerFilesystem();
 			$this->app->registerBackEndAjax();
 			$container = $this->app->getContainer();
 			$pagePostType = $container->query('PagePostType');
@@ -48,7 +49,7 @@ class BackEndHook extends Hook{
 				BackEndApplication::main('EventController', 'calendar_taxonomy_delete', $container, array($term_id));
 			}, 10, 2);
 			$this->execAll();
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($this->getWidgets() as $widget){
 				$container->registerService($widget, function($c) use ($widget){
 					$w = new $widget();
 					$w->setContainer($c);
@@ -117,11 +118,13 @@ class BackEndHook extends Hook{
 				$scripts->enqueue('wp-color-picker');
 				$styles->enqueue('wp-color-picker');
 				$scripts->enqueue('cp-press-event-admin');
+				$scripts->enqueue('cp-press-settings-admin');
 				$scripts->enqueue('ace-editor/ace');
 				$scripts->enqueue('media-upload');
 				$styles->enqueue('cp-press-flag-icon');
 				$styles->enqueue('cp-press-dialog');
 				$styles->enqueue('cp-press-event-admin');
+                $styles->enqueue('cp-press-jquery-ui');
 				$styles->enqueue('cp-press-admin');
 
 				$this->create('cppress_admin_enqueue_scripts');
@@ -134,9 +137,7 @@ class BackEndHook extends Hook{
 		$container = $this->app->getContainer();
 		$container->register(new FeatureFactory());
 
-		$container->query('CpPageWidgets');
 		$container->query('CpPageContent');
-
 		$container->query('CpPageSubtitle');
 	}
 }

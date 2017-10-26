@@ -46,10 +46,8 @@
 		</div>
 		<div class="cp-widget-field cp-widget-input">
 			<label for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e('Custom video template', 'cppress')?>:</label>
-			<input class="widefat"
-			       id="<?= $widget->get_field_id( 'temlatename' ); ?>"
-			       name="<?= $widget->get_field_name( 'templatename' ); ?>"
-			       value="<? isset( $instance['templatename'] ) ? e( $instance['templatename'] ) : e( '' ); ?>"/>
+            <?php echo $template->inc('/templates/widget/widget-parts/template',
+                array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 	</div>
 </div>

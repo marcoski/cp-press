@@ -11,7 +11,6 @@ use CpPress\Application\FrontEnd\FrontEventController;
 use CpPress\Application\WP\Hook\FrontEndHook;
 use CpPress\Application\WP\Hook\FrontEndFilter;
 use CpPress\CpPress;
-use CpPress\Application\Widgets\CpWidgetBase;
 use CpPress\Application\WP\Query\Query;
 use CpPress\Application\FrontEnd\FrontBreadcrumbController;
 use CpPress\Application\FrontEnd\FrontGalleryController;
@@ -44,8 +43,9 @@ class FrontEndApplication extends CpPressApplication{
 		$container = $this->getContainer();
 		$container->registerService('Page', function($c){
 			$filter = $c->query('FrontEndFilter');
+			$hook = $c->query('FrontEndHook');
 			$widgets = array();
-			foreach(CpWidgetBase::getWidgets() as $widget){
+			foreach($hook->getWidgets() as $widget){
 				$wObj = $c->query($widget);
 				$widgets[$widget] = $wObj;
 			}
