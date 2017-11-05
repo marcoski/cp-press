@@ -70,7 +70,11 @@
             _.each(this.classes, function(c){
                this.$el.addClass(c);
             }, this);
-            this.$el.append(this.template({data: this.model.attributes}));
+            try {
+                this.$el.append(this.template({data: this.model.attributes}));
+            }catch(err){
+                console.error('You must specify a template for search item with id #search-item-template');
+            }
             return this;
         }
 
@@ -112,6 +116,8 @@
         events: {
             'click .dropdown-title': 'toggle',
             'change .dropdown-input': 'dropdown',
+            'keyup .simple-input': 'simple',
+            'keydown .simple-input': 'prevent',
             'click .tags-item a': 'removeFilter'
         },
 
@@ -134,12 +140,16 @@
         filterActiveTemplate: _.template('<li class="tags-item"> <a href="#" data-filter="<%= filter_active %>"><%= tag %></a> </li>'),
         filterActive: null,
 
+        timeoutId: null,
+
         initialize: function(options){
             this.itemsView = options.itemsView;
             this.query = this.$el.data('query');
             this.originalQuery = _.clone(this.query);
             this.collection = options.collection;
-            this.paginator = options.paginator;
+            if(!_.isUndefined(options.paginator)) {
+                this.paginator = options.paginator;
+            }
             this.$infoBox = this.$el.find('.filters-info-box');
             this.listenTo(this.collection, 'sync:search', this.render);
         },
@@ -212,6 +222,31 @@
             var $$ = $(e.target);
             this.toggled = e;
             $$.siblings('ul.dropdown-list').toggle();
+        },
+
+        prevent: function(e){
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if(code === 13){
+                e.preventDefault();
+            }
+        },
+
+        simple: function(e){
+            var $$ = $(e.target);
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if(code === 13){
+                e.preventDefault();
+                this.simpleSearch($$, e.target.value);
+                return;
+            }
+            clearTimeout(this.timeoutId);
+            this.timeoutId = setTimeout(_.bind(this.simpleSearch, this, $$, e.target.value), 500)
+        },
+
+        simpleSearch: function($input, searchStr){
+            _.extend(this.query, {'s': searchStr});
+            $(window).trigger('filter.onsearch');
+            this.collection.search(this.query);
         },
 
         dropdown: function(e){

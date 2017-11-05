@@ -25,9 +25,10 @@ class FrontFilterController extends WPController  {
 		$this->query = $query;
 	}
 
-	public function form($query, $url){
+	public function form($query, $url, $id){
 		$this->assign('query', $query);
 		$this->assign('url', $url);
+		$this->assign('id', $id);
 		$this->assign('filter', $this->filter);
 	}
 
@@ -44,6 +45,11 @@ class FrontFilterController extends WPController  {
 		$this->assign('query', $query);
 		$this->assign('filter', $this->filter);
 	}
+
+	public function simple($label){
+	    $this->assign('label', $label);
+	    $this->assign('filter', $this->filter);
+    }
 
 	public function getFilter(){
 		return $this->filter;

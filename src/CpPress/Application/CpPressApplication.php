@@ -60,6 +60,11 @@ abstract class CpPressApplication extends WPApplication{
 			
 			return null;
 		});
+
+		$container->registerService('WPTheme', function($c){
+		    return wp_get_theme();
+        });
+
 		$this->registerPostTypes();
 	}
 	

@@ -12,7 +12,6 @@
 			<div class="cp-row-icons cp-row-settings cp-dropdown" title="<? esc_attr_e('Delete Section', 'cppress'); ?>">
 				<div class="cp-dropdown-links">
 					<ul>
-						<li><a href="#" class="cp-section-dropdown" data-action="edit"><?= __('Edit Section', 'cppress'); ?></a></li>
 						<li><a href="#" class="cp-section-dropdown" data-action="add"><?= __('Add Row', 'cppress'); ?></a></li>
 						<li><a href="#" class="cp-section-dropdown" data-action="duplicate"><?= __('Duplicate Section', 'cppress'); ?></a></li>
 						<li><a href="#" class="cp-section-dropdown cp-dropdown-delete" data-action="delete"><?= __('Delete Section', 'cppress'); ?></a></li>

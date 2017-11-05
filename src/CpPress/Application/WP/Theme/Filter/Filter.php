@@ -46,6 +46,7 @@ class Filter implements FilterInterface {
 	protected $containerClasses;
 	protected $fieldsContainer;
 	protected $fieldsContainerClasses;
+	protected $formId;
 
 	public function __construct(FrontEndApplication $application, Query $query = null) {
 		$container = $application->getContainer();
@@ -54,6 +55,7 @@ class Filter implements FilterInterface {
 		$this->query = null !== $query ? $query : $this->controller->getQuery();
 		$this->filter = $this->controller->getFilter();
 
+		$this->formId = $this->filter->apply('cppress_filter_form_id', 'filters-form');
 		$this->container = '<div class="%s"><div class="filters hidden-print">%s</div></div>';
 		$this->containerClasses = implode(' ', $this->filter->apply(
 			'cppress_filter_container_classes',
@@ -107,7 +109,7 @@ class Filter implements FilterInterface {
 	public function formStart(){
 		$query = $this->query->all();
 		$url = '';
-		return FrontEndApplication::part(FrontFilterController::class, 'form', $this->application->getContainer(), array($query, $url));
+		return FrontEndApplication::part(FrontFilterController::class, 'form', $this->application->getContainer(), array($query, $url, $this->formId));
 	}
 
 	public function create(){
