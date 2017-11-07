@@ -12,7 +12,7 @@
 	<div class="col-md-6">
 		<h2 class="filters-result-count">
 			<span class="filters-result-count-number"><?php echo $query->found_posts ?></span>
-			<span class="filters-result-count-label"><?php echo __('results', 'cppress'); ?></span>
+			<span class="filters-result-count-label"><?php echo  $filter->apply('cppress_filters_results', __('results', 'cppress')); ?></span>
 		</h2>
 	</div>
 </div>

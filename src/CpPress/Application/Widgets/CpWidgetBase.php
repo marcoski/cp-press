@@ -232,6 +232,61 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 		return $this->icon;
 	}
 
+	public function getWidgetTemplates()
+    {
+        /** @var \WP_Theme $wpTheme */
+        $wpTheme = $this->container->get('WPTheme');
+
+        $widgetTemplates = [];
+        foreach($wpTheme->get_files('php', 2) as $file => $fullPath){
+            $fileContent = file_get_contents($fullPath);
+            if(!preg_match('|WidgetTemplateName:(.*)$|mi', $fileContent, $header)){
+                continue;
+            }
+
+            $allowedWidgets = [];
+            if(preg_match('|Widgets:(.*)$|mi', $fileContent, $allowed)){
+                $allowedWidgets = explode(',', $this->cleanUpHeaderComment($allowed[1]));
+            }
+
+            if(!$this->isAllowedWidget($allowedWidgets)){
+                continue;
+            }
+
+            $description = '';
+            if(preg_match('|WidgetTemplateDescription:(.*)$|mi', $fileContent, $desc)){
+                $description = $this->cleanUpHeaderComment($desc[1]);
+            }
+
+            $template['file'] = $file;
+            $template['title'] = $this->cleanUpHeaderComment($header[1]);
+            $template['description'] = $description;
+            $widgetTemplates[] = $template;
+        }
+
+        return $widgetTemplates;
+    }
+
+    private function isAllowedWidget($allowedWidgets)
+    {
+        if(empty($allowedWidgets)){
+            return true;
+        }
+        foreach($allowedWidgets as $widget){
+            $widget = trim($widget);
+            if(preg_match('|'.$widget.'|mi', get_class($this))){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function cleanUpHeaderComment($str)
+    {
+        return trim(preg_replace("/\s*(?:\*\/|\?Z).*/", '', $str));
+    }
+
 	protected function render() {
 		$this->template->setVars( $this->vars );
 
@@ -261,6 +316,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 			$templateName = $this->filter->apply( 'cppress_widget_post_template_name',
 				'template-parts/' . $instance['templatename'], $instance );
 		}
+
 		if ( ! $template->issetTemplate( $templateName ) && $instance['wtitle'] !== '' ) {
 			$templateName = $this->filter->apply( 'cppress_widget_post_template_name',
 				'template-parts/' . $tPreName . '-' .
@@ -270,6 +326,11 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 			$templateName = $this->filter->apply( 'cppress_widget_post_template_name',
 				'template-parts/' . $tPreName, $instance );
 		}
+        if(!$template->issetTemplate($templateName)){
+            $templateName = preg_replace("/(.php)/", "", $instance['templatename']);
+            $templateName = $this->filter->apply('cppress_widget_post_template_name', $templateName);
+        }
+
 		$this->assign( 'templateName', $templateName );
 		$this->assign( 'template_theme', $template );
 	}

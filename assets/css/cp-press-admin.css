@@ -1931,3 +1931,17 @@ img.cp-multithumbnail {
 cp-widget-tinymce-container{
     width: auto !important;
 }
+
+.cp-item-template-description{
+    background: #F0F0F0;
+    border: 1px solid #D0D0D0;
+    padding: 5px;
+    display: block;
+    margin-bottom: 0;
+    font-size: 12px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected]{
+    background: #999999;
+    color: black;
+}

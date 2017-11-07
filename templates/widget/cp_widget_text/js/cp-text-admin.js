@@ -1,6 +1,5 @@
 (function($){
     $(document).on('widget.loaded', function(){
-        console.log($('.cp-widget-editor'));
         $('.cp-widget-editor').AceEditor({
             // overwrites the default
             setEditorContent: function () {

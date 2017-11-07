@@ -60,8 +60,19 @@
             if(options.hasOwnProperty('classes')){
                 this.classes = options.classes;
             }
-            if($('#search-item-template').length > 0){
-                this.template = _.template($('#search-item-template').html());
+
+            if(_.isUndefined(options.template)){
+                if($('#search-item-template').length > 0){
+                    this.template = _.template($('#search-item-template').html());
+                }
+            }else{
+                if($(options.template).length > 0) {
+                    this.template = _.template($(options.template).html());
+                }
+            }
+
+            if(options.hasOwnProperty('tagName')){
+                this.tagName = options.tagName;
             }
         },
 
@@ -85,6 +96,8 @@
         collection: null,
         col: 'col-md-12',
         classes: {},
+        template: null,
+        searchItemTag: 'div',
 
         initialize: function(options){
             this.collection = options.collection;
@@ -94,11 +107,20 @@
             if(options.hasOwnProperty('classes')){
                 this.classes = options.classes;
             }
+
+            if(!_.isUndefined(options.template)){
+                this.template = options.template;
+            }
+
+            if(options.hasOwnProperty('searchItemTag')){
+                this.searchItemTag = options.searchItemTag;
+            }
         },
 
         render: function(){
             this.$el.html('');
-            this.collection.each(function(item){
+            this.collection.each(function(item, key){
+                item.set('count', key);
                 this.addItem(item);
             }, this);
 
@@ -106,7 +128,13 @@
         },
 
         addItem: function(item){
-            var searchItem = new SearchItem({model: item, col: this.col, classes: this.classes});
+            var searchItem = new SearchItem({
+                model: item,
+                col: this.col,
+                classes: this.classes,
+                template: this.template,
+                tagName: this.searchItemTag,
+            });
             this.$el.insertAndFadeIn(searchItem.render().$el);
         }
 

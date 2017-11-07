@@ -45,8 +45,7 @@
 			</label>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
-			<label for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e('Custom video template', 'cppress')?>:</label>
-            <?php echo $template->inc('/templates/widget/widget-parts/template',
+			<?php echo $template->inc('/templates/widget/widget-parts/template',
                 array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 	</div>

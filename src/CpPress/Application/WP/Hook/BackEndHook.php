@@ -119,8 +119,10 @@ class BackEndHook extends Hook{
 				$styles->enqueue('wp-color-picker');
 				$scripts->enqueue('cp-press-event-admin');
 				$scripts->enqueue('cp-press-settings-admin');
+				$scripts->enqueue('cp-press-select2');
 				$scripts->enqueue('ace-editor/ace');
 				$scripts->enqueue('media-upload');
+				$styles->enqueue('cp-press-select2');
 				$styles->enqueue('cp-press-flag-icon');
 				$styles->enqueue('cp-press-dialog');
 				$styles->enqueue('cp-press-event-admin');

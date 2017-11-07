@@ -207,6 +207,10 @@ class FrontPostController extends WPController{
 			$templateName = $this->filter->apply('cppress_widget_post_template_name',
 					'template-parts/' . $tPreName, $instance);
 		}
+        if(!$template->issetTemplate($templateName)){
+		    $templateName = preg_replace("/(.php)/", "", $instance['templatename']);
+            $templateName = $this->filter->apply('cppress_widget_post_template_name', $templateName);
+        }
 		$this->assign('templateName', $templateName);
 		$this->assign('template', $template);
 	}

@@ -33,7 +33,6 @@
   			array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
 		<div class="cp-widget-field cp-widget-input">
-            <label for="<?= $widget->get_field_id( 'templatename' ); ?>"><?php _e('Custom template name', 'cppress')?>:</label>
             <?php echo $template->inc('/templates/widget/widget-parts/template',
                 array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
