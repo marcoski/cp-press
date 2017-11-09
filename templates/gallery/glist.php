@@ -22,6 +22,7 @@ if(!empty($items)){
             if(isset($items[$itemCounter])){
                 $item = $items[$itemCounter];
                 echo '<div class="cp-gallery-item">';
+                echo '<figure>';
                 echo $filter->apply('cppress_widget_gallery_before_image', '', $item, $options, $galleryId);
                 if(!$item['isvideo']){
                     $itemClassArray[] = 'img-responsive';
@@ -50,6 +51,10 @@ if(!empty($items)){
                         echo ' ' . $name . '="' . $value . '"';
                     }
                     echo ' />';
+                    if(isset($item['caption'])){
+                        echo '<figcaption>'.$item['caption'].'</figcaption>';
+                    }
+                    echo '</figure>';
                 }else{
                     $itemClassArray[] = $options['enablelightbox'] ? 'cp-embed-lightbox play-icon' : 'cp-embed-responsive';
                     $divClasses = $filter->apply('cppress_widget_gallery_item_classes', $itemClassArray, $item, $options);
@@ -80,14 +85,14 @@ if(!empty($items)){
                     }else{
                         echo $item['oembed']->html;
                     }
+                    if(isset($item['caption'])){
+                        echo '<figcaption>'.$item['caption'].'</figcaption>';
+                    }
+                    echo '</figure>';
                     echo '</div>';
                 }
                 echo $filter->apply('cppress_widget_gallery_after_image', '', $item, $options, $galleryId);
                 echo '</div>';
-            }
-
-            if(isset($item['caption'])){
-                echo '<h2>'.$item['caption'].'</h2>';
             }
             echo '</div>';
         }
@@ -96,5 +101,8 @@ if(!empty($items)){
 
     echo '</' . $filter->apply('cppress_widget_gallery_tag', "div", $slides, $options) . '>';
     echo $filter->apply('cppress_widget_gallery_after', '', $items, $options, $galleryId);
+    if(isset($lightbox)){
+        echo $lightbox;
+    }
 }
 

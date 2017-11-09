@@ -33,11 +33,11 @@
 						</div>
 					</div>
 				</div>
+                <?php if($item['caption'] != ''): ?>
 				<div class="modal-footer">
-				<?php if($item['caption'] != ''): ?>
 					<?php echo $item['caption'] ?>
-				<?php endif; ?>
 				</div>
+                <?php endif; ?>
 			</div>
 		</div>
 	</div>

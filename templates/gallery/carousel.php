@@ -13,6 +13,9 @@
 			echo ' ' . $name . '="' . $value . '"';
 		}
 		echo '>';
+        if($options['thumbindicators']){
+            echo '<div class="carousel-outer">';
+        }
 		if(!$options['hideindicators']){
 			echo '<ol class="carousel-indicators">';
 			foreach($items as $i => $item){
@@ -37,9 +40,10 @@
 			/**
 			 * SLIDE CONTENT MARKUP START
 			 */
+			echo '<figure class="'.implode(' ', $itemClassArray).'">';
 			if(!$item['isvideo']){
-				$itemClassArray[] = 'img-responsive';
-				$imageClasses = $filter->apply('cppress_widget_gallery_item_classes', $itemClassArray, $item, $options);
+				$imgClassArray[] = 'img-responsive';
+				$imageClasses = $filter->apply('cppress_widget_gallery_item_classes', $imgClassArray, $item, $options);
 				if($options['enablelightbox']){
 					$imgAttrArray = array(
 						'src' => $item['link'],
@@ -96,6 +100,10 @@
 				}
 				echo '</div>';
 			}
+			if(isset($item['caption']) && $item['caption'] !== ''){
+			    echo '<figcaption>'.$item['caption'].'</figcaption>';
+            }
+			echo '</figure>';
 			/**
 			 * SLIDE CONTENT MARKUP END
 			 */
@@ -105,29 +113,46 @@
 				
 		}
 		echo '</div>';
+
 		
-		
-			echo '<a class="left carousel-control" href="#' . $galleryId . '" role="button" data-slide="prev">';
-			$leftClasses = $filter->apply(
-					'cppress_carousel_control_left_classes', 
-					array('glyphicon glyphicon-chevron-left'),
-					$galleryId,
-					$items
-			);
-			echo '<span class="' . implode(' ', $leftClasses) . '" aria-hidden="true"></span>';
-			echo '<span class="sr-only">' . __('Previous', 'cppress') . '</span>';
-			echo '</a>';
-			echo '<a class="right carousel-control" href="#' . $galleryId . '" role="button" data-slide="next">';
-			$rightClasses = $filter->apply(
-					'cppress_carousel_control_right_classes',
-					array('glyphicon glyphicon-chevron-right'),
-					$galleryId,
-					$slides,
-					$options
-			);
-			echo '<span class="' . implode(' ', $rightClasses) . '" aria-hidden="true"></span>';
-			echo '<span class="sr-only">' . __('Next', 'cppress') . '</span>';
-			echo '</a>';
+        echo '<a class="left carousel-control" href="#' . $galleryId . '" role="button" data-slide="prev">';
+        $leftClasses = $filter->apply(
+                'cppress_carousel_control_left_classes',
+                array('glyphicon glyphicon-chevron-left'),
+                $galleryId,
+                $items
+        );
+        echo '<span class="' . implode(' ', $leftClasses) . '" aria-hidden="true"></span>';
+        echo '<span class="sr-only">' . __('Previous', 'cppress') . '</span>';
+        echo '</a>';
+        echo '<a class="right carousel-control" href="#' . $galleryId . '" role="button" data-slide="next">';
+        $rightClasses = $filter->apply(
+                'cppress_carousel_control_right_classes',
+                array('glyphicon glyphicon-chevron-right'),
+                $galleryId,
+                $slides,
+                $options
+        );
+        echo '<span class="' . implode(' ', $rightClasses) . '" aria-hidden="true"></span>';
+        echo '<span class="sr-only">' . __('Next', 'cppress') . '</span>';
+        echo '</a>';
+
+        if($options['thumbindicators']){
+            echo '</div>';
+
+            echo '<ol class="carousel-indicators">';
+            foreach($items as $i => $item){
+                $active = ''; if($i==0){ $active = 'class="active"'; }
+                echo '<li 
+                    ' . $filter->apply('cppress_carousel_indicators_styles', '') . '
+                    data-target="#' . $galleryId .'" 
+                    data-slide-to="' . $i . '" ' . $active . '>
+                    <img class="thumb-indicators img-responsive" src="'.$item['link'].'" />
+                </li>';
+            }
+            echo '</ol>';
+
+        }
 		
 		echo '</' . $filter->apply('cppress_widget_gallery_tag', "div", $slides, $options) . '>';
 		echo $filter->apply('cppress_widget_gallery_after', '', $items, $options, $galleryId);

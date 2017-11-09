@@ -225,6 +225,11 @@ class FrontEndApplication extends CpPressApplication{
 	public function registerHooks(){
 		$hook = $this->getContainer()->query('FrontEndHook');
 		$hook->massRegister();
+		/**
+         * @TODO add better shortcode handling manager class for gallery replacement
+         * @TODO set it as option
+         * @SEE dinamopress theme implementation post_gallery filter
+         */
 	}
 	
 	public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1){

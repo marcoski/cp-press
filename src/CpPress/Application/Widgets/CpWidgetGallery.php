@@ -45,6 +45,7 @@ class CpWidgetGallery extends CpWidgetBase{
 		$gallery = array();
 		$options = array(
     	'enablelightbox' => isset($instance['enablelightbox']) ? true : false,
+    	'thumbindicators' => isset($instance['thumbindicators']) ? true : false,
     	'tperrow' => $instance['tperrow'] > 0 ? $instance['tperrow'] : 1,
 			'title' => $instance['wtitle'],
 			'galleryclass' => $instance['galleryclass']
@@ -68,7 +69,6 @@ class CpWidgetGallery extends CpWidgetBase{
 						$gallery['items'][$i]['oembed'] = null;
 					}
 					$gallery['items'][$i]['isvideo'] = false;
-				}else if($items[$i]['video']){
 				}else if($instance['items']['video_ext'][$i]){
 					$gallery['items'][$i]['link'] = $instance['items']['video_ext'][$i];
 					$gallery['items'][$i]['oembed'] = $embed->getEmbedObj($instance['items']['video_ext'][$i]);
