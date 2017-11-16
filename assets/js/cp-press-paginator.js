@@ -17,7 +17,6 @@
             this.itemsView = options.itemsView;
             this.collection = options.collection;
             this.listenTo(this.collection, 'sync:paginate', this.render);
-            this.on('paginator.refresh', this.refresh, this);
             this.$queryData = this.$el;
             if(options.hasOwnProperty('queryData') && null !== options.queryData){
                 this.$queryData = options.queryData;
@@ -26,8 +25,9 @@
             this.query = this.$queryData.data('query');
         },
 
-        refresh: function(){
-            this.query = this.$queryData.data('query');
+        refresh: function(query){
+            this.query = query;
+            this.$queryData.data('query', query);
             return this.render();
         },
 

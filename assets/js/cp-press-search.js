@@ -14,6 +14,8 @@
         model: WPPost,
         url: ajaxurl+'?action=cppress_search',
 
+        foundPosts: 0,
+
         paginate: function(page, query){
             var _that = this;
             if(query.hasOwnProperty('offset')){
@@ -22,6 +24,8 @@
             this.fetch({
                 data: {query: query},
                 success: function(collection, response, options){
+                    _that.set(response.posts);
+                    _that.foundPosts = response.total;
                     _that.trigger('sync:paginate');
                 },
                 error: function(collection, response, options){
@@ -35,7 +39,10 @@
             var _that = this;
             this.fetch({
                 data: {query: query},
+                reset: true,
                 success: function(collection, response, options){
+                    _that.set(response.posts);
+                    _that.foundPosts = response.total;
                     _that.trigger('sync:search')
                 },
                 error: function(collection, response, options){
@@ -192,14 +199,14 @@
                 this.refreshInfoBox();
                 $(window).trigger('filter.onsuccess');
             }else{
-                this.paginator.refresh();
+                this.paginator.refresh(this.query);
                 this.refreshInfoBox();
             }
         },
 
         refreshInfoBox: function(){
             var $tagsList = this.$infoBox.find('.filters-active ul.tags');
-            this.$infoBox.find('.filters-result-count span.filters-result-count-number').html(this.collection.length);
+            this.$infoBox.find('.filters-result-count span.filters-result-count-number').html(this.collection.foundPosts);
             if(this.$infoBox.find('.filters-active').hasClass('is-empty')){
                 this.$infoBox.find('.filters-active').removeClass('is-empty');
             }
@@ -228,6 +235,7 @@
                            _.each(f, function(v){
                                if(v === $(this).val()){
                                    $(this).prop('checked', false);
+                                   $(this).removeAttr('checked');
                                }
                            }, this);
                         });
@@ -289,13 +297,15 @@
             if(!this.checked.hasOwnProperty(type)){
                 this.checked[type] = [];
             }
-
             $.pushIfNotExists(this.checked[type], queryObj, function(e){
                 return e.value === queryObj.value;
             });
 
-            if("undefined" !== this[type]){
+            if(!_.isUndefined(this[type])){
                 this.filterActive = this[type](queryObj, inputQuery);
+                _.extend(this.query, this.filterActive);
+            }else{
+                this.filterActive = this.custom(queryObj, inputQuery, type);
                 _.extend(this.query, this.filterActive);
             }
 
@@ -318,6 +328,15 @@
                 }
             }, this);
             return inputQuery
+        },
+
+        custom: function(queryObj, inputQuery, type){
+            _.each(this.checked[type], function(obj, key){
+                if(inputQuery.hasOwnProperty('tax_query')){
+                    inputQuery['tax_query'][0]['terms'].push(obj.value);
+                }
+            }, this);
+            return inputQuery;
         }
     });
 

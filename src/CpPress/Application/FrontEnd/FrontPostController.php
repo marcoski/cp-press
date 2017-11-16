@@ -83,7 +83,10 @@ class FrontPostController extends WPController{
 			$i++;
 		}
 		$this->wpQuery->reset_postdata();
-		return new JsonResponse($this->filter->apply('cppress_search_posts', $posts));
+		return new JsonResponse(array(
+		    'posts' => $this->filter->apply('cppress_search_posts', $posts),
+            'total' => $this->wpQuery->found_posts
+        ));
 	}
 
 	public function xhr_paginate(){
