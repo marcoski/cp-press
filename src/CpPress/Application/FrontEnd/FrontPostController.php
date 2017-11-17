@@ -64,7 +64,6 @@ class FrontPostController extends WPController{
 
 
 	public function xhr_search(){
-		$posts = array();
 		$queryArgs = $this->request->getParam('query');
 		$this->wpQuery->setLoop($queryArgs);
 		$i=0;

@@ -68,7 +68,7 @@
                 this.classes = options.classes;
             }
 
-            if(_.isUndefined(options.template)){
+            if(_.isNull(options.template)){
                 if($('#search-item-template').length > 0){
                     this.template = _.template($('#search-item-template').html());
                 }

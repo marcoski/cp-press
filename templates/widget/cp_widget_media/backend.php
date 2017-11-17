@@ -3,7 +3,7 @@
 	<div class="cp-widget-section cp-widget-section-show">
 		<?= $media ?>
 		<div class="cp-widget-field cp-widget-input">
-			<label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
+            <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
 			<?php echo $template->inc('/templates/widget/widget-parts/wtitle',
 				array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 		</div>
