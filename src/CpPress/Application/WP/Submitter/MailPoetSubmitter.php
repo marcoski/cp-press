@@ -17,7 +17,12 @@ class MailPoetSubmitter extends Submitter{
 		$list = intval($this->request->getParam('_cppress_mailpoet-list', 1));
 		$submit = 'submit' . $type;
 
-		return $this->$submit($id, $list);
+		try{
+            return $this->$submit($id, $list);
+        }catch (\Exception $e){
+		    pr($e->getTraceAsString());
+		    return;
+        }
 	}
 
 	protected function submitDefault($id, $list){
@@ -67,6 +72,9 @@ class MailPoetSubmitter extends Submitter{
 			'user_list' => array('list_ids' => array($list))
 		);
 
+        if(!class_exists('WYSIJA')){
+            throw new \Exception('No class WYSIJA found');
+        }
 		$helperUser = \WYSIJA::get('user', 'helper');
 		$helperUser->addSubscriber($dataSubscriber);
 

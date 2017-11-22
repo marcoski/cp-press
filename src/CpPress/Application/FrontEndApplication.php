@@ -4,12 +4,14 @@ namespace CpPress\Application;
 use Closure;
 use \Commonhelp\WP\WPApplication;
 use CpPress\Application\FrontEnd\FrontFilterController;
+use CpPress\Application\FrontEnd\FrontMailPoet3Controller;
 use CpPress\Application\FrontEnd\FrontPageController;
 use CpPress\Application\FrontEnd\FrontSliderController;
 use CpPress\Application\FrontEnd\FrontPostController;
 use CpPress\Application\FrontEnd\FrontEventController;
 use CpPress\Application\WP\Hook\FrontEndHook;
 use CpPress\Application\WP\Hook\FrontEndFilter;
+use CpPress\Application\WP\Submitter\MailPoet3Submitter;
 use CpPress\CpPress;
 use CpPress\Application\WP\Query\Query;
 use CpPress\Application\FrontEnd\FrontBreadcrumbController;
@@ -164,10 +166,20 @@ class FrontEndApplication extends CpPressApplication{
 			$mailPoetController = new FrontMailPoetController('MailPoetApp', $c->query('Request'), array($this->themeRoot), $filter);
 			return $mailPoetController;
 		});
+
+		$container->registerService('MailPoet3', function($c){
+		    $filter = $c->query('FrontEndFilter');
+		    return new FrontMailPoet3Controller('MailPoet3App', $c->query('Request'), array($this->themeRoot), $filter);
+        });
+
 		$container->registerService('MailPoetSubmitter', function($c){
 			$request = $c->query('Request');
 			return new MailPoetSubmitter($request, $c->query('FrontEndFilter'), $c->query('FrontEndHook'));
 		});
+
+		$container->registerService('MailPoet3Submitter', function($c){
+		    return new MailPoet3Submitter($c->query('Request'), $c->query('FrontEndFilter'), $c->query('FrontEndHook'));
+        });
 	}
 	
 	public function setWPPost($post){
@@ -185,8 +197,13 @@ class FrontEndApplication extends CpPressApplication{
 		$hookObj->create('cppress_frontend_setup');
 		$request = $this->container->query('Request');
 		if(!is_null($request->getParam('_cppress-mailpoet'))){
-			self::$formResult['cppress-mailpoet'] = 
-				json_decode(FrontEndApplication::part('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter'))), true);
+		    if($request->getParam('_cppress-mailpoet-version') == 3){
+		        self::$formResult['cppress-mailpoet'] =
+                    json_decode(FrontEndApplication::part('MailPoet3', 'submit', $container, array($container->query('MailPoet3Submitter'))), true);
+            }else{
+                self::$formResult['cppress-mailpoet'] =
+                    json_decode(FrontEndApplication::part('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter'))), true);
+            }
 		}
 	}
 	
@@ -200,8 +217,16 @@ class FrontEndApplication extends CpPressApplication{
 			return $widget['widget']->widget(array(), $widget['data']);
 		});
 		$hookObj->registerFrontEnd('cppress_mailpoet_ajax', function() use ($container){
-			self::main('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter')));
+		    $request = $container->query('Request');
+		    if($request->getParam('_cppress-mailpoet-version') === 3){
+                self::main('MailPoet3', 'submit', $container, array($container->query('MailPoet3Submitter')));
+            }else{
+                self::main('MailPoet', 'submit', $container, array($container->query('MailPoetSubmitter')));
+            }
 		});
+		$hookObj->registerFrontEnd('cppress_mailpoet3_ajax', function() use ($container){
+		    self::main('MailPoet3', 'submit', $container, array($container->query('MailPoet3Submitter')));
+        });
 		$hookObj->registerFrontEnd('cppress_loop_loadmore', function() use($container){
 			self::main('Post', 'loop_loadmore', $container);
 		});

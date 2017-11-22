@@ -3,6 +3,7 @@ namespace CpPress\Application;
 
 use Closure;
 use \Commonhelp\WP\WPApplication;
+use CpPress\Application\WP\Shortcode\MailPoet3ShortcodeManager;
 use CpPress\Application\WP\Theme\Sidebar;
 use CpPress\Application\WP\Theme\Menu;
 use Commonhelp\Util\Inflector;
@@ -54,9 +55,11 @@ abstract class CpPressApplication extends WPApplication{
 			return new ContactFormShortcodeManager($c);
 		});
 		$container->registerService('MailPoetShortcodeManager', function($c){
-			if(class_exists('WYSIJA')){
+		    if(class_exists('WYSIJA')){
 				return new MailPoetShortcodeManager($c);
-			}
+			}else if(defined('MAILPOET_VERSION')){
+		        return new MailPoet3ShortcodeManager($c);
+            }
 			
 			return null;
 		});

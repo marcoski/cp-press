@@ -65,6 +65,7 @@ class FrontMailPoetController extends WPController{
 				}
 				$this->setTemplateDirs(array(get_template_directory().'/', get_stylesheet_directory().'/'));
 			}
+
 			return new WPTemplateResponse($this, $template);
 		}
 
@@ -74,6 +75,7 @@ class FrontMailPoetController extends WPController{
 	private function hiddenFields($id, $type, $submit, $list=null){
 		$hiddenFields = array(
 			'_cppress-mailpoet' => 1,
+			'_cppress-mailpoet-version' => 2,
 			'_wpnonce' => wp_create_nonce('cppress-mailpoet'),
 			'_cppress-mailpoet-id' => $id,
 			'_cppress-mailpoet_type' => $type
