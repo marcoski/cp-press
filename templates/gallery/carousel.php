@@ -33,6 +33,7 @@
 			$item = $items[$i];
 			$active = ''; if($i==0){ $active = 'active'; }
 			if($options['tperrow'] > 1){
+			    $itemClassArray = [];
 				echo '<div class="item '. $active . '">';
 			}else{
 				$itemClassArray = array('item', $active);
@@ -40,7 +41,7 @@
 			/**
 			 * SLIDE CONTENT MARKUP START
 			 */
-			echo '<figure class="'.implode(' ', $itemClassArray).'">';
+            echo '<figure class="'.implode(' ', $itemClassArray).'">';
 			if(!$item['isvideo']){
 				$imgClassArray[] = 'img-responsive';
 				$imageClasses = $filter->apply('cppress_widget_gallery_item_classes', $imgClassArray, $item, $options);

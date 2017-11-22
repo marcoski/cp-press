@@ -19,16 +19,19 @@
 <div class="cp-widget-field cp-widget-type-section ">
 	<label class="section"><?php _e('Design and Layout', 'cppress')?></label>
 	<div class="cp-widget-section cp-widget-section-hide">
-	 <!-- <div class="cp-widget-field cp-widget-input">
+	    <div class="cp-widget-field cp-widget-input">
 		  <label for="<?= $widget->get_field_id( 'btheme' ); ?>"><?php _e('Button theme', 'cppress')?>:</label>
 		  <select 
 		  	id="<?= $widget->get_field_id( 'btheme' ); ?>"
 		  	name="<?= $widget->get_field_name( 'btheme' ); ?>">
-					<option value="atom" <?php selected($instance['btheme'], 'atom'); ?>><?php _e('Atom', 'cppress') ?></option>
-					<option value="flat" <?php selected($instance['btheme'], 'flat'); ?>><?php _e('Flat', 'cppress') ?></option>
-					<option value="wire" <?php selected($instance['btheme'], 'wire'); ?>><?php _e('Wire', 'cppress') ?></option>
+					<option value="btn-default" <?php selected($instance['btheme'], 'btn-default'); ?>><?php _e('Default', 'cppress') ?></option>
+					<option value="btn-primary" <?php selected($instance['btheme'], 'btn-primary'); ?>><?php _e('Primary', 'cppress') ?></option>
+					<option value="btn-success" <?php selected($instance['btheme'], 'btn-success'); ?>><?php _e('Success', 'cppress') ?></option>
+                    <option value="btn-info" <?php selected($instance['btheme'], 'btn-info'); ?>><?php _e('Info', 'cppress') ?></option>
+                    <option value="btn-warning" <?php selected($instance['btheme'], 'btn-warning'); ?>><?php _e('Warning', 'cppress') ?></option>
+                    <option value="btn-danger" <?php selected($instance['btheme'], 'btn-danger'); ?>><?php _e('Danger', 'cppress') ?></option>
 			</select>
-		</div> -->
+		</div>
 		<div class="cp-widget-field cp-widget-field-color">
 			<label for="<?= $id ?>_icolor"><?php _e('Button color', 'cppress')?>:</label>
 			<input class="wp-color-picker" 

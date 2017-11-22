@@ -3,7 +3,12 @@
 	$containerClasses = $filter->apply('cppress_widget_button_container_classes', 
 			array('cp-widget-button-container', 'text-'.$instance['align']), $instance['wtitle']);
 	echo '<div class="' . implode(' ', $containerClasses) . '">';
-	$defaultBtnClasses = array('btn', 'btn-default');
+	$defaultBtnClasses = array('btn');
+	if(isset($instance['btheme']) && $instance['btheme'] !== ''){
+	    $defaultBtnClasses[] = $instance['btheme'];
+    }else{
+	    $defaultBtnClasses[] = 'btn-default';
+    }
 	if(isset($instance['hovereffects']) && $instance['hovereffects']){
 		$defaultBtnClasses[] = 'btn-hover';
 	}

@@ -28,7 +28,11 @@ if($isVideo && $template_theme->issetTemplate($templateName)){
 		if(isset($instance['showcaption']) && $instance['showcaption']){
 			$figCapClasses = $filter->apply('cppress_widget_media_figurecaption_classes', array('figure-caption'), $instance['wtitle'], $instance);
 			$figCapText = $filter->apply('cppress_widget_media_figurecaption_text', $instance['alttext'], $instance['wtitle'], $instance);
-			echo '<figcaption class="' . implode(' ', $figCapClasses) . '">'.$figCapText.'</figcaption>';
+			echo $filter->apply(
+			    'cppress_widget_media_figcaption',
+                '<figcaption class="' . implode(' ', $figCapClasses) . '">'.$figCapText.'</figcaption>',
+                $instance
+            );
 		}
 		echo '</figure>';
 		if($instance['desturi'] !== ''){

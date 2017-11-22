@@ -1,7 +1,7 @@
 <div class="cp-widget-field cp-widget-input">
   <label for="<?= $widget->get_field_id( 'wtitle' ); ?>"><?php _e('Title', 'cppress')?>:</label>
   <?php echo $template->inc('/templates/widget/widget-parts/wtitle', 
-  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>s
+  		array('widget' => $widget, 'instance' => $instance, 'filter' => $filter)); ?>
 </div>
 <?= $post_list ?>
 <?= $icon ?>

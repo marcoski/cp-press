@@ -427,14 +427,7 @@
           if(obj.post_title === ''){
               obj.post_title = '&nbsp;';
           }
-
-          var title;
-          if(obj.post_title.length > 30){
-              title = obj.post_title.substring(0, 30) + '...';
-          }else{
-              title = obj.post_title;
-          }
-
+          var title = obj.post_title;
           this.$ul.append(
               $('<li>')
                   .addClass('post')

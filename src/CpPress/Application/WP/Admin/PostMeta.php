@@ -29,7 +29,7 @@ class PostMeta{
 	}
 	
 	public function _findAll(){
-		$metas = get_post_meta($id);
+		$metas = get_post_meta($this->postId);
 		$toReturn = array();
 		foreach($metas as $key => $meta){
 			foreach($meta as $k => $v){
@@ -49,7 +49,49 @@ class PostMeta{
 			
 		}
 		
-		return self::$instances[$id]->_findAll($id);
+		return self::$instances[$id]->_findAll();
 	}
+
+	public function _add($key, $value)
+    {
+        return add_post_meta($this->postId, $key, $value);
+    }
+
+    public static function add($id, $key, $value)
+    {
+        if(!isset(self::$instances[$id])){
+            self::$instances[$id] = new static($id);
+        }
+
+        return self::$instances[$id]->_add($key, $value);
+    }
+
+	public function _delete($key)
+    {
+        return delete_post_meta($this->postId, $key);
+    }
+
+    public static function delete($id, $key)
+    {
+        if(!isset(self::$instances[$id])){
+            self::$instances[$id] = new static($id);
+        }
+
+        return self::$instances[$id]->_delete($key);
+    }
+
+    public function _update($key, $value)
+    {
+        return update_post_meta($this->postId, $key);
+    }
+
+    public static function update($id, $key, $value)
+    {
+        if(!isset(self::$instances[$id])){
+            self::$instances[$id] = new static($id);
+        }
+
+        return self::$instances[$id]->_update($key, $value);
+    }
 	
 }

@@ -41,7 +41,7 @@ class CpWidgetGallery extends CpWidgetBase{
 	 * @param array $instance
 	 */
 	public function widget($args, $instance) {
-		$embed = $this->container->query('Embed');
+	    $embed = $this->container->query('Embed');
 		$gallery = array();
 		$options = array(
     	'enablelightbox' => isset($instance['enablelightbox']) ? true : false,

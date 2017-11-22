@@ -921,7 +921,7 @@ section.cp_content_type{
 
 .cp-panel-dialog .cp-rows{
   border: 0px;
-    min-height: 400px;
+    min-height: 800px;
 }
 
 .cp-rows .cp-grid, .cp-rows-inside .cp-grid-inside{
@@ -1678,7 +1678,7 @@ table.cp-link tr.cp-link textarea {
   position: absolute;
   top: 0;
   right: 0px;
-  width: 360px;
+  width: 660px;
   z-index: 10;
   border: 1px solid #c0c0c0;
   background: #F6F6F6;
@@ -1726,7 +1726,6 @@ table.cp-link tr.cp-link textarea {
 .cp-widget-field-type-link .existing-content-selector .posts li span {
   font-size: 0.9em;
   display: inline-block;
-  float: right;
   color: #999;
   margin-left: 10px;
 }

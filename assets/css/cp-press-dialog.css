@@ -291,7 +291,6 @@
 .cp-panel-dialog .cp-row-preview{
 	margin: 0 -6px;
 	position: relative;
-	white-space: nowrap;
 }
 
 .cp-panel-dialog .cp-row-preview div.cp-row-list div.cp-row-widget{
