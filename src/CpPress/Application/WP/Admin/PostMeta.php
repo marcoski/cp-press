@@ -82,7 +82,7 @@ class PostMeta{
 
     public function _update($key, $value)
     {
-        return update_post_meta($this->postId, $key);
+        return update_post_meta($this->postId, $key, $value);
     }
 
     public static function update($id, $key, $value)

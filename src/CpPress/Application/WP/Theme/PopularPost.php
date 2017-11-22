@@ -13,7 +13,7 @@ use CpPress\Application\WP\Query\Query;
 class PopularPost
 {
 
-    const COUNT_KEY = 'cppress_post_views_count';
+    const COUNT_KEY = '_cppress_post_views_count';
 
     /**
      * @var Hook
