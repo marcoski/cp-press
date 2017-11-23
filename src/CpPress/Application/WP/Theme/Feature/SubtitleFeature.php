@@ -40,7 +40,6 @@ class SubtitleFeature extends BaseFeature {
 
 	public function getMetaKey() {
 		return 'cp-press-page-subtitle';
-
 	}
 
 	public function render(){

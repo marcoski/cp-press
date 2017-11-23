@@ -43,7 +43,7 @@ class VideoThumbFeature extends BaseFeature
     public function render(){
         global $post;
         echo '<p> 
-			<input type="text" name="cp-viedo-thumb" class="cp-viedo-thumb" value="'.PostMeta::find($post->ID, $this->getMetaKey()).'" />
+			<input type="text" name="'.$this->getMetaKey().'" class="cp-viedo-thumb" value="'.PostMeta::find($post->ID, $this->getMetaKey()).'" />
 		</p>';
     }
 
@@ -57,5 +57,4 @@ class VideoThumbFeature extends BaseFeature
             update_post_meta($postId, $this->getMetaKey(), sanitize_text_field($request->getParam($this->getMetaKey())));
         }
     }
-
 }

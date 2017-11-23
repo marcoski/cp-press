@@ -3,6 +3,7 @@ namespace CpPress\Application\Widgets;
 
 use Commonhelp\DI\Container;
 use CpPress\Application\Widgets\Settings\CpWidgetSettings;
+use CpPress\Application\WP\Admin\PostMeta;
 use WP_Widget;
 use Commonhelp\WP\WPIController;
 use Commonhelp\Util\Inflector;
