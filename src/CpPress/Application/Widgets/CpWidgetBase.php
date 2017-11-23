@@ -256,7 +256,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
                 $description = $this->cleanUpHeaderComment($desc[1]);
             }
 
-            $template['file'] = $file;
+            $template['file'] = 'template-parts/'.$file;
             $template['title'] = $this->cleanUpHeaderComment($header[1]);
             $template['description'] = $description;
             $widgetTemplates[] = $template;
