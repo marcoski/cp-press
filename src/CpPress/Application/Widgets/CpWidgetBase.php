@@ -234,12 +234,9 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 
 	public function getWidgetTemplates()
     {
-        wp_cache_flush();
-        /** @var \WP_Theme $wpTheme */
-        $wpTheme = $this->container->get('WPTheme');
 
         $widgetTemplates = [];
-        foreach($wpTheme->get_files('php', 2) as $file => $fullPath){
+        foreach($this->getAllFiles('php') as $file => $fullPath){
             $fileContent = file_get_contents($fullPath);
             if(!preg_match('|WidgetTemplateName:(.*)$|mi', $fileContent, $header)){
                 continue;
@@ -335,5 +332,60 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 		$this->assign( 'templateName', $templateName );
 		$this->assign( 'template_theme', $template );
 	}
+
+	private function getAllFiles($type = null)
+    {
+
+        $path = get_stylesheet_directory().'/template-parts';
+        $all_files = (array) self::scandir($path);
+
+        // Filter $all_files by $type & $depth.
+        $files = array();
+        if ( $type ) {
+            $type = (array) $type;
+            $_extensions = implode( '|', $type );
+        }
+        foreach ( $all_files as $key => $file ) {
+            if ( ! $type || preg_match( '~\.(' . $_extensions . ')$~', $file ) ) { // Filter by type.
+                $files[ $key ] = $file;
+            }
+        }
+
+        return $files;
+    }
+
+    private static function scandir($path, $extensions = null) {
+        if ( ! is_dir( $path ) ) {
+            return false;
+        }
+
+        if ( $extensions ) {
+            $extensions = (array) $extensions;
+            $_extensions = implode( '|', $extensions );
+        }
+
+        $results = scandir( $path );
+        $files = array();
+
+        /**
+         * Filters the array of excluded directories and files while scanning theme folder.
+         *
+         * @since 4.7.4
+         *
+         * @param array $exclusions Array of excluded directories and files.
+         */
+        $exclusions = (array) apply_filters( 'theme_scandir_exclusions', array( 'CVS', 'node_modules', 'vendor', 'bower_components' ) );
+
+        foreach ($results as $result){
+            if ( '.' == $result[0] || in_array( $result, $exclusions, true ) ) {
+                continue;
+            }
+            if (!$extensions || preg_match( '~\.(' . $_extensions . ')$~', $result ) ) {
+                $files[ $result ] = $path . '/' . $result;
+            }
+        }
+
+        return $files;
+    }
 
 }
