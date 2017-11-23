@@ -234,6 +234,7 @@ abstract class CpWidgetBase extends WP_Widget implements WPIController {
 
 	public function getWidgetTemplates()
     {
+        wp_cache_flush();
         /** @var \WP_Theme $wpTheme */
         $wpTheme = $this->container->get('WPTheme');
 

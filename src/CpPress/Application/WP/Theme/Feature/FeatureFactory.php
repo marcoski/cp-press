@@ -54,4 +54,14 @@ class FeatureFactory implements ServiceProviderInterface {
 		return $multithumb;
 	}
 
+	public static function videothumb(ContainerInterface $container, array $options = array()){
+	    $videoThumb = new VideoThumbFeature(
+	        $container->query('BackEndHook'),
+            $container->query('BackEndFilter'),
+            $container->query('WPScripts'),
+            $container->query('WPStyles'), $container, $options);
+	    $videoThumb->hooks();
+	    return $videoThumb;
+    }
+
 }
