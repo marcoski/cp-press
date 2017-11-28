@@ -3,6 +3,7 @@ namespace CpPress\Application\WP\Hook;
 
 use Commonhelp\WP\WPContainer;
 use CpPress\Application\CpPressApplication;
+use CpPress\Application\WP\Asset\Scripts;
 use CpPress\Application\WP\Theme\Feature\FeatureFactory;
 use CpPress\Application\WP\Admin\MetaBox;
 use CpPress\Application\BackEndApplication;
@@ -102,6 +103,12 @@ class BackEndHook extends Hook{
 		
 		$this->register('admin_enqueue_scripts', function($page){
 			if(BackEndApplication::isAlowedPage($page)){
+                $gApiKey = '';
+                if(get_option('cppress-options-apikey')){
+                    $apiKeyOptions = get_option('cppress-options-apikey');
+                    $gApiKey = $apiKeyOptions['google-api-key'];
+                }
+			    /** @var Scripts $scripts */
 				$scripts = $this->app->getScripts();
 				$styles = $this->app->getStyles();
 				wp_enqueue_media();
@@ -118,6 +125,7 @@ class BackEndHook extends Hook{
 				$scripts->enqueue('wp-color-picker');
 				$styles->enqueue('wp-color-picker');
 				$scripts->enqueue('cp-press-event-admin');
+				wp_localize_script('cp-press-event-admin', 'settings', ['gApiKey' => $gApiKey]);
 				$scripts->enqueue('cp-press-settings-admin');
 				$scripts->enqueue('cp-press-select2');
 				$scripts->enqueue('ace-editor/ace');

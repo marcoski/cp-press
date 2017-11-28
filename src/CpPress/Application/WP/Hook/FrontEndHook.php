@@ -62,7 +62,15 @@ class FrontEndHook extends Hook{
 		});
 
 		$this->register('wp_head', function(){
-			echo '<script type="text/javascript">var ajaxurl="'.admin_url('admin-ajax.php').'";</script>';
+		    $gApiKey = '';
+		    if(get_option('cppress-options-apikey')){
+		        $apiKeyOptions = get_option('cppress-options-apikey');
+		        $gApiKey = $apiKeyOptions['google-api-key'];
+            }
+			echo '<script type="text/javascript">
+                    var ajaxurl="'.admin_url('admin-ajax.php').'";
+                    var gMapApiKey="'.$gApiKey.'";
+                  </script>';
 		});
 	}
 	

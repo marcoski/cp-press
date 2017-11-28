@@ -81,7 +81,7 @@ class Scripts implements Asset{
 	}
 	
 	public function inline($asset, $data){
-		throw new CpPressException('inline method is not available for Scripts');
+		return wp_add_inline_script($asset, $data);
 	}
 	
 	

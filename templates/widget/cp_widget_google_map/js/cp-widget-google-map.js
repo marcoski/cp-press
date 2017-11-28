@@ -203,8 +203,12 @@ jQuery(function ($) {
     if (window.google && window.google.maps) {
         new CpGoogleMap($).loadMaps();
     } else {
-        var apiUrl = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=cpGoogleMapInitialize';
-        var script = $('<script type="text/javascript" src="' + apiUrl + '">');
-        $('body').append(script);
+      if(_.isUndefined(gMapApiKey)){
+        gMapApiKey = '';
+      }
+      var apiUrl = 'https://maps.googleapis.com/maps/api/js?key='+gMapApiKey+'&callback=cpGoogleMapInitialize';
+      var script = $('<script type="text/javascript" src="' + apiUrl + '">');
+
+      $('body').append(script);
     }
 });

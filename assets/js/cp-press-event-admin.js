@@ -36,7 +36,11 @@ jQuery(document).ready(function(){
 			$('#cpevent-location-data').show();
 		}
 	}).trigger('change');
-	$('#cpevent-map').cpgmaps();
+	var gApiKey = '';
+	if(!_.isUndefined(settings) && settings.hasOwnProperty('gApiKey')){
+		gApiKey = settings.gApiKey;
+	}
+	$('#cpevent-map').cpgmaps(gApiKey);
 	$(document).on('cp_press_refresh_content_types', function(){
 		$('.cpevent-selectview').bind('change', events.event_view);
 	});
@@ -44,7 +48,11 @@ jQuery(document).ready(function(){
 });
 
 function cp_google_maps(){
-	jQuery('#cpevent-map').cpgmaps();
+    var gApiKey = '';
+    if(!_.isUndefined(settings) && settings.hasOwnProperty('gApiKey')){
+        gApiKey = settings.gApiKey;
+    }
+	jQuery('#cpevent-map').cpgmaps(gApiKey);
 }
 
 (function($){
@@ -360,14 +368,14 @@ function cp_google_maps(){
 	
 	
 	
-	$.fn.cpgmaps = function(){
+	$.fn.cpgmaps = function(key){
 			return this.each(function ()
 		{
 			if ( typeof google !== 'object' || typeof google.maps !== 'object' ){ 
 				var script = document.createElement("script");
 				script.type = "text/javascript";
 				var proto = 'https:';
-				script.src = proto + '//maps.google.com/maps/api/js?v=3.12&sensor=false&libraries=places&callback=cp_google_maps';
+				script.src = proto + '//maps.google.com/maps/api/js?key='+key+'&libraries=places&callback=cp_google_maps';
 				document.body.appendChild(script);
 			}else{
 				var gmaps = new CpGMaps(this);
