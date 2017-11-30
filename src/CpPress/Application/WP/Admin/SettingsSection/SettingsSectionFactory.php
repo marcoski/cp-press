@@ -3,7 +3,9 @@ namespace CpPress\Application\WP\Admin\SettingsSection;
 
 use CpPress\Application\Widgets\Settings\WidgetSection;
 use CpPress\Application\Widgets\Settings\WidgetsSettingsFieldFactory;
+use CpPress\Application\WP\Admin\SettingsField\ApiKeysFieldFactory;
 use CpPress\Application\WP\Admin\SettingsField\Field\BaseField;
+use CpPress\Application\WP\Admin\SettingsSection\Section\ApiKeysSection;
 use CpPress\Application\WP\Admin\SettingsSection\Section\GeneralSection;
 use CpPress\Application\WP\Admin\SettingsSection\Section\AttachmentSection;
 use CpPress\Exception\SettingsException;
@@ -22,6 +24,7 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 	
 	public function create(){
 		$attachmentSection = new AttachmentSection(new AttachmentSettingsFieldFactory());
+		$apiKeySection = new ApiKeysSection(new ApiKeysFieldFactory());
 		
 		$this->sections = array(
 			'cppress-options-general' => $this->createGeneralSection(),
@@ -29,7 +32,12 @@ class SettingsSectionFactory implements SettingsSectionFactoryInterface{
 				$attachmentSection->setId('cppress-options-attachment')
 				->setTitle(__('Attachment Settings', 'cppress'))
 				->setPage('cppress-options-attachment'),
-			'cppress-options-ldap' => $this->createLdapSection()
+			'cppress-options-ldap' => $this->createLdapSection(),
+            'cppress-options-apikey' =>
+                $apiKeySection->setId('cppress-options-apikey')
+                    ->setTitle(__('Api Keys Settings', 'cppress'))
+                    ->setPage('cppress-options-apikey')
+
 		);
 		
 		$this->add();

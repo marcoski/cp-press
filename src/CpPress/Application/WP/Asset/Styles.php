@@ -64,7 +64,7 @@ class Styles implements Asset{
 	}
 	
 	public function inline($asset, $data){
-		return wp_add_inline_style( $handle, $data );
+		return wp_add_inline_style( $asset, $data );
 	}
 	
 }
