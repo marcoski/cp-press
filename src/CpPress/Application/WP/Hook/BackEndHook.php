@@ -30,6 +30,7 @@ class BackEndHook extends Hook{
 		$this->register('admin_init', function(){
 		    $this->app->registerFilesystem();
 			$this->app->registerBackEndAjax();
+			$this->setCapRoles();
 			$container = $this->app->getContainer();
 			$pagePostType = $container->query('PagePostType');
 			$pagePostType->removeSupport('editor');
@@ -141,6 +142,35 @@ class BackEndHook extends Hook{
 			}
 		});
 	}
+
+	private function setCapRoles()
+    {
+        $roles = ['event_manager', 'editor', 'administrator'];
+        foreach($roles as $roleString){
+            /** @var \WP_Role $role */
+            $role = get_role($roleString);
+            $role->add_cap('read');
+            $role->add_cap('read_event');
+            $role->add_cap('read_private_events');
+            $role->add_cap('edit_event');
+            $role->add_cap('edit_events');
+            $role->add_cap('edit_published_events');
+            $role->add_cap('publish_events');
+            $role->add_cap('delete_private_events');
+            $role->add_cap('delete_published_events');
+
+            if($roleString !== 'event_manager'){
+                $role->add_cap('delete_events');
+                $role->add_cap('delete_others_events');
+                $role->add_cap('edit_others_events');
+            }else{
+                $role->remove_cap('delete_others_events');
+                $role->remove_cap('edit_others_events');
+            }
+        }
+
+        //dump($GLOBALS['wp_post_types']['event']);
+    }
 
 	private function featureFactory(){
 		/** @var WPContainer $container */

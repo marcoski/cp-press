@@ -22,6 +22,7 @@ class CpPress{
 	public static function start(){
 		if(is_admin() && !isset($_POST['_cppress_front_ajax']) && !isset($_GET['_front_ajax'])){
 			self::$App = new BackEndApplication();
+			self::$App->addRoles();
 			self::$App->registerHook('init', function(){
 				self::$App->setup();
 			});
@@ -39,6 +40,7 @@ class CpPress{
 			    remove_action('wp_head', '_admin_bar_bump_cb');
 			});
 			self::$App = new FrontEndApplication();
+			self::$App->addRoles();
 			self::$App->registerHooks();
 			self::$App->execHooks();
 			self::$App->registerFilters();

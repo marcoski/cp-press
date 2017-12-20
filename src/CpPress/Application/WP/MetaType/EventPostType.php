@@ -24,6 +24,8 @@ class EventPostType extends PostType{
 		$this->setPublic(true);
 		$this->setHasArchive(false);
 		$this->setTaxonomies(array());
+		$this->setCapabilityType(array('event', 'events'));
+		$this->setMapMetaCap(true);
 		$this->setSupports(array('title', 'editor', 'thumbnail', 'excerpt'));
 		$this->setMenuIcon('dashicons-calendar');
 		

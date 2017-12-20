@@ -124,6 +124,7 @@ abstract class CpPressApplication extends WPApplication{
 		//init styles and scripts global
 		$wp_styles = $this->getStyles();
 		$wp_scripts = $this->getScripts();*/
+
 		$container = $this->getContainer();
 		$container->query('EventPostType')->register();
 		$container->query('CalendarTaxonomy')->register();
@@ -165,6 +166,17 @@ abstract class CpPressApplication extends WPApplication{
 			return new PostPostType();
 		});
 	}
+
+	public function addRoles()
+    {
+        add_role('event_manager', __('Event Manager', 'cppress'), [
+            'read' => true,
+            'edit_posts' => false,
+            'delete_posts' => false,
+            'publish_posts' => false,
+            'upload_files' => true
+        ]);
+    }
 	
 	abstract public function registerHooks();
 	abstract public function registerHook($hook, Closure $closure, $priority=10, $acceptedArgs=1);
