@@ -51,6 +51,7 @@ class FrontMailPoetController extends WPController{
 		$formModel = \WYSIJA::get('forms', 'model');
 		$form = $formModel->getOne(array('form_id' => $atts['id']));
 		if(!empty($form)){
+			$this->assign('form', unserialize(base64_decode($form['data'])));
 			$this->hiddenFields($atts['id'], $atts['type'], $atts['submit'], $atts['list']);
 			$this->assign('mailpoetConfig', \WYSIJA::get('config', 'model'));
 			$this->assign('id', $atts['id']);
